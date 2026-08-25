@@ -24,7 +24,7 @@ BM.renderLogin = function () {
 
   const hero = el("div", "login-hero");
   hero.appendChild(el("div", "login-logo", '<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="5" y="22" width="6" height="14" rx="2" fill="currentColor" opacity="0.55"/><rect x="14" y="14" width="6" height="22" rx="2" fill="currentColor" opacity="0.7"/><rect x="23" y="8" width="6" height="28" rx="2" fill="currentColor"/><polyline points="8,18 17,10 26,4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/></svg>'));
-  hero.appendChild(el("div", "login-title", "AI 行政预算智能管理平台"));
+  hero.appendChild(el("div", "login-title", "三安光电 AI 费用预决算管理系统"));
   hero.appendChild(el("div", "login-sub", "手机版 · 四角色演示"));
   root.appendChild(hero);
 
