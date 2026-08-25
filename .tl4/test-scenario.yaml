@@ -1,0 +1,14 @@
+schema_version: "1.0"
+scenario:
+  id: SCN-REPLACE-ME
+  name: Replace Me
+  system: replace-me
+preconditions: []
+steps: []
+expected:
+  required_events: []
+  forbidden_events: []
+  final_status: ""
+assertions: []
+cleanup: []
+

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1e2a4a" />
+    <meta
+      name="description"
+      content="AI 行政预算智能管理平台 · 交互式产品 Demo v0.4"
+    />
+    <title>AI 行政预算智能管理平台 · DEMO</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/components.css" />
+    <link rel="stylesheet" href="styles/v02.css" />
+    <link rel="stylesheet" href="styles/v04.css" />
+    <link rel="stylesheet" href="styles/views.css" />
+  </head>
+  <body>
+    <!-- 登录页 -->
+    <div id="loginRoot" class="login-root"></div>
+
+    <!-- 主界面 -->
+    <div id="appRoot" class="app-root" style="display: none; flex-direction: column; height: 100%">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark"><svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="5" y="22" width="6" height="14" rx="2" fill="currentColor" opacity="0.55"/><rect x="14" y="14" width="6" height="22" rx="2" fill="currentColor" opacity="0.7"/><rect x="23" y="8" width="6" height="28" rx="2" fill="currentColor"/><polyline points="8,18 17,10 26,4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/></svg></div>
+          <div class="brand-text">
+            <div class="brand-title">AI 行政预算智能管理平台</div>
+            <div class="brand-sub">Administrative Budget Intelligence Platform</div>
+          </div>
+        </div>
+        <nav class="quicknav" id="quicknav"></nav>
+        <div class="topbar-right">
+          <button class="btn btn-ghost bell-btn" id="bellBtn" title="消息通知">
+            <span class="bell-ico">🔔</span><span class="bell-badge" id="bellBadge" hidden>0</span>
+          </button>
+          <span class="role-label" id="roleLabel">未登录</span>
+          <button class="btn btn-ghost" id="switchRoleBtn">切换角色</button>
+          <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+          <button class="btn btn-ghost" id="resetBtn">重置 Demo</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <!-- 左侧：AI Copilot 常驻 -->
+        <section class="copilot-panel">
+          <div class="copilot-head">
+            <div class="copilot-head-info">
+              <div class="copilot-title">AI Budget Copilot</div>
+              <div class="copilot-sub">对话式智能预算助手 · 所有结论均可追溯证据</div>
+            </div>
+          </div>
+          <div class="chat" id="chat"></div>
+          <div class="composer">
+            <textarea
+              id="chatInput"
+              rows="1"
+              placeholder="直接提问，例如：哪个部门今年最容易超预算？"
+              autocomplete="off"
+            ></textarea>
+            <button class="btn btn-primary" id="sendBtn">发送</button>
+          </div>
+        </section>
+
+        <!-- 右侧：工作台内容区 -->
+        <section class="view-panel" id="viewPanel"></section>
+      </main>
+    </div>
+
+    <div id="modalRoot"></div>
+    <div class="toast-stack" id="toastRoot" aria-live="polite"></div>
+
+    <script src="data/data.js"></script>
+    <script src="core/state.js"></script>
+    <script src="core/engine.js"></script>
+    <script src="core/calc.js"></script>
+    <script src="views/copilot.js"></script>
+    <script src="views/dashboard.js"></script>
+    <script src="views/details.js"></script>
+    <script src="views/approval.js"></script>
+    <script src="views/decisions.js"></script>
+    <script src="views/projects.js"></script>
+    <script src="views/adjust.js"></script>
+    <script src="views/rules.js"></script>
+    <script src="views/basedata.js"></script>
+    <script src="views/orgchart.js"></script>
+    <script src="views/login.js"></script>
+    <script src="views/roleSwitch.js"></script>
+    <script src="views/workbench.js"></script>
+    <script src="views/plan.js"></script>
+    <script src="views/track.js"></script>
+    <script src="views/final.js"></script>
+    <script src="views/benchmark.js"></script>
+    <script src="views/collision.js"></script>
+    <script src="views/collision-tune.js"></script>
+    <script src="views/tune.js"></script>
+    <script src="views/compile.js"></script>
+    <script src="views/monthly-split.js"></script>
+    <script src="views/unit-inbox.js"></script>
+    <script src="views/unit-summary.js"></script>
+    <script src="views/final-risk.js"></script>
+    <script src="views/org.js"></script>
+    <script src="views/accounts.js"></script>
+    <script src="views/import-view.js"></script>
+    <script src="views/risk-view.js"></script>
+    <script src="views/kanban.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

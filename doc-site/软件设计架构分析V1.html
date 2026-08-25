@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>软件设计架构分析V1</title>
+<style>
+:root{--bg:#ffffff;--fg:#1f2328;--muted:#57606a;--line:#d8dee4;--accent:#0969da;--code-bg:#f6f8fa;--quote:#fff8c5;--table-head:#f6f8fa;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.75;font-size:16px;}
+.wrap{max-width:1080px;margin:0 auto;padding:40px 28px 80px;}
+h1,h2,h3,h4{line-height:1.3;font-weight:700;margin-top:2em;}
+h1{font-size:30px;border-bottom:3px solid var(--accent);padding-bottom:.3em;}
+h2{font-size:24px;border-bottom:1px solid var(--line);padding-bottom:.25em;}
+h3{font-size:20px;color:#24292f;}
+a{color:var(--accent);text-decoration:none;}
+blockquote{background:var(--quote);border-left:4px solid #d4a72c;margin:1em 0;padding:.6em 1em;color:#3d2c00;}
+code{background:var(--code-bg);padding:.15em .4em;border-radius:4px;font-size:85%;font-family:"SFMono-Regular",Consolas,monospace;}
+pre{background:var(--code-bg);padding:14px;border-radius:8px;overflow:auto;}
+pre code{background:none;padding:0;font-size:13px;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:14.5px;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:var(--table-head);font-weight:600;}
+tr:nth-child(even) td{background:#fafbfc;}
+.mermaid{background:#fafbfc;border:1px solid var(--line);border-radius:8px;padding:14px;margin:1em 0;text-align:center;}
+.note{color:var(--muted);font-size:13px;margin-bottom:2em;}
+ul,ol{padding-left:1.6em;}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+<div class="note">本文档由 <code>docs/architecture/软件设计架构分析V1.md</code> 渲染生成 · 权威源为 Markdown · 技术设计视角（产品决策见《产品设计稿 V1》）</div>
+<h1 id="ai">三安光电 AI 费用预决算管理系统</h1>
+<h2 id="v1">软件设计架构分析 V1</h2>
+<blockquote>
+<p>分析依据：需求调研稿 V1、当前桌面/移动端 Demo 设计方案 v0.5、现有 Demo 源码<br />
+分析性质：从业务需求推导目标架构，并评估当前 Demo 与目标架构的差距<br />
+当前结论：Demo 可作为交互验证层；正式系统需要补齐后端、数据治理、工作流、计算引擎、AI 证据链和审计能力。<br />
+文档定位：本文为<strong>技术设计视角</strong>，仅保留技术骨架（分层架构、ER 与字段、计算/规则/AI 边界、代码演进、非功能要求、AI 技术可行性与技术侧待确认）。产品决策（双轨、一期目标、模块产品定义、业务流程、待拍板清单）以《产品设计稿 V1》为准，本文不重复产品论述。</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 总体判断</h2>
+<h3 id="11-demo">1.1 当前 Demo 的技术形态</h3>
+<p>当前 Demo 是一个纯前端单页应用，主要特征如下：</p>
+<ul>
+<li><code>website/index.html</code> 负责页面骨架和脚本加载；</li>
+<li><code>website/app.js</code> 负责初始化、角色进入、页面路由和 Copilot 交互；</li>
+<li><code>website/data/data.js</code> 集中保存组织、角色、预算科目、单据、项目和规则模拟数据；</li>
+<li><code>website/core/state.js</code> 负责前端状态、业务操作和 <code>localStorage</code> 持久化；</li>
+<li><code>website/core/engine.js</code> 使用关键词和确定性规则模拟 AI 对话；</li>
+<li><code>website/views/</code> 按页面拆分渲染逻辑；</li>
+<li>移动端基本是独立的一套页面和脚本，复用思路多于代码复用。</li>
+</ul>
+<p>这套结构适合快速验证以下问题：</p>
+<ol>
+<li>管理者是否理解“预算总览—诊断—建议—执行”的交互路径。</li>
+<li>角色、预算编制、预算追踪、决算和 Copilot 是否形成可演示闭环。</li>
+<li>自上而下/自下而上、预算调剂和 AI 归类是否符合用户直觉。</li>
+</ol>
+<p>但它不具备正式系统所需的多租户数据隔离、多人并发、版本审计、真实接口、权限控制和可靠计算能力。</p>
+<h3 id="12">1.2 目标系统的核心架构判断</h3>
+<p>建议采用：</p>
+<blockquote>
+<p><strong>模块化单体应用 + 统一预算数据模型 + 确定性计算引擎 + AI 决策支持层 + 异步数据集成能力</strong></p>
+</blockquote>
+<p>第一阶段不建议直接采用微服务。原因是当前最重要的风险不是服务规模，而是：</p>
+<ul>
+<li>预算口径还需要客户确认；</li>
+<li>组织、科目、项目和关键事件的主数据关系尚未稳定；</li>
+<li>预算版本、争议项和压降方案需要统一事务；</li>
+<li>组织汇总、项目汇总和集团总额必须在同一套计算规则下保持一致。</li>
+</ul>
+<p>在业务模型稳定、数据量和集成量明确后，再将数据接入、AI 任务或报表查询拆分为独立服务。</p>
+<hr />
+<h2 id="2">2. 目标分层架构</h2>
+<div class="mermaid">flowchart TB
+    U[集团管理层 / 总经办 / 法人公司 / 基层责任人]
+    WEB[Web 管理端]
+    MOBILE[移动端 / 响应式端]
+    API[应用 API 与权限层]
+    WF[预算工作流与协商模块]
+    CALC[预算计算与平衡引擎]
+    AI[AI 诊断与建议编排层]
+    MASTER[主数据与组织权限模块]
+    EXEC[预算执行与决算模块]
+    INTEG[数据接入与同步模块]
+    DB[(预算业务数据库)]
+    DWH[(分析库 / 指标层)]
+    FILE[(证据与附件存储)]
+    QUEUE[异步任务队列]
+    EXT[财务 / 费控 / HR / 采购 / 合同系统]
+
+    U --&gt; WEB
+    U --&gt; MOBILE
+    WEB --&gt; API
+    MOBILE --&gt; API
+    API --&gt; WF
+    API --&gt; MASTER
+    API --&gt; EXEC
+    WF --&gt; CALC
+    WF --&gt; AI
+    EXEC --&gt; CALC
+    INTEG --&gt; EXT
+    INTEG --&gt; DB
+    INTEG --&gt; DWH
+    AI --&gt; DWH
+    AI --&gt; FILE
+    AI --&gt; QUEUE
+    WF --&gt; DB
+    MASTER --&gt; DB
+    EXEC --&gt; DB
+    CALC --&gt; DB
+    DB --&gt; DWH
+    FILE --&gt; DB
+</div>
+<h3 id="21">2.1 交互层</h3>
+<p>包括桌面 Web 和移动端/响应式端：</p>
+<ul>
+<li>集团预算总览；</li>
+<li>法人公司预算工作台；</li>
+<li>基层责任人编制和解释入口；</li>
+<li>预算争议协商工作区；</li>
+<li>AI 诊断与证据链；</li>
+<li>压降方案模拟器；</li>
+<li>执行追踪和决算复盘。</li>
+</ul>
+<p>交互层只负责展示、收集用户操作和调用 API，不应在浏览器中持有集团预算的权威状态，也不应由前端直接决定最终金额、审批结果或权限范围。</p>
+<h3 id="22">2.2 应用服务层</h3>
+<p>应用服务层负责将用户动作组织为业务用例：</p>
+<ul>
+<li>创建预算编制任务；</li>
+<li>提交法人公司预算；</li>
+<li>生成集团建议版；</li>
+<li>创建预算争议项；</li>
+<li>提交解释和证据；</li>
+<li>生成和采纳压降方案；</li>
+<li>执行预算版本调整；</li>
+<li>导入实际执行数据；</li>
+<li>形成决算差异解释；</li>
+<li>确认下一年度基线。</li>
+</ul>
+<p>应用服务层应统一处理权限、状态转换、事务、审计事件和计算触发，避免把业务规则散落在各个页面中。</p>
+<h3 id="23">2.3 领域模块层</h3>
+<p>建议按业务能力划分模块，而不是按页面划分模块：</p>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>主要职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>组织与权限</td>
+<td>集团、法人公司、部门、责任人、角色、数据范围和授权</td>
+</tr>
+<tr>
+<td>主数据</td>
+<td>费用科目、预算项目、单位、标准、供应商、合同属性</td>
+</tr>
+<tr>
+<td>预算编制</td>
+<td>编制任务、编制方式、明细、公式、依据和提交</td>
+</tr>
+<tr>
+<td>预算版本</td>
+<td>申报版、建议版、调整版、批准版及版本差异</td>
+</tr>
+<tr>
+<td>预算协商</td>
+<td>差异检测、争议项、解释、证据、协商状态和共识结果</td>
+</tr>
+<tr>
+<td>AI 诊断</td>
+<td>合理区间、异常识别、归因、建议金额和风险</td>
+</tr>
+<tr>
+<td>水分与压降</td>
+<td>潜在压降项目池、弹性属性、压降目标和方案模拟</td>
+</tr>
+<tr>
+<td>关键事件</td>
+<td>一次性/延续性事项及其对预算基线的影响</td>
+</tr>
+<tr>
+<td>执行与决算</td>
+<td>实际费用、执行率、预算偏差、差异分类和基线修正</td>
+</tr>
+<tr>
+<td>规则与指标</td>
+<td>管理标准、预算规则、指标口径和计算版本</td>
+</tr>
+<tr>
+<td>审计与证据</td>
+<td>操作记录、变更原因、附件、AI 证据和审批轨迹</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3">3. 业务域与数据关系</h2>
+<h3 id="31">3.1 推荐的核心实体关系</h3>
+<div class="mermaid">erDiagram
+    ORGANIZATION ||--o{ ORGANIZATION : contains
+    ORGANIZATION ||--o{ USER_ORG : authorizes
+    USER ||--o{ USER_ORG : belongs
+    BUDGET_CYCLE ||--o{ BUDGET_VERSION : has
+    ORGANIZATION ||--o{ BUDGET_VERSION : owns
+    BUDGET_VERSION ||--o{ BUDGET_LINE : contains
+    BUDGET_ITEM ||--o{ BUDGET_LINE : classifies
+    ORGANIZATION ||--o{ BUDGET_LINE : scopes
+    BUDGET_LINE ||--o{ BUDGET_LINE_CHANGE : changes
+    BUDGET_LINE ||--o{ DISPUTE_ITEM : triggers
+    DISPUTE_ITEM ||--o{ DISPUTE_MESSAGE : includes
+    DISPUTE_ITEM ||--o{ EVIDENCE : supports
+    BUDGET_LINE ||--o{ AI_DIAGNOSIS : analyzes
+    AI_DIAGNOSIS ||--o{ AI_EVIDENCE : cites
+    REDUCTION_TARGET ||--o{ REDUCTION_SCENARIO : has
+    REDUCTION_SCENARIO ||--o{ REDUCTION_ACTION : contains
+    REDUCTION_ACTION }o--|| BUDGET_LINE : affects
+    KEY_EVENT ||--o{ KEY_EVENT_LINK : links
+    KEY_EVENT_LINK }o--|| BUDGET_LINE : affects
+    BUDGET_LINE ||--o{ ACTUAL_TRANSACTION : compares
+    ACTUAL_TRANSACTION ||--o{ VARIANCE_EXPLANATION : explains
+</div>
+<h3 id="32">3.2 预算明细必须具备的维度</h3>
+<p>当前调研稿中的“组织 × 预算项目 × 时间 × 预算版本”是最小核心，但正式实现建议扩展为：</p>
+<blockquote>
+<p><strong>集团/法人组织 × 部门/责任单位 × 费用科目 × 预算项目 × 时间 × 预算版本 × 预算场景 × 数据口径</strong></p>
+</blockquote>
+<p>建议字段包括：</p>
+<table>
+<thead>
+<tr>
+<th>维度/字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>organization_id</code></td>
+<td>归属集团、法人公司或部门</td>
+</tr>
+<tr>
+<td><code>budget_item_id</code></td>
+<td>费用预算项目</td>
+</tr>
+<tr>
+<td><code>account_id</code></td>
+<td>财务科目或管理科目</td>
+</tr>
+<tr>
+<td><code>period</code></td>
+<td>年、季度、月；支持年度预算分解</td>
+</tr>
+<tr>
+<td><code>version_id</code></td>
+<td>预算版本，不允许直接覆盖历史版本</td>
+</tr>
+<tr>
+<td><code>scenario</code></td>
+<td>正常经营、关键事件、压降方案等</td>
+</tr>
+<tr>
+<td><code>amount</code></td>
+<td>预算金额</td>
+</tr>
+<tr>
+<td><code>quantity</code> / <code>unit_price</code></td>
+<td>数量×单价编制依据</td>
+</tr>
+<tr>
+<td><code>driver_type</code> / <code>driver_value</code></td>
+<td>人数、车辆数、面积、业务量等驱动因子</td>
+</tr>
+<tr>
+<td><code>standard_id</code></td>
+<td>人均标准、管理标准或最低保障标准</td>
+</tr>
+<tr>
+<td><code>elasticity</code></td>
+<td>刚性、替代性、延期性、合同锁定等属性</td>
+</tr>
+<tr>
+<td><code>event_id</code></td>
+<td>关联关键事件，区分一次性和持续性影响</td>
+</tr>
+<tr>
+<td><code>basis_ref</code></td>
+<td>编制依据和证据引用</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>草稿、提交、协商、批准、冻结等状态</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33">3.3 版本模型不能只做字段标记</h3>
+<p>建议采用“版本头 + 版本明细 + 变更记录”的结构：</p>
+<ul>
+<li>版本头：年度、组织、版本类型、状态、创建人、创建时间、来源版本；</li>
+<li>版本明细：每个预算项目的金额和计算依据；</li>
+<li>变更记录：旧值、新值、差额、原因、操作人、证据、关联争议项；</li>
+<li>发布快照：批准后形成不可变快照，用于执行和决算对比。</li>
+</ul>
+<p>这样才能回答“集团为什么把厦门公司车辆费从申报版调整到集团调整版的金额”“该调整依据是什么”等管理问题。</p>
+<hr />
+<h2 id="4">4. 关键业务流程的架构实现</h2>
+<h3 id="41">4.1 预算编制</h3>
+<p>建议将编制拆成“编制任务—预算草稿—校验—提交”四层：</p>
+<ol>
+<li>创建年度编制任务，指定组织、责任人、截止时间和适用规则。</li>
+<li>责任人通过历史参考、同比、标准、驱动因子或人工方式产生预算明细。</li>
+<li>计算引擎校验数量、单价、汇总关系、最低保障和组织边界。</li>
+<li>生成法人公司申报版，不允许后续直接覆盖。</li>
+</ol>
+<h3 id="42">4.2 预算碰撞与协商</h3>
+<p>集团建议值不应直接覆盖公司申报值，而应形成独立的“建议/调整结果”：</p>
+<pre><code class="language-text">公司申报版
+    ↓ 对比计算
+集团建议版 + 差异解释 + AI 诊断
+    ↓ 重大差异识别
+预算争议项
+    ↓ 多轮解释与证据补充
+协商结果
+    ↓ 人工确认
+集团调整版
+    ↓ 最终批准
+批准版快照
+</code></pre>
+<p>争议项建议使用状态机：</p>
+<pre><code class="language-text">identified → raised → awaiting_explanation → analyzing
+           → negotiating → agreed / rejected / escalated
+</code></pre>
+<p>每次状态变更都应生成审计事件；AI 重新分析应产生新诊断记录，而不是覆盖上一轮结论。</p>
+<h3 id="43-ai">4.3 AI 预算诊断</h3>
+<p>AI 不应直接从前端页面读取零散字段并给出不可追溯回答，建议采用以下编排：</p>
+<pre><code class="language-text">预算项目
+  ↓
+指标查询与特征计算
+  ↓
+规则初筛 / 异常检测
+  ↓
+证据检索（历史、实际、人员、业务量、标准、事件）
+  ↓
+AI 解释与建议生成
+  ↓
+结构化诊断结果
+  ↓
+人工复核与采纳/驳回
+</code></pre>
+<p>AI 输出建议固定为结构化对象：</p>
+<pre><code class="language-json">{
+  &quot;verdict&quot;: &quot;review&quot;,
+  &quot;reasonable_range&quot;: {&quot;min&quot;: 0, &quot;max&quot;: 0},
+  &quot;suggested_amount&quot;: 0,
+  &quot;reasons&quot;: [],
+  &quot;evidence_refs&quot;: [],
+  &quot;risks&quot;: [],
+  &quot;missing_data&quot;: [],
+  &quot;confidence&quot;: 0,
+  &quot;model_version&quot;: &quot;...&quot;
+}
+</code></pre>
+<p>其中金额、比例、执行率和压降目标必须由确定性计算服务提供；模型只负责解释、归纳、分类和提出候选建议。</p>
+<h3 id="44">4.4 智能压降</h3>
+<p>压降不是简单的排序减法，建议拆为：</p>
+<ol>
+<li>目标管理：集团年度压降目标、目标口径和截止时间。</li>
+<li>候选池：预算水分、低执行率、异常单位成本、可替代性等指标筛选。</li>
+<li>约束集：最低保障、合同锁定、业务影响、关键事件和不可压降项目。</li>
+<li>方案计算：生成一个或多个候选方案。</li>
+<li>模拟比较：比较压降金额、覆盖组织、业务风险和剩余目标。</li>
+<li>人工采纳：将方案转化为预算调整动作或协商任务。</li>
+</ol>
+<p>压降方案必须是可回滚、可比较的场景，不应直接改写正式批准版预算。</p>
+<h3 id="45">4.5 决算闭环</h3>
+<p>实际费用导入后，先进行数据归属和口径校验，再进行差异分析：</p>
+<pre><code class="language-text">实际数据接入
+  ↓
+组织/科目/项目映射
+  ↓
+重复、缺失、跨期、关键事件校验
+  ↓
+预算 VS 实际
+  ↓
+差异分类与业务解释
+  ↓
+基线修正建议
+  ↓
+下一年度预算编制
+</code></pre>
+<p>关键事件需要在决算时参与“是否剔除、是否延续、是否纳入基线”的判断，不能只作为备注字段保存。</p>
+<hr />
+<h2 id="5-ai">5. 计算、规则和 AI 的边界</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>应由谁负责</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>预算加总、组织汇总、压降金额</td>
+<td>确定性计算引擎</td>
+<td>必须可复算、可审计</td>
+</tr>
+<tr>
+<td>执行率、同比、单位成本</td>
+<td>指标服务/计算引擎</td>
+<td>统一口径，避免页面各算各的</td>
+</tr>
+<tr>
+<td>最低保障、合同锁定、不可压降</td>
+<td>规则引擎</td>
+<td>管理制度必须显式化</td>
+</tr>
+<tr>
+<td>异常初筛</td>
+<td>规则 + 统计模型</td>
+<td>先保证边界和稳定性</td>
+</tr>
+<tr>
+<td>历史与证据归纳</td>
+<td>AI 分析层</td>
+<td>提升解释效率</td>
+</tr>
+<tr>
+<td>预算建议金额</td>
+<td>计算约束 + AI 候选</td>
+<td>AI 不能绕过硬约束</td>
+</tr>
+<tr>
+<td>最终批准、争议结论</td>
+<td>人工管理者</td>
+<td>责任和授权不能转移给模型</td>
+</tr>
+</tbody>
+</table>
+<p>核心原则：</p>
+<blockquote>
+<p><strong>AI 可以建议“为什么”和“可选方案”，确定性引擎决定“怎么算”，管理者决定“是否采用”。</strong></p>
+</blockquote>
+<hr />
+<h2 id="6-demo">6. 当前 Demo 与目标架构差距</h2>
+<table>
+<thead>
+<tr>
+<th>需求能力</th>
+<th>当前 Demo 状态</th>
+<th>目标系统需补齐</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多集团/多法人组织</td>
+<td>只有模拟中心和部门，未建法人层</td>
+<td>组织树、法人边界、数据权限和组织有效期</td>
+</tr>
+<tr>
+<td>预算版本</td>
+<td><code>plan.status</code> 有流程状态，但没有完整版本实体</td>
+<td>版本头、明细快照、差异和不可变批准版</td>
+</tr>
+<tr>
+<td>预算编制</td>
+<td>支持自上而下/自下而上和自由语言归类</td>
+<td>编制任务、公式、标准、驱动因子、多人协作</td>
+</tr>
+<tr>
+<td>预算争议</td>
+<td>有 AI 建议和调整入口，但无争议实体</td>
+<td>争议状态机、多轮消息、证据、协商结果</td>
+</tr>
+<tr>
+<td>AI 诊断</td>
+<td><code>engine.js</code> 为关键词规则和固定文本</td>
+<td>特征计算、数据检索、模型编排、证据链和评估</td>
+</tr>
+<tr>
+<td>水分识别</td>
+<td>主要通过预置 <code>forecast</code> 展示</td>
+<td>可解释指标、阈值版本、候选池和人工复核</td>
+</tr>
+<tr>
+<td>智能压降</td>
+<td>有固定调剂建议</td>
+<td>目标、约束、场景、方案比较、回滚和审批</td>
+</tr>
+<tr>
+<td>预算弹性</td>
+<td>当前主要是界面概念</td>
+<td>项目属性、规则权重、最低保障和风险模型</td>
+</tr>
+<tr>
+<td>关键事件</td>
+<td>未形成独立业务对象</td>
+<td>事件登记、金额拆分、持续性和基线处理</td>
+</tr>
+<tr>
+<td>数理平衡</td>
+<td>部分页面本地计算，数据源分散</td>
+<td>统一计算服务、事务、一致性校验和重算</td>
+</tr>
+<tr>
+<td>实际/决算</td>
+<td>Mock 单据和前端导入</td>
+<td>外部系统接入、映射、对账、差异处理</td>
+</tr>
+<tr>
+<td>权限与审计</td>
+<td>URL 角色切换和前端过滤</td>
+<td>服务端鉴权、组织级数据权限、操作审计</td>
+</tr>
+<tr>
+<td>持久化</td>
+<td>浏览器 <code>localStorage</code></td>
+<td>服务端数据库、附件存储、备份和恢复</td>
+</tr>
+<tr>
+<td>并发与协作</td>
+<td>单浏览器状态</td>
+<td>乐观锁、版本冲突、任务通知和协作记录</td>
+</tr>
+<tr>
+<td>移动端</td>
+<td>独立拷贝，存在重复维护风险</td>
+<td>响应式/共享领域 API/统一权限与状态</td>
+</tr>
+</tbody>
+</table>
+<h3 id="61-demo">6.1 当前 Demo 最需要修正的架构认知</h3>
+<p>当前 Demo 中的“AI”主要是确定性演示逻辑，不应在客户沟通或技术方案中表述为已经接入真实大模型。更准确的说法是：</p>
+<blockquote>
+<p>当前已完成 AI 交互形态和决策卡片的体验验证；真实 AI 能力需要在后端数据、指标和证据体系确定后接入。</p>
+</blockquote>
+<hr />
+<h2 id="7">7. 推荐的实施架构阶段</h2>
+<h3 id="0">阶段 0：业务与数据口径确认</h3>
+<ul>
+<li>确认集团、法人公司、部门和责任人组织关系；</li>
+<li>确认费用项目、财务科目和管理口径；</li>
+<li>收集 1～2 家典型法人公司预算/决算数据；</li>
+<li>复盘 2～3 个真实预算争议案例；</li>
+<li>定义关键事件、预算弹性和不可压降规则。</li>
+</ul>
+<h3 id="1-mvp">阶段 1：模块化单体 MVP</h3>
+<p>优先实现：</p>
+<ul>
+<li>组织与权限；</li>
+<li>主数据；</li>
+<li>预算编制与版本；</li>
+<li>法人公司提交；</li>
+<li>集团建议与差异对比；</li>
+<li>预算争议和证据留痕；</li>
+<li>确定性汇总/平衡引擎；</li>
+<li>基础执行导入和预算对实际分析。</li>
+</ul>
+<h3 id="2ai">阶段 2：AI 决策支持</h3>
+<ul>
+<li>历史/实际数据指标层；</li>
+<li>预算异常检测；</li>
+<li>预算水分候选池；</li>
+<li>证据检索和 AI 诊断；</li>
+<li>业务解释结构化；</li>
+<li>AI 建议的人工采纳和反馈闭环。</li>
+</ul>
+<h3 id="3_1">阶段 3：智能压降与基线闭环</h3>
+<ul>
+<li>预算弹性与约束规则；</li>
+<li>压降目标和场景模拟；</li>
+<li>关键事件基线处理；</li>
+<li>决算差异归因；</li>
+<li>下一年度基线自动建议。</li>
+</ul>
+<h3 id="4_1">阶段 4：系统集成与规模化</h3>
+<ul>
+<li>财务/费控/HR/采购/合同系统接口；</li>
+<li>定时同步和数据质量监控；</li>
+<li>报表与管理驾驶舱；</li>
+<li>异步任务和大规模分析；</li>
+<li>在有明确边界后再考虑拆分独立服务。</li>
+</ul>
+<hr />
+<h2 id="8">8. 非功能架构要求</h2>
+<h3 id="81">8.1 数据安全</h3>
+<ul>
+<li>集团、法人公司和部门数据必须服务端隔离；</li>
+<li>敏感金额、人员和供应商信息按权限脱敏；</li>
+<li>AI 调用前进行数据分级和最小化传递；</li>
+<li>附件和证据需要访问控制、病毒检查和保留策略；</li>
+<li>不允许把生产数据、密钥或完整财务数据放入前端代码。</li>
+</ul>
+<h3 id="82">8.2 可审计性</h3>
+<p>预算金额、版本、AI 结论、压降方案和最终批准都必须可追溯：</p>
+<ul>
+<li>谁在什么时间做了什么操作；</li>
+<li>修改前后是什么值；</li>
+<li>为什么修改；</li>
+<li>使用了哪些数据和证据；</li>
+<li>AI 使用了什么规则/模型版本；</li>
+<li>最终由谁批准或驳回。</li>
+</ul>
+<h3 id="83">8.3 可解释性</h3>
+<p>系统展示 AI 结论时至少提供：数据来源、计算口径、关键因素、缺失数据、风险和人工确认项。不能只展示一个“合理/不合理”标签。</p>
+<h3 id="84">8.4 一致性与可靠性</h3>
+<ul>
+<li>汇总结果由后端统一计算；</li>
+<li>预算版本发布采用事务和幂等操作；</li>
+<li>导入数据必须支持重复导入检测和失败重试；</li>
+<li>计算规则和指标口径要有版本；</li>
+<li>关键操作支持回滚或生成反向调整记录；</li>
+<li>日志、指标和任务失败信息应可监控。</li>
+</ul>
+<hr />
+<h2 id="9">9. 对当前代码演进的建议</h2>
+<h3 id="91-demo">9.1 保留 Demo 层的价值</h3>
+<p>当前 <code>website/</code> 不必立即重写。它可以继续承担：</p>
+<ul>
+<li>客户访谈演示；</li>
+<li>角色与页面验证；</li>
+<li>预算协商、压降和 Copilot 交互原型；</li>
+<li>未来 API 合同的前端试验。</li>
+</ul>
+<h3 id="92">9.2 下一步代码拆分方向</h3>
+<p>当前全局 <code>BM</code> 对象适合 Demo，但正式开发前建议逐步拆分为：</p>
+<pre><code class="language-text">frontend/
+  pages/                 # 页面和路由
+  components/            # 复用组件
+  api/                   # 后端 API 客户端
+  stores/                # 前端展示状态
+  permissions/           # 前端能力显隐，不承担安全边界
+
+backend/
+  modules/
+    organization/
+    master-data/
+    budgeting/
+    negotiation/
+    diagnostics/
+    reduction/
+    execution/
+    settlement/
+    audit/
+  calculation/
+  workflows/
+  integrations/
+  jobs/
+
+data/
+  migrations/
+  fixtures/
+  metric-definitions/
+</code></pre>
+<p>前端页面应逐渐从“直接改 <code>BM.state</code>”转为调用领域 API，例如：</p>
+<pre><code class="language-text">POST /api/budget-cycles/{id}/versions
+POST /api/budget-versions/{id}/submit
+POST /api/disputes/{id}/messages
+POST /api/diagnostics/budget-lines/{id}/run
+POST /api/reduction-scenarios
+POST /api/settlements/{id}/baseline-review
+</code></pre>
+<p>这些接口只是架构示例，具体 URL 应在 API 设计阶段统一确定。</p>
+<hr />
+<h2 id="10">10. 技术侧待确认问题</h2>
+<blockquote>
+<p>产品 / 业务侧待确认问题（多集团租户、法人横向查看、科目映射关系、版本审批关系、争议线上/线下、关键事件台账、压降分解维度、预算弹性制度、会议纪要效力等）已归集至《产品设计稿 V1》§8.2。本文仅保留技术实现侧待确认。</p>
+</blockquote>
+<ol>
+<li>财务 / 费控 / HR / 采购 / 合同系统是否提供接口或定期文件（影响集成层与 §9 设计）。</li>
+<li>AI 是否允许使用企业内部数据训练 / 微调，还是只能检索增强生成（影响 §13 技术路线）。</li>
+<li>生产环境部署位置、账号体系、单点登录和数据保留要求（影响 §8 非功能与部署形态）。</li>
+<li>对外部模型调用、敏感数据脱敏和供应商合规有什么限制（影响 §8 数据安全技术设计）。</li>
+</ol>
+<hr />
+<h2 id="11">11. 架构结论</h2>
+<p>本项目的核心不是增加一个预算填报页面，而是建立一条可信的管理决策链：</p>
+<blockquote>
+<p><strong>主数据可信 → 预算版本可追溯 → 差异可解释 → 协商有证据 → 压降可模拟 → 执行可对账 → 决算能修正基线</strong></p>
+</blockquote>
+<p>因此，正式系统的优先级应为：</p>
+<ol>
+<li>先统一组织、项目、口径和版本模型；</li>
+<li>再建设确定性计算、平衡和审计能力；</li>
+<li>然后接入 AI 诊断、水分识别和压降建议；</li>
+<li>最后扩展外部系统集成和规模化分析。</li>
+</ol>
+<p>当前 Demo 已经验证了产品交互方向，但不能替代上述业务基础设施。建议将它定位为“客户验证前端”，以 API 合同和真实样例数据为下一阶段架构演进的起点。</p>
+<hr />
+<h2 id="12_1">12. 双层驱动的技术实现视角</h2>
+<blockquote>
+<p>产品模式决策（约束/冲突驱动 vs 角色辅助决策驱动的选择、优缺点、适用场景、落地顺序）见《产品设计稿 V1》§5.7。本文仅说明技术上必须支撑的能力。</p>
+</blockquote>
+<p>系统须同时支撑两条驱动路径，且二者共用同一套预算版本、约束、证据与计算模型：</p>
+<ul>
+<li><strong>集团约束层</strong>：会议纪要 / 管理目标 / 正式通知解析为正式约束、目标与冲突项，经集团级方案引擎生成跨组织优化方案，下发到法人公司、部门与责任人。</li>
+<li><strong>角色 Copilot 层</strong>：个人用自然语言补充实际要求、业务依据与系统外约束，生成可修改预算草稿与解释材料，回到集团级计算、平衡、协商与审批。</li>
+</ul>
+<p>技术实现要点：</p>
+<ul>
+<li><strong>约束对象实体</strong>：区分全局约束、部门 / 局部约束、待确认约束；自然语言要求先形成「待确认约束」，经授权确认后才进入正式约束集合。</li>
+<li><strong>优先级引擎</strong>：全局约束与局部要求冲突时按 法律/监管 &gt; 集团正式 &gt; 法人正式 &gt; 部门确认 &gt; 个人偏好 &gt; AI 默认 解决（详见产品设计稿 §5.7）。</li>
+<li><strong>共用模型</strong>：两层生成的预算建议都必须回到确定性计算引擎重新校验，输出区分「系统计算结果 / AI 建议 / 人工确认结果」。</li>
+</ul>
+<p>自然语言约束的最小结构（技术契约）：</p>
+<pre><code class="language-json">{
+  &quot;source_type&quot;: &quot;user_statement&quot;,
+  &quot;source_text&quot;: &quot;领导要求今年车辆费用降低 10%&quot;,
+  &quot;constraint_type&quot;: &quot;reduction_target&quot;,
+  &quot;scope&quot;: {&quot;budget_item&quot;: &quot;车辆费用&quot;, &quot;organization&quot;: null},
+  &quot;target&quot;: {&quot;operator&quot;: &quot;reduce_by_rate&quot;, &quot;value&quot;: 0.1},
+  &quot;effective_period&quot;: &quot;待确认&quot;,
+  &quot;authority&quot;: &quot;待确认&quot;,
+  &quot;evidence_refs&quot;: [],
+  &quot;status&quot;: &quot;pending_confirmation&quot;
+}
+</code></pre>
+<p>系统随后应追问适用范围、生效周期、基准口径、不可压降项与确认人，只有授权角色确认后才进入正式约束集合。</p>
+<hr />
+<h2 id="13-ai">13. AI 能力边界、投入条件与实现可行性</h2>
+<h3 id="131-ai">13.1 先区分“AI 能力”与“系统能力”</h3>
+<p>本项目中有些目标适合由 AI 完成，有些目标必须由确定性软件、数据工程和管理流程完成。不能把所有智能行为都归因于大模型。</p>
+<table>
+<thead>
+<tr>
+<th>目标</th>
+<th>AI 能否直接解决</th>
+<th>更适合的实现方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>从会议纪要中提取预算要求</td>
+<td>可以辅助</td>
+<td>文档解析 + 结构化抽取 + 人工确认</td>
+</tr>
+<tr>
+<td>把自然语言转成预算草稿</td>
+<td>可以较好完成</td>
+<td>大模型 + 主数据检索 + 计算校验</td>
+</tr>
+<tr>
+<td>解释预算与实际差异</td>
+<td>在数据充分时可以辅助</td>
+<td>指标计算 + 证据检索 + AI 归因</td>
+</tr>
+<tr>
+<td>识别连续低执行率</td>
+<td>不需要大模型</td>
+<td>SQL/指标引擎/规则引擎</td>
+</tr>
+<tr>
+<td>判断预算是否有水分</td>
+<td>只能提供候选判断</td>
+<td>统计规则 + 横向基准 + 业务复核</td>
+</tr>
+<tr>
+<td>生成压降方案</td>
+<td>可以生成候选方案</td>
+<td>约束优化/场景计算 + AI 解释</td>
+</tr>
+<tr>
+<td>保证组织汇总等于集团总额</td>
+<td>不能依赖 AI</td>
+<td>确定性事务计算引擎</td>
+</tr>
+<tr>
+<td>判断业务最低保障</td>
+<td>不能单独可靠判断</td>
+<td>管理规则、标准库和责任人确认</td>
+</tr>
+<tr>
+<td>决定预算最终是否批准</td>
+<td>不应由 AI 决定</td>
+<td>授权流程和人工决策</td>
+</tr>
+</tbody>
+</table>
+<p>核心判断：</p>
+<blockquote>
+<p><strong>AI 适合处理非结构化信息、复杂解释和人机协作；金额、比例、约束、权限和最终决策必须由可验证的软件机制控制。</strong></p>
+</blockquote>
+<h3 id="132-ai">13.2 当前 AI 可以达到的能力层级</h3>
+<h4 id="a">A 级：近期可稳定实现</h4>
+<p>这类能力主要依赖现有大模型、结构化数据和规则，不需要新的算法突破：</p>
+<ul>
+<li>读取会议纪要、通知和业务解释；</li>
+<li>提取金额、比例、组织、项目、时间和约束对象；</li>
+<li>将自然语言编制意图归类到科目、项目和物料；</li>
+<li>根据系统指标生成预算差异说明；</li>
+<li>将业务方的口头解释整理成结构化依据；</li>
+<li>生成预算填报草稿和修改建议；</li>
+<li>对比多个预算版本并用自然语言说明变化；</li>
+<li>根据已确定的规则生成管理摘要、待办和追问。</li>
+</ul>
+<p>这部分是最适合作为首期 AI 价值验证的范围。</p>
+<h4 id="b">B 级：具备可行性，但必须依赖企业数据和规则</h4>
+<ul>
+<li>识别潜在预算水分；</li>
+<li>判断预算项目的合理区间；</li>
+<li>解释不同法人公司的单位成本差异；</li>
+<li>识别哪些费用具有延期、替代或压缩空间；</li>
+<li>结合人员变化、业务量和关键事件判断同比异常；</li>
+<li>对会议纪要约束和预算编制结果进行一致性检查；</li>
+<li>生成多个压降方案并解释业务影响。</li>
+</ul>
+<p>这类能力的关键不在于更强的聊天模型，而在于：数据口径、指标定义、同类样本、约束规则和历史案例是否可靠。</p>
+<h4 id="c">C 级：不能承诺完全自动化</h4>
+<ul>
+<li>自动判断某个管理要求是否真实有效；</li>
+<li>自动判断一个费用是否“必须发生”；</li>
+<li>自动替代集团总经办与法人公司协商；</li>
+<li>自动决定最低业务保障线；</li>
+<li>自动对所有公司作出公平且无争议的横向比较；</li>
+<li>自动承担最终预算批准责任；</li>
+<li>在数据缺失、口径冲突时仍保证结论正确。</li>
+</ul>
+<p>这些任务可以由 AI 提供分析和候选方案，但必须保留授权确认、业务复核和责任归属。</p>
+<h3 id="133-ai">13.3 AI 要实现目标所需的投入</h3>
+<h4 id="1_1">1. 数据投入</h4>
+<p>至少需要形成以下数据基础：</p>
+<ul>
+<li>组织架构、法人关系、部门和责任人；</li>
+<li>费用项目、财务科目和映射关系；</li>
+<li>近 2～3 年预算数据；</li>
+<li>近 2～3 年实际执行和决算数据；</li>
+<li>月度或季度执行明细；</li>
+<li>人员数量、组织变化和业务量驱动数据；</li>
+<li>合同、供应商、价格和锁定期限；</li>
+<li>历史预算调整和争议案例；</li>
+<li>关键事件及其一次性/延续性判断；</li>
+<li>行政管理标准、最低保障标准和不可压降规则。</li>
+</ul>
+<p>如果只有几张年度汇总表，AI 可以做摘要和问答，但很难可靠判断预算水分、单位成本和压降空间。</p>
+<h4 id="2_1">2. 业务专家投入</h4>
+<p>需要集团总经办、法人公司行政负责人、财务和基层责任人共同参与：</p>
+<ul>
+<li>确认预算项目和统计口径；</li>
+<li>标注哪些历史预算属于异常或一次性事项；</li>
+<li>解释不同法人公司之间的业务差异；</li>
+<li>确认哪些费用可以压降、延期或替代；</li>
+<li>审核 AI 输出并反馈“为什么对/为什么错”；</li>
+<li>建立可复用的预算争议案例库。</li>
+</ul>
+<p>AI 不会自动发现企业隐含的管理规则。很多规则必须由业务专家显式说出来，并转化为系统可执行的标准。</p>
+<h4 id="3_2">3. 数据工程投入</h4>
+<ul>
+<li>数据接入和文件解析；</li>
+<li>组织、科目、项目和供应商主数据映射；</li>
+<li>历史数据清洗和重复处理；</li>
+<li>实际费用与预算项目的归属匹配；</li>
+<li>单位、币种、周期和跨期口径统一；</li>
+<li>数据质量检查、缺失率和异常值监控；</li>
+<li>指标层和特征层建设。</li>
+</ul>
+<p>这部分通常比接入大模型更决定最终效果。</p>
+<h4 id="4_2">4. 系统工程投入</h4>
+<ul>
+<li>预算版本和变更审计；</li>
+<li>权限和组织级数据隔离；</li>
+<li>确定性计算与平衡；</li>
+<li>工作流和协商状态机；</li>
+<li>证据、附件和引用管理；</li>
+<li>AI 任务编排、重试和失败处理；</li>
+<li>模型输入输出记录；</li>
+<li>人工采纳、驳回和回滚。</li>
+</ul>
+<h4 id="5">5. 持续运营投入</h4>
+<ul>
+<li>持续维护组织和预算主数据；</li>
+<li>定期复核规则和管理标准；</li>
+<li>评估 AI 误判、漏判和无依据结论；</li>
+<li>维护提示词、检索内容和模型版本；</li>
+<li>维护异常案例和业务反馈；</li>
+<li>每年预算周期前重新校验指标口径。</li>
+</ul>
+<p>AI 不是一次性交付的功能，而是需要随着预算周期持续校准的业务能力。</p>
+<h3 id="134">13.4 需要的知识突破是什么</h3>
+<p>本项目未必需要基础模型层面的重大突破，更现实的“知识突破”集中在企业业务知识工程：</p>
+<h4 id="1_2">1. 把隐性管理经验变成显性规则</h4>
+<p>例如“车辆费用不能简单按去年执行额下降”“食堂费用要结合就餐人数和原材料价格”“物业费受合同锁定影响”。这些经验需要转化为：</p>
+<ul>
+<li>适用范围；</li>
+<li>判断条件；</li>
+<li>例外情况；</li>
+<li>最低保障；</li>
+<li>可执行动作；</li>
+<li>责任人和确认机制。</li>
+</ul>
+<h4 id="2_2">2. 建立预算项目知识图谱</h4>
+<p>需要建立以下关系：</p>
+<pre><code class="language-text">组织 → 责任部门 → 预算项目 → 财务科目
+预算项目 → 业务量驱动 → 管理标准
+预算项目 → 合同/供应商 → 价格和锁定期限
+预算项目 → 关键事件 → 一次性/延续性
+预算项目 → 历史实际 → 单位成本和执行趋势
+预算项目 → 弹性属性 → 可压降动作和风险
+</code></pre>
+<h4 id="3_3">3. 建立企业自己的案例库</h4>
+<p>预算水分和合理性往往不是通用知识，而是企业内部的判断传统。需要积累：</p>
+<ul>
+<li>哪些预算后来被证明有水分；</li>
+<li>哪些预算看似增长但属于合理增长；</li>
+<li>哪些压降方案最终影响了业务；</li>
+<li>哪些会议要求最终没有执行；</li>
+<li>哪些一次性事件不应作为下一年度基线。</li>
+</ul>
+<h4 id="4_3">4. 建立“建议结果”的评价标准</h4>
+<p>不能只评价 AI 是否说得像人，还要评价：</p>
+<ul>
+<li>金额是否算对；</li>
+<li>证据是否真的支持结论；</li>
+<li>是否识别了关键约束；</li>
+<li>是否遗漏了重要风险；</li>
+<li>建议是否被业务人员采纳；</li>
+<li>采纳后实际结果是否改善。</li>
+</ul>
+<h3 id="135">13.5 推荐工具链</h3>
+<h4 id="_1">数据与计算工具</h4>
+<ul>
+<li>关系型数据库：保存组织、预算、版本、执行和审计数据；</li>
+<li>数据导入与清洗工具：处理 Excel、CSV 和财务系统导出数据；</li>
+<li>SQL/指标引擎：执行预算、实际、同比、执行率和单位成本计算；</li>
+<li>任务调度工具：定时同步、批量计算和年度预算任务；</li>
+<li>数据质量工具：检查缺失、重复、映射失败和异常波动。</li>
+</ul>
+<h4 id="ai_1">AI 工具</h4>
+<ul>
+<li>大语言模型：自然语言理解、解释、归纳和方案草拟；</li>
+<li>文档解析/OCR：处理会议纪要、通知、扫描件和附件；</li>
+<li>向量检索或混合检索：查找制度、历史案例、预算依据和会议材料；</li>
+<li>工具调用：让模型调用指标查询、版本对比、场景计算和证据查询；</li>
+<li>结构化输出校验：保证模型返回金额、组织、项目和约束字段符合数据模型；</li>
+<li>模型评测工具：测试抽取准确率、证据命中率、建议采纳率和幻觉率。</li>
+</ul>
+<h4 id="_2">业务协作工具</h4>
+<ul>
+<li>约束确认工作台；</li>
+<li>预算争议协商记录；</li>
+<li>AI 建议采纳/驳回/修改反馈；</li>
+<li>证据附件和来源管理；</li>
+<li>管理规则维护和版本发布；</li>
+<li>AI 诊断结果抽样复核。</li>
+</ul>
+<h3 id="136-ai">13.6 推荐的 AI 技术架构</h3>
+<div class="mermaid">flowchart LR
+    INPUT[会议纪要 / 业务自然语言 / 预算草稿]
+    PARSE[文档解析与意图抽取]
+    CONFIRM[约束确认与权限校验]
+    METRIC[指标与特征计算]
+    RETRIEVE[历史数据 / 制度 / 案例检索]
+    RULE[规则与硬约束校验]
+    MODEL[大模型解释与方案生成]
+    VALIDATE[结构化校验与风险检查]
+    HUMAN[人工采纳 / 修改 / 驳回]
+    VERSION[预算版本 / 争议项 / 压降方案]
+
+    INPUT --&gt; PARSE
+    PARSE --&gt; CONFIRM
+    CONFIRM --&gt; METRIC
+    CONFIRM --&gt; RETRIEVE
+    METRIC --&gt; RULE
+    RETRIEVE --&gt; MODEL
+    RULE --&gt; MODEL
+    MODEL --&gt; VALIDATE
+    VALIDATE --&gt; HUMAN
+    HUMAN --&gt; VERSION
+    VERSION --&gt; METRIC
+</div>
+<p>AI 不应直接连接数据库后自由生成金额结论。正确方式是：模型调用经过授权的指标和业务工具，计算结果由工具返回，模型负责组织解释和候选方案，最终由校验器和人工确认把结果写入预算版本。</p>
+<h3 id="137-ai">13.7 分阶段判断 AI 能做到什么</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>可交付能力</th>
+<th>可靠程度</th>
+<th>主要前提</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0 Demo</td>
+<td>固定场景问答、建议卡片、自然语言归类</td>
+<td>仅用于体验验证</td>
+<td>Mock 数据和确定性规则</td>
+</tr>
+<tr>
+<td>P1 助手</td>
+<td>角色输入约束、生成预算草稿、解释历史数据</td>
+<td>中等</td>
+<td>结构化主数据和指标查询</td>
+</tr>
+<tr>
+<td>P2 诊断</td>
+<td>异常识别、差异归因、证据链和建议金额</td>
+<td>有条件可靠</td>
+<td>2～3 年可用历史数据、规则和专家复核</td>
+</tr>
+<tr>
+<td>P3 优化</td>
+<td>多方案压降、跨公司比较、业务风险权衡</td>
+<td>依赖企业成熟度</td>
+<td>弹性规则、约束模型和跨组织数据</td>
+</tr>
+<tr>
+<td>P4 闭环</td>
+<td>决算反馈影响下一年度基线并持续学习</td>
+<td>长期建设</td>
+<td>连续预算周期、结果反馈和治理机制</td>
+</tr>
+</tbody>
+</table>
+<h3 id="138-ai">13.8 AI 投入与预期收益的匹配</h3>
+<p>建议不要一开始承诺“AI 自动完成预算管理”，而应按以下收益层级评估：</p>
+<ol>
+<li><strong>效率收益</strong>：减少人工查表、汇总、解释和材料编写时间。</li>
+<li><strong>质量收益</strong>：减少漏项、错项、口径不一致和缺少依据的预算。</li>
+<li><strong>决策收益</strong>：更早发现异常，提供可比较的调整方案。</li>
+<li><strong>治理收益</strong>：把会议要求、预算争议和压降结果沉淀为可追踪资产。</li>
+<li><strong>财务收益</strong>：经过多个预算周期验证后，才评估实际节省金额和成本改善。</li>
+</ol>
+<p>前两层通常可以较早验证；后三层需要真实数据、管理规则和持续运营，不能仅凭 Demo 或一次模型问答证明。</p>
+<h3 id="139">13.9 最终可行性判断</h3>
+<p>本项目的 AI 目标可以实现，但应重新定义为：</p>
+<blockquote>
+<p><strong>AI 帮助企业理解约束、解释预算、发现候选问题并生成可比较方案；系统保证计算、权限、证据和版本可信，管理者负责最终判断。</strong></p>
+</blockquote>
+<p>可以较有把握承诺的首期能力：</p>
+<ul>
+<li>自然语言录入约束并生成待确认结构；</li>
+<li>基于真实历史数据生成预算草稿；</li>
+<li>对预算与实际差异进行证据化解释；</li>
+<li>帮助角色补充业务依据和编制说明；</li>
+<li>对候选压降项目进行排序和初步建议。</li>
+</ul>
+<p>不应在资料未验证前承诺的能力：</p>
+<ul>
+<li>自动准确识别所有预算水分；</li>
+<li>自动决定跨法人公司的公平压降比例；</li>
+<li>自动替代集团与法人公司的协商；</li>
+<li>自动确认会议纪要或口头指令的正式效力；</li>
+<li>自动批准预算或承担管理责任。</li>
+</ul>
+<p>因此，项目的关键投入顺序应是：</p>
+<blockquote>
+<p><strong>先建数据和规则底座，再建 AI 诊断；先实现可解释建议，再逐步实现跨组织优化。</strong></p>
+</blockquote>
+<hr />
+<h2 id="14">14. 约束管理的技术实现（会议驱动模式的技术视角）</h2>
+<blockquote>
+<p>产品模式决策（会议纪要全局驱动 vs 个人理解后辅助编制的选择、适用场景、审计重点、确认问题）见《产品设计稿 V1》§5.7。本文仅说明约束管理的技术实现。</p>
+</blockquote>
+<p>系统采用三级约束结构，区分三类信息的存储与生效：</p>
+<ol>
+<li><strong>会议原始内容</strong>：原文、会议时间、参与人、附件与来源。</li>
+<li><strong>正式全局约束</strong>：经授权确认，可影响相关编制检测与预算审批。</li>
+<li><strong>个人 / 部门局部理解</strong>：用户输入的解释、补充条件与局部建议，默认不直接覆盖全局约束。</li>
+</ol>
+<p>约束检测优先级（技术规则）：</p>
+<pre><code class="language-text">法律/监管要求 &gt; 集团正式约束 &gt; 法人公司正式约束 &gt; 部门已确认约束 &gt; 个人编制偏好 &gt; AI 默认建议
+</code></pre>
+<p>当局部业务确需突破全局约束时，系统标记冲突、要求补充业务依据、生成例外申请或预算争议项（见 §4.2 状态机）、指向有权审批人并保留处理结果。三类信息必须区分保存，确保全局约束、局部理解与原始会议内容均可追溯。</p>
+</div>
+<script>mermaid.initialize({startOnLoad:true, theme:"default", securityLevel:"loose"});</script>
+</body>
+</html>

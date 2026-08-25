@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEAM</title>
+<style>
+:root{--bg:#ffffff;--fg:#1f2328;--muted:#57606a;--line:#d8dee4;--accent:#0969da;--code-bg:#f6f8fa;--quote:#fff8c5;--table-head:#f6f8fa;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.75;font-size:16px;}
+.wrap{max-width:1080px;margin:0 auto;padding:40px 28px 80px;}
+h1,h2,h3,h4{line-height:1.3;font-weight:700;margin-top:2em;}
+h1{font-size:30px;border-bottom:3px solid var(--accent);padding-bottom:.3em;}
+h2{font-size:24px;border-bottom:1px solid var(--line);padding-bottom:.25em;}
+h3{font-size:20px;color:#24292f;}
+a{color:var(--accent);text-decoration:none;}
+blockquote{background:var(--quote);border-left:4px solid #d4a72c;margin:1em 0;padding:.6em 1em;color:#3d2c00;}
+code{background:var(--code-bg);padding:.15em .4em;border-radius:4px;font-size:85%;font-family:"SFMono-Regular",Consolas,monospace;}
+pre{background:var(--code-bg);padding:14px;border-radius:8px;overflow:auto;}
+pre code{background:none;padding:0;font-size:13px;}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:14.5px;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:var(--table-head);font-weight:600;}
+tr:nth-child(even) td{background:#fafbfc;}
+.mermaid{background:#fafbfc;border:1px solid var(--line);border-radius:8px;padding:14px;margin:1em 0;text-align:center;}
+.note{color:var(--muted);font-size:13px;margin-bottom:2em;}
+ul,ol{padding-left:1.6em;}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+<div class="note">本文档由 <code>governance/TEAM.md</code> 渲染生成 · 团队治理文件</div>
+<h1 id="ai">三安光电 AI 费用预决算管理系统 · 项目团队治理</h1>
+<blockquote>
+<p>版本：V1（2026-08-21）<br />
+适用范围：本项目一期建设（预算编制统计自动化、费控执行跟踪、AI 风险筛查）<br />
+依赖文件：<code>.tl4/governance/AI_WORKING_AGREEMENT.md</code>、<code>.tl4/governance/PRODUCT_WORKFLOW.md</code>、<code>.tl4/governance/DEVELOPMENT_RULES.md</code>、<code>.tl4/governance/TESTING_STANDARD.md</code></p>
+</blockquote>
+<hr />
+<h2 id="1">1. 项目角色</h2>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>承担者</th>
+<th>职责</th>
+<th>决策权限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sponsor</strong></td>
+<td>松哥</td>
+<td>需求最终拍板、资源批准、关键业务确认、验收决策</td>
+<td>最高决策权</td>
+</tr>
+<tr>
+<td><strong>PM（项目经理）</strong></td>
+<td>本 AI 助手</td>
+<td>拆解任务、协调前后端/测试、审阅交付物、把控设计门禁、组织升级</td>
+<td>过程管理权；对技术方案有建议权，无最终拍板权</td>
+</tr>
+<tr>
+<td><strong>前端开发（兼 UI 设计）</strong></td>
+<td>sanan-frontend-dev</td>
+<td>UI 设计、前端实现、交互还原、移动端适配、数据可视化、控制台错误清零</td>
+<td>前端实现决策权；对跨端设计一致性负主责</td>
+</tr>
+<tr>
+<td><strong>后端开发</strong></td>
+<td>sanan-backend-dev</td>
+<td>数据模型、API、确定性计算引擎、规则引擎、费控导入、审计日志、集成</td>
+<td>后端实现决策权</td>
+</tr>
+<tr>
+<td><strong>测试</strong></td>
+<td>sanan-qa-tester</td>
+<td>测试策略、回归测试、端到端验收、零控制台错误检查、外部服务真机验证</td>
+<td>质量否决权；发现 blocker 可要求回滚/返工</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2">2. 角色责任边界</h2>
+<h3 id="21-ui">2.1 前端开发（兼 UI 设计）：交付主责</h3>
+<p>项目采用「<strong>前端负交付主责</strong>」机制：</p>
+<ul>
+<li>前端负责把《产品设计稿 V1》与《软件设计架构分析 V1》转化为可交互、可演示、零控制台错误的界面。</li>
+<li>若交付物在<strong>界面还原度、交互逻辑、移动端适配、数据可视化、角色工作台差异化</strong>上出现缺陷，无论根因在前端还是后端，前端均为第一责任人，负责牵头定位并推动修复。</li>
+<li>后端与测试配合前端完成接口联调、数据修正与验证；PM 负责判定责任归属并组织返工。</li>
+<li>该机制不豁免后端与测试的责任，但明确<strong>交付体验的第一把尺在前端</strong>。</li>
+<li><strong>页面设计汇报义务（Sponsor 要求）</strong>：每个模块的页面设计完成后，须向 Sponsor 报告设计结果，由 Sponsor 审阅；前端实现约束（框架/页面复用、设计风格升级、新增页面补充、冲突调参即时反馈界面）以《产品设计稿 V1》§3.0 为准。</li>
+</ul>
+<h3 id="22">2.2 后端开发：数据与规则主责</h3>
+<ul>
+<li>负责数据模型、版本控制、计算规则、费控导入、AI 抽取结果的结构化存储。</li>
+<li>对「金额正确性、版本一致性、接口契约稳定性、审计证据完整性」负主责。</li>
+<li>任何金额/汇总/约束计算错误，由后端牵头修复并补回归测试。</li>
+</ul>
+<h3 id="23">2.3 测试：质量门禁主责</h3>
+<ul>
+<li>任何代码改动必须配套回归测试；外部服务功能必须真机验证后才可宣称完成。</li>
+<li>对「零控制台错误、关键路径端到端通过、缺陷可复现」负主责。</li>
+<li>有权因为 blocker 缺陷拒绝交付进入下一阶段。</li>
+</ul>
+<h3 id="24-pm">2.4 PM：流程与协调主责</h3>
+<ul>
+<li>负责把 Sponsor 的意图拆成可执行任务，分派给前端/后端/测试。</li>
+<li>负责维持「对齐 → 设计 → 开发」三段分离门禁；未过设计拍板，不得进入开发。</li>
+<li>负责整理会议结论、待拍板清单、版本说明与交付物归档。</li>
+<li>不替 Sponsor 做业务拍板；遇到未覆盖点退回 Sponsor 确认或补设计文档。</li>
+</ul>
+<h3 id="24-pm-sponsor">2.4 PM 自主处置授权（Sponsor 明确授权边界）</h3>
+<p>Sponsor 明确授权：PM 在以下情形可<strong>直接分派工作给其他 agent，无需逐次请示</strong>：</p>
+<ul>
+<li><strong>设计缺陷</strong>：设计文档内部的逻辑矛盾、遗漏、不可实现点，由 PM 组织修订或退回设计角色补正。</li>
+<li><strong>代码缺陷 / Bug</strong>：实现过程中发现的缺陷、报错、回归失败、控制台异常，由 PM 直接分派给前端/后端/测试修复并跟踪闭环。</li>
+<li><strong>排障与返工</strong>：缺陷定位、责任判定、修复验证，由 PM 牵头推进，不阻塞等待 Sponsor。</li>
+</ul>
+<p>PM <strong>仅在以下两类情况必须找 Sponsor</strong>：</p>
+<ol>
+<li><strong>需求理解有偏差或不清楚</strong>：对需求范围、业务规则、客户口径把握不准，或新信息显示原理解可能偏差。</li>
+<li><strong>重大事情</strong>：范围或架构方向变更、对外承诺、验收结论、影响交付成本或周期的决策等（具体以 Sponsor 判定为准）。</li>
+</ol>
+<p>其余事项 PM 自行决策并知会 Sponsor 即可。</p>
+<h3 id="25-sponsor">2.5 Sponsor：方向与拍板主责</h3>
+<ul>
+<li>对需求范围、关键业务规则、待确认问题、架构决策（D1–D5 等）做最终拍板。</li>
+<li>负责提供客户侧真实材料与反馈。</li>
+<li>对交付物做最终验收；验收不过可要求返工或调整方向。</li>
+</ul>
+<hr />
+<h2 id="3">3. 协作流程</h2>
+<h3 id="31">3.1 标准任务流</h3>
+<pre><code class="language-text">Sponsor 提出需求 / 拍板 → PM 拆解任务 → 设计（如需）→ 分派给前端/后端/测试
+   ↑                                                                  ↓
+   └←←←←←←←←←←← 最终验收 ←←←←←←←←←← QA 验收通过 ← 开发完成 ←←←←┘
+</code></pre>
+<h3 id="32">3.2 阶段协作规则</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>主要角色</th>
+<th>关键动作</th>
+<th>门禁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>对齐</strong></td>
+<td>Sponsor + PM</td>
+<td>双向确认需求、风险、约束；PM 复述，Sponsor 确认</td>
+<td>关键问题闭合后才能进入设计</td>
+</tr>
+<tr>
+<td><strong>设计</strong></td>
+<td>PM + 前后端 + Sponsor</td>
+<td>出/审设计文档、架构决策对比、待拍板清单</td>
+<td>Sponsor 拍板后设计定稿</td>
+</tr>
+<tr>
+<td><strong>开发</strong></td>
+<td>前后端 + PM</td>
+<td>按设计文档实现；前端牵头交付体验；后端牵头数据规则</td>
+<td>未过设计定稿不得开发</td>
+</tr>
+<tr>
+<td><strong>测试</strong></td>
+<td>QA + 前后端</td>
+<td>补回归测试、端到端验收、控制台检查、真机验证</td>
+<td>blocker 不通过则退回开发</td>
+</tr>
+<tr>
+<td><strong>交付</strong></td>
+<td>PM + Sponsor</td>
+<td>演示、确认、归档、写工作记忆</td>
+<td>Sponsor 验收签字</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33">3.3 每日 / 每轮同步规则</h3>
+<ul>
+<li><strong>任务启动前</strong>：PM 在对话中列出任务清单（编号、内容、预估、状态、优先级），请 Sponsor 引导排序。</li>
+<li><strong>开发中</strong>：设计缺陷 / 代码缺陷由 PM 按 §2.4 自主分派修复并跟踪闭环；仅当需求理解偏差或范围蔓延时升级给 Sponsor。</li>
+<li><strong>完成后</strong>：由执行角色自测，QA 复验，PM 审阅，Sponsor 验收。</li>
+</ul>
+<h3 id="34">3.4 争议与升级</h3>
+<ul>
+<li><strong>缺陷修复（不属升级事项）</strong>：设计缺陷、代码 Bug、回归失败、控制台异常，按 §2.4 由 PM 自主分派修复并闭环；仅在修复过程揭示需求偏差时才升级 Sponsor。</li>
+<li><strong>技术实现争议</strong>（如框架、接口、算法）：前后端先协商；协商不成由 PM 组织方案对比，报 Sponsor 拍板。</li>
+<li><strong>需求范围争议</strong>：PM 不擅自扩展；回 Sponsor 确认，必要时补设计文档。</li>
+<li><strong>质量争议</strong>：QA 拥有质量否决权；PM 组织三方（前后端/QA/Sponsor）判定 blocker 是否成立。</li>
+<li><strong>交付延期</strong>：PM 提前向 Sponsor 预警，调整阶段优先级或范围。</li>
+</ul>
+<hr />
+<h2 id="4-raci">4. RACI 矩阵（一期关键活动）</h2>
+<table>
+<thead>
+<tr>
+<th>活动</th>
+<th>Sponsor</th>
+<th>PM</th>
+<th>前端</th>
+<th>后端</th>
+<th>测试</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>需求范围拍板</td>
+<td>A / R</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+</tr>
+<tr>
+<td>架构 / 模块 / 数据模型设计</td>
+<td>I</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+</tr>
+<tr>
+<td>架构决策备选方案对比</td>
+<td>I</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>UI / 交互设计</td>
+<td>I</td>
+<td>C</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>前端实现</td>
+<td>I</td>
+<td>C</td>
+<td>R</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>后端 API / 计算引擎 / 规则引擎</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+<td>R</td>
+<td>C</td>
+</tr>
+<tr>
+<td>数据模型与字段定义</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+<td>R</td>
+<td>C</td>
+</tr>
+<tr>
+<td>费控 Excel 导入与执行跟踪</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+<td>R</td>
+<td>C</td>
+</tr>
+<tr>
+<td>AI 风险筛查（提示层）</td>
+<td>I</td>
+<td>C</td>
+<td>R</td>
+<td>R</td>
+<td>C</td>
+</tr>
+<tr>
+<td>单元 / 回归 / 端到端测试</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+<td>R</td>
+</tr>
+<tr>
+<td>控制台错误清零</td>
+<td>I</td>
+<td>C</td>
+<td>R</td>
+<td>C</td>
+<td>R</td>
+</tr>
+<tr>
+<td>外部服务真机验证</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+<td>C</td>
+<td>R</td>
+</tr>
+<tr>
+<td>演示与验收</td>
+<td>A</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>文档与记忆归档</td>
+<td>I</td>
+<td>R</td>
+<td>C</td>
+<td>C</td>
+<td>I</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>图例：R = 执行主责，A = 最终负责/拍板，C = 咨询/协作，I = 知情。</p>
+</blockquote>
+<hr />
+<h2 id="5">5. 交付物与质量标准</h2>
+<h3 id="51">5.1 前端交付标准</h3>
+<ul>
+<li>UI 与设计稿偏差不得影响业务语义（颜色/字号/间距在 5% 以内）。</li>
+<li>角色工作台差异化：总经理、部门经理、员工、财务经理的入口、权限、默认视图必须区分。</li>
+<li>移动端与桌面端核心流程均可完成，移动端优先保证查看与审批。</li>
+<li>浏览器控制台无 error / 无未处理异常。</li>
+<li>关键操作（提交、压降、协商、导入）有 loading、成功/失败反馈、回滚提示。</li>
+</ul>
+<h3 id="52">5.2 后端交付标准</h3>
+<ul>
+<li>所有金额计算有单元测试覆盖；边界场景（跨月、跨法人、跨科目、版本回滚）必须测试。</li>
+<li>费控导入必须保留原始文件、解析日志、错误行号与修正轨迹。</li>
+<li>AI 抽取结果必须保存原始文本、解析置信度、人工确认状态；禁止 AI 直接写正式约束。</li>
+<li>审计日志覆盖：谁、何时、改什么、由什么触发。</li>
+</ul>
+<h3 id="53">5.3 测试交付标准</h3>
+<ul>
+<li>每轮改动至少一条回归测试锁定关键行为。</li>
+<li>端到端覆盖：登录 → 工作台 → 编制/导入/压降/协商/审批 → 导出/留痕。</li>
+<li>控制台错误检查必须使用真实 Chrome（Playwright），不接受简化测试页。</li>
+<li>外部服务（如有）必须真机验证；未验证不得报告完成。</li>
+</ul>
+<hr />
+<h2 id="6">6. 专家调用方式</h2>
+<p>三个交付角色已固化为 WorkBuddy 专家包，存放于 <code>~/.workbuddy/plugins/marketplaces/my-experts/plugins/</code>：</p>
+<table>
+<thead>
+<tr>
+<th>专家包</th>
+<th>类型</th>
+<th>主要能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sanan-frontend-dev</code></td>
+<td>Agent</td>
+<td>前端/UI：Tailwind、vanilla JS、BM 命名空间、角色工作台、数据可视化、移动端</td>
+</tr>
+<tr>
+<td><code>sanan-backend-dev</code></td>
+<td>Agent</td>
+<td>后端：FastAPI/SQLite、ER 建模、确定性计算、规则引擎、费控导入、审计</td>
+</tr>
+<tr>
+<td><code>sanan-qa-tester</code></td>
+<td>Agent</td>
+<td>测试：Playwright、pytest、回归测试、零控制台错误、端到端验收</td>
+</tr>
+</tbody>
+</table>
+<p>PM（本会话）负责根据当前任务调度对应专家，并传递：</p>
+<ul>
+<li>必须遵循的设计文档路径。</li>
+<li>本 TEAM.md 的责任边界。</li>
+<li>当前任务的具体输入、输出标准与验收条件。</li>
+</ul>
+<hr />
+<h2 id="7">7. 变更与升级</h2>
+<ul>
+<li>本文件由 PM 维护；角色调整、责任边界变化需经 Sponsor 确认。</li>
+<li>新增专家角色（如数据工程师、运维）时，按同样流程创建专家包并更新本文件 RACI。</li>
+<li>项目进入二期前，由 Sponsor 与 PM 共同复盘本治理机制是否调整。</li>
+</ul>
+</div>
+<script>mermaid.initialize({startOnLoad:true, theme:"default", securityLevel:"loose"});</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "sanan-economic-event-module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "三安光电 AI 费用预决算 · 经济事项编制模块（前端 + API + SQLite）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --experimental-sqlite server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.0"
+  }
+}

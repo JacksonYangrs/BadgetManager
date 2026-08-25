@@ -1,0 +1,24 @@
+schema_version: "1.0"
+system:
+  id: replace-me
+  name: Replace Me
+  repository: ""
+  runtime: ""
+  owner: OPC
+tl4:
+  ready: false
+  run_context_header: X-TL4-Run-Id
+  event_endpoint: /__test__/runs/{run_id}/events
+  trace_enabled: false
+  coverage_enabled: false
+verification:
+  default_level: L1
+  supported_levels: [L1, L2, L3, L4]
+environments:
+  production:
+    destructive_test_controls: disabled
+  test_lite:
+    database: isolated
+  test_tl4:
+    database: isolated
+    external_effects: sandbox_only
