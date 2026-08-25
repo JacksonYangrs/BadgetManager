@@ -1,7 +1,6 @@
 /* ================================================================
  * login.js — 登录页（正式：用户名 + 密码，后端认证）
- *  - 演示账号卡片：一键填入常用账户（开发/演示期便利）
- *  - 演示通道：下拉选择角色直接进入（?as= 等价，不经后端认证）
+ *  - 仅保留用户名 + 密码普通登录；演示账号卡 / 演示通道等测试入口已隐藏
  * ================================================================ */
 
 var BM = window.BM || {};
@@ -34,42 +33,7 @@ const LOGIN_ICONS = {
   buHead: "🏭",
 };
 
-/* 演示账号（种子用户，密码统一 Admin@2026）· 按组织层级分组
- * 覆盖角色视角：集团管理层 / 事业部 / 职能中心 / 部门（含上下级部门对）/ 基层 */
-const DEMO_GROUPS = [
-  {
-    title: "集团层",
-    note: "含上下级部门示例：集团财务部（上级）→ 一公司财务部（下级）",
-    accounts: [
-      { u: "zhangmy", n: "张明远", d: "总经理（集团 CEO）", org: "集团总部" },
-      { u: "xujing", n: "徐静", d: "总经办负责人", org: "总经办" },
-      { u: "lijing", n: "李静", d: "集团财务部 · 财务经理（上级）", org: "集团财务部" },
-      { u: "zhoufang", n: "周芳", d: "职能中心归口责任人", org: "行政服务中心" },
-    ],
-  },
-  {
-    title: "事业部层",
-    accounts: [
-      { u: "sunyue", n: "孙悦", d: "行政服务事业部负责人", org: "行政服务事业部" },
-    ],
-  },
-  {
-    title: "公司 / 部门层",
-    accounts: [
-      { u: "wangmin", n: "王敏", d: "一公司财务部 · 部门经理（下级）", org: "一公司 · 财务部" },
-      { u: "chenkai", n: "陈凯", d: "行政归口负责人", org: "二公司" },
-      { u: "liuyang", n: "刘洋", d: "公司预算员", org: "四公司" },
-    ],
-  },
-  {
-    title: "基层层",
-    accounts: [
-      { u: "zhaolei", n: "赵磊", d: "基层费用责任岗（后勤）", org: "一公司 · 后勤保障部" },
-      { u: "duanwei", n: "段伟", d: "基层费用责任岗（后勤）", org: "二公司 · 后勤保障部" },
-      { u: "zhangwei", n: "张伟", d: "员工", org: "一公司 · 综合办公室" },
-    ],
-  },
-];
+/* 演示账号（DEMO_GROUPS）：测试/演示用，客户登录界面已隐藏，定义移除避免死代码 */
 
 BM.renderLogin = function () {
   const root = document.getElementById("loginRoot");
@@ -141,47 +105,7 @@ BM.renderLogin = function () {
   uInput.addEventListener("keydown", (e) => e.key === "Enter" && doLogin());
   pInput.addEventListener("keydown", (e) => e.key === "Enter" && doLogin());
 
-  /* ---- 演示账号（按组织层级分组） ---- */
-  const demoTitle = el("div", "login-demo-title", "演示账号 · 按组织层级（点击填入，密码 Admin@2026）");
-  card.appendChild(demoTitle);
-  const demos = el("div", "login-demos");
-  DEMO_GROUPS.forEach((g) => {
-    const group = el("div", "demo-group");
-    const gHead = el("div", "demo-group-head", g.title);
-    if (g.note) gHead.title = g.note;
-    group.appendChild(gHead);
-    const grid = el("div", "demo-group-grid");
-    g.accounts.forEach((a) => {
-      const c = el("button", "demo-acc");
-      c.innerHTML = `<b>${esc(a.n)}</b><span>${esc(a.d)} · ${esc(a.u)}</span><i>${esc(a.org)}</i>`;
-      c.addEventListener("click", () => {
-        uInput.value = a.u;
-        pInput.value = "Admin@2026";
-        errLine.style.display = "none";
-      });
-      grid.appendChild(c);
-    });
-    group.appendChild(grid);
-    demos.appendChild(group);
-  });
-  card.appendChild(demos);
-
-  /* ---- 演示通道（开发期快捷） ---- */
-  const demoRow = el("div", "login-demo-row");
-  demoRow.innerHTML = `<span class="login-hint">开发期快捷通道：</span>`;
-  const demoSel = el("select");
-  demoSel.innerHTML = Object.keys(BM.ROLES).map((rid) => `<option value="${rid}">${esc(BM.ROLES[rid].name)}（${esc(BM.ROLES[rid].title)}）</option>`).join("");
-  const demoGo = el("button", "btn btn-ghost", "以演示身份进入");
-  demoGo.addEventListener("click", () => {
-    const rid = demoSel.value;
-    const dept = rid === "manager" ? "admin" : "admin";
-    BM.login(rid, dept);
-    BM.initCopilot();
-    BM.enterApp();
-  });
-  demoRow.appendChild(demoSel);
-  demoRow.appendChild(demoGo);
-  card.appendChild(demoRow);
+  /* 演示账号卡片 / 演示通道：测试入口，客户登录界面已隐藏（仅保留用户名+密码普通登录） */
 
   root.appendChild(card);
   root.style.display = "flex";

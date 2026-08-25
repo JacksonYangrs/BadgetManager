@@ -213,7 +213,7 @@ function init() {
     document.getElementById("loginRoot").style.display = "flex";
     document.getElementById("appRoot").style.display = "none";
     BM.renderLogin();
-    BM.toast("请选择角色重新登录");
+    BM.toast("请重新登录");
   });
 
   /* 重置 */
@@ -226,10 +226,11 @@ function init() {
   /* 弹层遮罩点击关闭 */
   document.getElementById("modalMask").addEventListener("click", BM.closeSheet);
 
-  /* URL 参数自动登录（演示/截图） */
+  /* URL 参数自动登录（?as=角色 免登录）：测试/演示用，客户环境已隐藏，默认关闭 */
+  const ENABLE_DEMO_DEEPLINK = false;
   const params = new URLSearchParams(location.search);
   const asRole = params.get("as");
-  if (asRole && BM.ROLES[asRole]) {
+  if (ENABLE_DEMO_DEEPLINK && asRole && BM.ROLES[asRole]) {
     const dept = params.get("dept") || "admin";
     BM.login(asRole, dept);
   }

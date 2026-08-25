@@ -375,8 +375,11 @@ function init() {
 
   /* ========== 登录状态 ========== */
   const params = new URLSearchParams(location.search);
+  /* 演示深链（?as=角色 免登录）：测试/演示用，客户环境已隐藏，默认关闭。
+   * 需要演示时把 ENABLE_DEMO_DEEPLINK 改为 true。 */
+  const ENABLE_DEMO_DEEPLINK = false;
   const asRole = params.get("as");
-  if (asRole && BM.ROLES[asRole]) {
+  if (ENABLE_DEMO_DEEPLINK && asRole && BM.ROLES[asRole]) {
     const dept = params.get("dept") || "admin";
     BM.login(asRole, dept);
     /* 阶段一：真实角色参数化深链（兼容旧 boss/manager/staff/finance） */
