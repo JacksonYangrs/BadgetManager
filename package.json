@@ -1,0 +1,16 @@
+{
+  "name": "badget-manager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "经济事项预算编制平台（前端 + Express 一体化服务 + 单元/集成/E2E 测试）",
+  "scripts": {
+    "start": "node --experimental-sqlite server/server.js",
+    "test:unit": "node tests/unit/run.js",
+    "test:integration": "node --experimental-sqlite tests/integration/backend-api.test.cjs",
+    "test:e2e": "node tests/e2e/smoke.e2e.cjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "puppeteer": "^25.9.0"
+  }
+}

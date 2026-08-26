@@ -47,7 +47,8 @@ function methodSelect(selected) {
 }
 
 /* ---------- 入口 ---------- */
-BM.renderBaseData = function (container) {
+BM.renderBaseData = function (container, opts) {
+  opts = opts || {};
   container.innerHTML = "";
   const page = el("div", "page");
 
@@ -76,7 +77,7 @@ BM.renderBaseData = function (container) {
   page.appendChild(body);
   container.appendChild(page);
 
-  let curTab = "events";
+  let curTab = (opts.tab && ["events", "subjects", "org"].includes(opts.tab)) ? opts.tab : "events";
   function switchTab(t) {
     curTab = t;
     tabEvents.classList.toggle("active", t === "events");
@@ -401,7 +402,7 @@ function openOrgModal(node, tree, reloadBody, canEditOrg, forcedParentId) {
     <div class="bd-field" id="o_center_field" style="${showCenter ? "" : "display:none"}"><label>归属管理中心</label><select class="bd-input" id="o_center">${centerOpts}</select>
       <div class="bd-hint">单位 / 部门可挂靠某个管理中心，建立归口 / 管理关系（一对多：1 中心管 N 部门）。</div></div>
     <div class="bd-field" id="o_bu_field" style="${showBu ? "" : "display:none"}"><label>归属事业部 (BU)</label><select class="bd-input" id="o_bu">${buOpts}</select>
-      <div class="bd-hint">单位（公司）可归属到某个事业部，预算看板按事业部聚合下属公司真实预算 / 执行。初始值由系统按编码规则推断，可在此纠偏。</div></div>
+      <div class="bd-hint">单位（公司）可归属到某个事业部，预算跟踪按事业部聚合下属公司真实预算 / 执行。初始值由系统按编码规则推断，可在此纠偏。</div></div>
     ${isEdit ? `<div class="bd-field"><label>级别（深度自动推导）</label><span class="bd-static">${esc(node.level || "—")}</span></div>` : ""}
     <div class="bd-modal-ops">
       ${isEdit ? `<button class="btn btn-ghost" id="o_child">＋ 新增子级</button><button class="btn btn-ghost bd-del" id="o_del">删除</button>` : ""}

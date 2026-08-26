@@ -153,9 +153,13 @@ BM.calc.compileByMethod = function (p) {
  * 入参：annual（年度总额），weights（12 个权重，缺省用季节性默认）
  * 返回：长度 12 的整数数组，和 = annual（残差补到最后一个月，确定性）
  * ---------------------------------------------------------------- */
+/* 三端共享的月度分解相对权重（canonical 合同口径，与 server/pure-calc.js 同值）。
+ * 修改需同步 server/pure-calc.js，且有 Suite D 跨端口径契约测试锁定一致性。 */
+BM.MONTHLY_WEIGHTS = [1.1, 0.9, 1.0, 1.0, 1.05, 1.1, 0.85, 0.9, 1.15, 1.1, 1.05, 0.8];
+
 BM.calc.decomposeMonthly = function (annual, weights) {
   annual = Math.round(annual || 0);
-  var w = (weights && weights.length === 12) ? weights.slice() : [1.1, 0.9, 1.0, 1.0, 1.05, 1.1, 0.85, 0.9, 1.15, 1.1, 1.05, 0.8];
+  var w = (weights && weights.length === 12) ? weights.slice() : BM.MONTHLY_WEIGHTS;
   var sum = w.reduce(function (a, b) { return a + b; }, 0) || 1;
   var months = w.map(function (x) { return Math.floor((annual * x) / sum); });
   var used = months.reduce(function (a, b) { return a + b; }, 0);

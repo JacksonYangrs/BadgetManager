@@ -1,5 +1,5 @@
 /* ================================================================
- * rules.js — 预算规则管理（财务/管理员，D4 版本化，三 Tab 重构 2026-08-25）
+ * rules.js — 预算规划（财务/管理员，D4 版本化，三 Tab 重构 2026-08-25；预算规则为预算规划核心内容）
  *  - Tab1 当前版本：baseline 卡片（单选 → 解释区）+ 财务流程规则子区 + 调整发布
  *  - Tab2 历史版本：列表 + 恢复为当前版本（发布/回滚）+ 删除（active 守卫）
  *  - Tab3 适用经济事项：左规则卡 + 右科目多选 + 整版本映射持久化
@@ -61,13 +61,13 @@ BM.renderRules = function (container) {
   const role = BM.state.role;
 
   const head = el("div", "page-head");
-  head.appendChild(el("div", "", `<div class="page-title">预算规则管理</div>
-    <div class="page-desc">规则独立版本化管理 · 基线因子即对明年的预测 · 规则变更形成新版本并发布后全系统生效</div>`));
+  head.appendChild(el("div", "", `<div class="page-title">预算规划</div>
+    <div class="page-desc">预算规则是预算规划的核心内容 · 规则独立版本化管理 · 基线因子即对明年的预测 · 规则变更形成新版本并发布后全系统生效</div>`));
   page.appendChild(head);
   BM.renderRoleHint(page, "rules");
 
   if (role !== "finance" && role !== "admin") {
-    page.appendChild(el("div", "empty", `<div class="empty-ico">🔒</div>仅财务经理 / 系统管理员可管理预算规则`));
+    page.appendChild(el("div", "empty", `<div class="empty-ico">🔒</div>仅财务经理 / 系统管理员可管理预算规划`));
     container.appendChild(page);
     return;
   }

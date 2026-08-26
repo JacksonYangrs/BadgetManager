@@ -117,14 +117,14 @@ try {
   errs.push("canViewBenchmark 异常：" + e.stack);
 }
 
-/* 导航集合复核：全角色 3 功能 + 首页 + 组织架构（模块三：org 全员只读；accounts 仅 admin） */
+/* 导航集合复核：基础 3 功能 + 首页；组织架构已收敛进「基础数据」第 3 Tab，不再作为独立菜单（模块三） */
 try {
   const v = BM.roleViews("staff").join(",");
-  if (v !== "wb-home,compile,kanban,rules,org") throw new Error("roleViews 集合不符：" + v);
-  console.log("✓ roleViews 已收敛为 wb-home,compile,kanban,rules,org");
+  if (v !== "wb-home,compile,kanban,rules") throw new Error("roleViews 集合不符：" + v);
+  console.log("✓ roleViews 已收敛为 wb-home,compile,kanban,rules（无独立组织架构入口）");
   const a = BM.roleViews("admin").join(",");
-  if (a !== "wb-home,compile,kanban,rules,accounts,org") throw new Error("admin roleViews 不符：" + a);
-  console.log("✓ admin roleViews 含 accounts 账户管理");
+  if (a !== "wb-home,compile,kanban,rules,accounts,basedata") throw new Error("admin roleViews 不符：" + a);
+  console.log("✓ admin roleViews 含 accounts 账户管理 + basedata 基础数据");
 } catch (e) {
   errs.push("roleViews 异常：" + e.stack);
 }

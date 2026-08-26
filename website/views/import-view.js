@@ -250,4 +250,27 @@ function renderImportView(container) {
 }
 
 window.BM.renderImportView = renderImportView;
+
+/* 弹窗式二级子页面：从「预算跟踪」页右上角按钮触发（不作为左侧菜单项） */
+BM.openImportModal = function () {
+  const modalRoot = document.getElementById("modalRoot");
+  if (!modalRoot) return;
+  modalRoot.innerHTML = "";
+  const mask = el("div", "modal-mask");
+  const modal = el("div", "modal");
+  const head = el("div", "modal-head");
+  head.appendChild(el("div", "modal-title", "费控导入"));
+  const closeBtn = el("button", "modal-close", "×");
+  head.appendChild(closeBtn);
+  modal.appendChild(head);
+  const body = el("div", "modal-body");
+  const close = () => { modalRoot.innerHTML = ""; };
+  closeBtn.addEventListener("click", close);
+  mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
+  modal.appendChild(body);
+  mask.appendChild(modal);
+  modalRoot.appendChild(mask);
+  BM.renderImportView(body);
+};
+
 window.BM = BM;

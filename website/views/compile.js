@@ -51,6 +51,7 @@ function monthSum(inputs) {
  * ================================================================ */
 BM.eventsData = null;   /* 后端经济事项列表（8 列结构） */
 BM.apiMode = false;     /* true = 已连接后端，保存走 PUT */
+BM.subjectCache = null; /* 科目编码 → 名称缓存（由 /api/subjects 填充） */
 let _apiChecked = false;
 
 BM.initEventsApi = function () {
@@ -68,7 +69,7 @@ BM.initEventsApi = function () {
       /* 仅当当前正停留在编制页时，用后端数据重渲染；其他视图（看板等）不跳转 */
       if (BM.apiMode) {
         const t = document.querySelector("#viewPanel .page-title");
-        if (t && (t.textContent || "").indexOf("新预算编制") >= 0) BM.openView("compile");
+        if (t && (t.textContent || "").indexOf("预算编制") >= 0) BM.openView("compile");
       }
     });
 };
@@ -117,7 +118,7 @@ function renderCompile(container) {
 
   const head = el("div", "page-head");
   head.appendChild(
-    el("div", "", `<div class="page-title">新预算编制 · 2026</div>
+    el("div", "", `<div class="page-title">预算编制 · 2026</div>
       <div class="page-desc">两个视角：经济事项视角（填报）· 财务会计视角（按会计科目聚合）——同一份数据</div>`)
   );
   page.appendChild(head);
@@ -361,21 +362,51 @@ function renderCompile(container) {
   /* 财务会计视角：按会计科目聚合（本年度预算值合计） */
   function renderAccountView() {
     dualBox.innerHTML = "";
-    const table = el("table");
-    table.innerHTML = `<thead><tr>
-      <th>会计科目（首要索引）</th><th>经济事项数</th>
-      <th style="text-align:right">金额合计（本年度预算值）</th>
-    </tr></thead>`;
-    const tb = el("tbody");
-    aggBy((d) => d.acctCode).forEach((row) => {
-      const tr = el("tr");
-      tr.innerHTML = `<td><b>${esc(row.key)}</b></td>
-        <td class="tbl-num" style="text-align:right">${row.events}</td>
-        <td class="tbl-num" style="text-align:right"><b>${BM.money(row.amount)}</b></td>`;
-      tb.appendChild(tr);
-    });
-    table.appendChild(tb);
-    dualBox.appendChild(table);
+    const loading = el("div", "hint-text", "正在加载科目字典…");
+    dualBox.appendChild(loading);
+
+    const buildTable = (acctName) => {
+      dualBox.innerHTML = "";
+      const table = el("table");
+      table.innerHTML = `<thead><tr>
+        <th>科目编码</th><th>科目名称</th>
+        <th style="text-align:right">经济事项数</th>
+        <th style="text-align:right">金额合计（本年度预算值）</th>
+      </tr></thead>`;
+      const tb = el("tbody");
+      aggBy((d) => d.acctCode).forEach((row) => {
+        const tr = el("tr");
+        tr.innerHTML = `<td><b>${esc(row.key)}</b></td>
+          <td>${esc(acctName[row.key] || "—")}</td>
+          <td class="tbl-num" style="text-align:right">${row.events}</td>
+          <td class="tbl-num" style="text-align:right"><b>${BM.money(row.amount)}</b></td>`;
+        tb.appendChild(tr);
+      });
+      table.appendChild(tb);
+      dualBox.appendChild(table);
+    };
+
+    const fallback = () => {
+      const acctName = {};
+      (BM.RULES || []).forEach((r) => { if (r.acctCode && !acctName[r.acctCode]) acctName[r.acctCode] = r.cat; });
+      buildTable(acctName);
+    };
+
+    if (BM.subjectCache) {
+      buildTable(BM.subjectCache);
+      return;
+    }
+    if (typeof fetch !== "function") { fallback(); return; }
+    fetch("/api/subjects", { headers: BM.authHeaders() })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((subjects) => {
+        const acctName = {};
+        (subjects || []).forEach((s) => { if (s.code) acctName[s.code] = s.name || "—"; });
+        (BM.RULES || []).forEach((r) => { if (r.acctCode && !acctName[r.acctCode]) acctName[r.acctCode] = r.cat; });
+        BM.subjectCache = acctName;
+        buildTable(acctName);
+      })
+      .catch(() => fallback());
   }
 
   function renderDual(mode) {

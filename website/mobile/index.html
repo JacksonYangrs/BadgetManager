@@ -47,8 +47,10 @@
     <div class="toast-stack" id="toastRoot" aria-live="polite"></div>
 
     <script src="data/data.js"></script>
+    <script src="../core/calc.js"></script>
     <script src="core/state.js"></script>
-    <script src="core/engine.js"></script>
+    <!-- engine.js 与 desktop 完全一致，复用共享内核，避免第三份漂移 -->
+    <script src="../core/engine.js"></script>
     <script src="views/home.js"></script>
     <script src="views/budget.js"></script>
     <script src="views/approval.js"></script>

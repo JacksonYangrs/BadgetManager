@@ -643,9 +643,9 @@ function renderFinal(container) {
 function renderRules(container) {
   const RULES = [
     { key: "planMode", title: "编制方式", options: [{ v: "topdown", t: "自上而下", d: "总经理定总额 → 逐级分解" }, { v: "bottomup", t: "自下而上", d: "个人/部门提报 → 汇总" }] },
-    { key: "trackMode", title: "执行追踪", options: [{ v: "reimburse", t: "实际报销为准", d: "报销入账后更新预算" }, { v: "apply", t: "申请单预跟踪", d: "请款单先占额度" }] },
-    { key: "surplus", title: "期末余量", options: [{ v: "recover", t: "收回", d: "未花完预算收回" }, { v: "hold", t: "挂起", d: "保留待下期" }, { v: "carry", t: "结转", d: "结转到下期" }] },
-    { key: "allowOverBudget", title: "超预算", options: [{ v: true, t: "不允许", d: "拦截 + 走追加流程" }, { v: false, t: "允许", d: "走部门经理审批接口" }] },
+    { key: "trackMode", title: "执行追踪", options: [{ v: "reimburse", t: "实际报销为准", d: "报销入账后更新预算" }, { v: "advance", t: "申请单预跟踪", d: "请款单先占额度" }] },
+    { key: "surplusAction", title: "期末余量", options: [{ v: "reclaim", t: "收回", d: "未花完预算期末收回" }, { v: "suspend", t: "挂起", d: "保留待下期处理" }, { v: "carry", t: "结转", d: "结转到下期" }] },
+    { key: "allowOverBudget", title: "超预算处理", options: [{ v: false, t: "不允许", d: "拦截 + 走追加流程" }, { v: true, t: "允许", d: "走部门经理审批接口" }] },
   ];
   RULES.forEach((rule) => {
     container.appendChild(el("div", "section-title", rule.title));

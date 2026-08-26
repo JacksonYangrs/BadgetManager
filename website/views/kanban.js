@@ -1,5 +1,5 @@
 /* ================================================================
- * kanban.js — 预算看板（2026-08-24 重构：三层时间 + 角色范围 + 双维度嵌套）
+ * kanban.js — 预算跟踪（2026-08-24 重构：三层时间 + 角色范围 + 双维度嵌套）
  *  - 三层时间粒度：年 / 季 / 月（面包屑下钻）
  *  - 角色 × 组织范围：事业部经理看自己事业部+下属；管理中心看自己中心+下属；总经理/财务看全部
  *  - 节点内嵌双维度：进入组织节点后，按「经济事项 / 财务科目」切换（同一份数据两种切法）
@@ -30,9 +30,15 @@ BM.renderKanban = function (container) {
   const page = el("div", "page");
   const head = el("div", "page-head");
   head.appendChild(
-    el("div", "", `<div class="page-title">预算看板</div>
+    el("div", "", `<div class="page-title">预算跟踪</div>
       <div class="page-desc">三层时间（年 › 季 › 月）· 按角色看组织范围 · 经济事项 / 财务双维度嵌套</div>`)
   );
+  /* 右上角：费控导入入口（弹出二级子页面，非左侧菜单） */
+  const headRight = el("div", "page-head-right");
+  const importBtn = el("button", "btn btn-primary btn-sm", "📥 费控导入");
+  importBtn.addEventListener("click", () => BM.openImportModal && BM.openImportModal());
+  headRight.appendChild(importBtn);
+  head.appendChild(headRight);
   page.appendChild(head);
   BM.renderRoleHint(page, "kanban");
 

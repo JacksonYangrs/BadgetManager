@@ -14,9 +14,12 @@ const fs = require("fs");
 const crypto = require("crypto");
 const { execFile } = require("child_process");
 const dbm = require("./db");
+const buildImportModule = require("./modules/expense-import");
+const buildPolicyRules = require("./policy_rules");
+const { buildAuth } = require("./middleware/auth");
 
-/* markitdown（default venv 已装）解析政策文档为文本 */
-const MARKITDOWN = "/Users/yangjackson/.workbuddy/binaries/python/envs/default/bin/python";
+/* markitdown（default venv 已装）解析政策文档为文本；优先用环境变量，回退到本机默认值，最后回退 python3 */
+const MARKITDOWN = process.env.MARKITDOWN_BIN || "/Users/yangjackson/.workbuddy/binaries/python/envs/default/bin/python";
 const TEXT_EXT = new Set(["pdf", "docx", "xlsx", "pptx", "md", "txt", "csv", "doc"]);
 
 const PORT = process.env.PORT || 8300;
@@ -26,34 +29,13 @@ const db = dbm.init();
 dbm.initUnits(db);
 dbm.initExecutions(db);
 dbm.seedExecutions(db);
+dbm.initAuth(db); /* 必须早于 seedBuCodes：migrateOrgTypeAndCenters 会补全 organization.type 列 */
 dbm.seedBuCodes(db);
-dbm.initAuth(db);
 const app = express();
 app.use(express.json());
 
-/* ---------- 认证中间件 ---------- */
-function auth(req, res, next) {
-  const h = req.headers.authorization || "";
-  const token = h.startsWith("Bearer ") ? h.slice(7) : null;
-  const user = dbm.getUserByToken(db, token);
-  if (!user) return res.status(401).json({ error: "未登录或会话已过期" });
-  req.user = user;
-  req.token = token;
-  next();
-}
-
-/* 仅系统管理员 */
-function requireAdmin(req, res, next) {
-  if (!req.user.roles.some((r) => r.code === "admin")) return res.status(403).json({ error: "需要系统管理员权限" });
-  next();
-}
-
-/* 组织维护权限：管理员 / 总经办负责人 / 总经办预算管理员（与前端 BM.canEditOrg 对齐） */
-function requireOrgEditor(req, res, next) {
-  if (!req.user.roles.some((r) => r.code === "admin" || r.code === "cooLead" || r.code === "cooAnalyst"))
-    return res.status(403).json({ error: "需要组织维护权限（管理员 / 总经办）" });
-  next();
-}
+/* 统一权限中间件（定义见 server/middleware/auth.js，由 db 注入 token  -解析） */
+const { auth, requireAdmin, requireOrgEditor, requireRuleEditor, requireBaseDataEditor, requireAccountsEditor, resolveAllowedOrgIds } = buildAuth(dbm, db);
 
 /* ---------- API ---------- */
 app.get("/api/health", (req, res) => res.json({ ok: true, service: "economic-event-module", db: dbm.DB_FILE }));
@@ -107,11 +89,6 @@ app.post("/api/notifications", auth, requireAdmin, (req, res) => {
 });
 
 /* ---------- 预算规则版本化（D4） ---------- */
-function requireRuleEditor(req, res, next) {
-  const rs = (req.user.roles || []).map((r) => r.code);
-  if (!rs.some((c) => c === "admin" || c === "finance")) return res.status(403).json({ error: "需要财务或管理员权限" });
-  next();
-}
 
 app.get("/api/rule-versions", auth, (req, res) => res.json(dbm.listRuleVersions(db)));
 
@@ -149,7 +126,9 @@ app.post("/api/policy-upload", auth, requireRuleEditor, (req, res) => {
   if (!TEXT_EXT.has(ext))
     return res.json({ text: "", note: "暂仅支持文本类文档（PDF/Word/Excel/Markdown/TXT/CSV），图片 OCR 后续补", filename });
   const safe = filename.replace(/[^\w.\-\u4e00-\u9fa5]/g, "_");
-  const tmp = path.join(__dirname, "..", "runtime", "uploads", Date.now() + "_" + safe);
+  const uploadDir = path.join(__dirname, "..", "runtime", "uploads");
+  fs.mkdirSync(uploadDir, { recursive: true }); /* 干净环境 runtime/ 可能不存在，先建目录防止写入失败 */
+  const tmp = path.join(uploadDir, Date.now() + "_" + safe);
   try {
     fs.writeFileSync(tmp, Buffer.from(content, "base64"));
   } catch (e) {
@@ -192,10 +171,10 @@ app.put("/api/rule-versions/:id/event-map", auth, requireRuleEditor, (req, res) 
 });
 
 /* ---------- 角色 / 组织 ---------- */
-app.get("/api/roles", (req, res) => res.json(dbm.listRoles(db)));
+app.get("/api/roles", auth, (req, res) => res.json(dbm.listRoles(db)));
 
 /* 组织树（集团 / 单位 / 部门 / 管理中心），含 type 与归口管理中心 */
-app.get("/api/orgs/tree", (req, res) => {
+app.get("/api/orgs/tree", auth, (req, res) => {
   const tree = dbm.buildOrgTree(db);
   const withUsers = (nodes) => nodes.map((n) => ({
     id: n.id, code: n.code, name: n.name, level: n.level, type: n.type, managedCenterId: n.managedCenterId || null, buCode: n.buCode || null,
@@ -220,15 +199,15 @@ app.put("/api/users/:id", auth, requireAccountsEditor, (req, res) => {
   res.json(u);
 });
 
-app.get("/api/events", (req, res) => res.json(dbm.listEvents(db)));
+app.get("/api/events", auth, (req, res) => res.json(dbm.listEvents(db)));
 
-app.get("/api/events/:id", (req, res) => {
+app.get("/api/events/:id", auth, (req, res) => {
   const ev = dbm.getEvent(db, Number(req.params.id));
   if (!ev) return res.status(404).json({ error: "未找到经济事项" });
   res.json(ev);
 });
 
-app.put("/api/events/:id/amount", (req, res) => {
+app.put("/api/events/:id/amount", auth, requireBaseDataEditor, (req, res) => {
   const { amount } = req.body || {};
   if (amount == null) return res.status(400).json({ error: "缺少 amount" });
   const ev = dbm.updateAmount(db, Number(req.params.id), Number(amount));
@@ -236,7 +215,7 @@ app.put("/api/events/:id/amount", (req, res) => {
   res.json(ev);
 });
 
-app.put("/api/events/:id/monthly", (req, res) => {
+app.put("/api/events/:id/monthly", auth, requireBaseDataEditor, (req, res) => {
   const { monthly } = req.body || {};
   const result = dbm.updateMonthly(db, Number(req.params.id), monthly);
   if (result && result.error) return res.status(400).json(result);
@@ -245,22 +224,6 @@ app.put("/api/events/:id/monthly", (req, res) => {
 });
 
 /* ---------- 基础数据管理（B）：会计科目 + 经济事项 CRUD ---------- */
-/* 基础数据维护权限：admin/finance/cooLead/cooAnalyst 直通；centerOwner 放行（center 隔离为后续增强） */
-function requireBaseDataEditor(req, res, next) {
-  const rs = (req.user.roles || []).map((r) => r.code);
-  if (!rs.some((c) => c === "admin" || c === "finance" || c === "cooLead" || c === "cooAnalyst" || c === "centerOwner"))
-    return res.status(403).json({ error: "需要基础数据维护权限（管理员/财务/总经办/归口责任人）" });
-  next();
-}
-
-/* 预算工作人员（用户账户）维护权限：管理员 / 财务 / 总经办 / 归口责任人 / 总经理(boss,ceo) */
-function requireAccountsEditor(req, res, next) {
-  const rs = (req.user.roles || []).map((r) => r.code);
-  if (!rs.some((c) => c === "admin" || c === "finance" || c === "cooLead" || c === "cooAnalyst" || c === "centerOwner" || c === "boss" || c === "ceo"))
-    return res.status(403).json({ error: "需要预算工作人员管理权限（管理员/财务/总经办/归口责任人/总经理）" });
-  next();
-}
-
 /* 会计科目主数据 */
 app.get("/api/subjects", auth, (req, res) => {
   const { center, method } = req.query;
@@ -314,10 +277,12 @@ app.delete("/api/events/:id", auth, requireBaseDataEditor, (req, res) => {
 
 /* ---------- 上级部门汇总 API（模块二） ---------- */
 /* 组织结构：上级部门 + 下级单位（数量按组织结构自动确定；公司挂事业部之下，按 level 取） */
-app.get("/api/orgs", (req, res) => {
+app.get("/api/orgs", auth, (req, res) => {
   const orgs = dbm.listOrgs(db);
+  const allowed = resolveAllowedOrgIds(dbm, db, req.user); // null = 全域
   const root = orgs.find((o) => o.code === "HQ") || orgs[0];
-  const units = orgs.filter((o) => o.level === "company");
+  let units = orgs.filter((o) => o.level === "company");
+  if (allowed) units = units.filter((u) => allowed.indexOf(u.id) >= 0);
   res.json({ root, units });
 });
 
@@ -340,9 +305,14 @@ app.delete("/api/orgs/:id", auth, requireOrgEditor, (req, res) => {
 });
 
 /* 某单位预算（与编制表同结构，含压降/注释） */
-app.get("/api/unit-budgets", (req, res) => {
+app.get("/api/unit-budgets", auth, (req, res) => {
   const { org } = req.query;
   if (!org) return res.status(400).json({ error: "缺少 org" });
+  const allowed = resolveAllowedOrgIds(dbm, db, req.user);
+  if (allowed) {
+    const o = dbm.listOrgs(db).find((n) => n.code === org);
+    if (!o || allowed.indexOf(o.id) < 0) return res.status(403).json({ error: "无权访问该组织数据" });
+  }
   res.json(dbm.listUnitBudgets(db, org));
 });
 
@@ -350,12 +320,20 @@ app.get("/api/unit-budgets", (req, res) => {
 app.get("/api/unit-summary", auth, (req, res) => {
   const { orgs, months } = req.query;
   if (!orgs) return res.status(400).json({ error: "缺少 orgs" });
+  const allowed = resolveAllowedOrgIds(dbm, db, req.user);
+  const orgList = String(orgs).split(",").map((s) => s.trim()).filter(Boolean);
+  if (allowed) {
+    const allowedCodes = new Set(dbm.listOrgs(db).filter((n) => allowed.indexOf(n.id) >= 0).map((n) => n.code));
+    const filtered = orgList.filter((c) => allowedCodes.has(c));
+    if (filtered.length === 0) return res.status(403).json({ error: "无权访问所请求的组织数据" });
+    orgList.length = 0; orgList.push(...filtered);
+  }
   const ms = months ? String(months).split(",").map((s) => parseInt(s, 10)).filter((n) => n >= 1 && n <= 12) : null;
-  res.json(dbm.summaryByCat(db, String(orgs).split(",").map((s) => s.trim()).filter(Boolean), ms));
+  res.json(dbm.summaryByCat(db, orgList, ms));
 });
 
 /* 压降处理 + 注释（原因分析，保存到数据库） */
-app.put("/api/unit-budgets/:id/reduction", (req, res) => {
+app.put("/api/unit-budgets/:id/reduction", auth, requireBaseDataEditor, (req, res) => {
   const { reduceRatio, reduceAmount, note } = req.body || {};
   const ev = dbm.updateUnitBudgetReduction(db, Number(req.params.id), { reduceRatio, reduceAmount, note });
   if (!ev) return res.status(404).json({ error: "未找到单位预算" });
@@ -365,23 +343,36 @@ app.put("/api/unit-budgets/:id/reduction", (req, res) => {
 /* 逐月执行流水（B 路径）：查询 + 单点 upsert（财务真实导入/修正） */
 app.get("/api/executions", auth, (req, res) => {
   const { org, months } = req.query;
+  const allowed = resolveAllowedOrgIds(dbm, db, req.user);
   let orgId = null;
   if (org) {
     const o = dbm.orgByCode ? dbm.orgByCode(db, org) : db.prepare("SELECT id FROM organization WHERE code = ?").get(org);
     if (!o) return res.status(404).json({ error: "组织不存在" });
+    if (allowed && allowed.indexOf(o.id) < 0) return res.status(403).json({ error: "无权访问该组织数据" });
     orgId = o.id;
   }
   const ms = months ? String(months).split(",").map((s) => parseInt(s, 10)).filter((n) => n >= 1 && n <= 12) : null;
-  res.json(dbm.listExecutions(db, { orgId, months: ms }));
+  let rows = dbm.listExecutions(db, { orgId, months: ms });
+  if (allowed && !org) rows = rows.filter((r) => allowed.indexOf(r.org_id) >= 0);
+  res.json(rows);
 });
 app.put("/api/executions", auth, requireBaseDataEditor, (req, res) => {
   const { org, cat, month, amount } = req.body || {};
   if (!org || !cat || !month) return res.status(400).json({ error: "缺少 org/cat/month" });
+  const monthNum = parseInt(month, 10);
+  if (!Number.isInteger(monthNum) || monthNum < 1 || monthNum > 12) return res.status(400).json({ error: "month 必须为 1–12 的整数" });
+  if (typeof amount !== "number" || Number.isNaN(amount) || amount < 0) return res.status(400).json({ error: "amount 必须为非负数字" });
+  const allowed = resolveAllowedOrgIds(dbm, db, req.user);
   const o = dbm.orgByCode ? dbm.orgByCode(db, org) : db.prepare("SELECT id FROM organization WHERE code = ?").get(org);
   if (!o) return res.status(404).json({ error: "组织不存在" });
-  const rec = dbm.upsertExecution(db, o.id, cat, parseInt(month, 10), amount);
+  if (allowed && allowed.indexOf(o.id) < 0) return res.status(403).json({ error: "无权访问该组织数据" });
+  const rec = dbm.upsertExecution(db, o.id, String(cat), monthNum, amount);
   res.json(rec);
 });
+
+/* ---------- 独立模块：费控导入（M8）/ 预算政策生成 ---------- */
+buildImportModule(dbm).attach(app, db);
+buildPolicyRules(dbm).attach(app, db);
 
 /* ---------- 静态前端 ---------- */
 app.use(express.static(WEB_ROOT));

@@ -1,7 +1,7 @@
 # 任务板｜三安光电 AI 费用预决算管理系统（BadgetManager）
 
-> 最后刷新：2026-08-25 14:55　|　刷新人：Buddy
-> 说明：原板停在 **B1–B7 pending**，与实际进度脱节。本板按 08-22~08-25 真实交付重建。
+> 最后刷新：2026-08-26 17:30　|　刷新人：Buddy
+> 说明：原板停在 **B1–B7 pending**，与实际进度脱节。本板按 08-22~08-25 真实交付重建，08-26 追加 M18（db.js 解构工程）。
 > 纪律：设计文档待定稿前不进开发；松哥未引导排序前不执行；改动必有回归测试 + 真机验证。
 
 ---
@@ -26,6 +26,12 @@
 | M14 | 预算规则 Tab4 三类管控规则下拉 + 发布同步 | 松哥拍板简化实现「就是下拉框选择一下」：Tab4 新增「监督规则设置」三下拉（trackMode/surplusAction/allowOverBudget，默认继承 active）；`genBtn` 用下拉值覆盖 flow 项（替代原样克隆）；草案内改下拉实时同步预览(`pushFlowOverrides`)；新增 `BM.syncStateRules` 修复隐藏双轨——`pubBtn` 发布后写回 `BM.state.rules`（含 planMode），报销/采购拦截随发布生效；CSS 加 `.cn-flow*` | 真机 E2E 18/18（08-25） |
 | M15 | 经济事项映射纳入版本化（与 baseline/flow 同生命周期） | 松哥拍板「克隆继承+草案可编辑」：后端 `cloneEventMap` 在 `createRuleVersion` 克隆 `rule_item_event`（active→草案）；前端 Tab3 加版本切换器（`.evt-ver-sel`，默认 active，可切草案/历史），`target` 取代 `active` 驱动标题/规则卡/加载/保存，`saveEventMap` 按 target.id 写；CSS 加 `.evt-ver-bar`/`.evt-ver-sel` | 真机 E2E：create_next 19/19（克隆断言通过）+ event_map 16/16（切换器断言）+ grouping 9/9 无回归（08-25） |
 | M16 | Tab3「适用经济事项」重布局 + 显示规则名 | 松哥指令"页面重新布局一下，根其他页面风格 一致。显示规则名，不要显示规则代码"：① Tab3 头部加 `.rule-version-card`（与 Tab1 风格一致，`.rv-title` + `statusBadge` + 描述）；② 新增 `.evt-toolbar` 工具栏（编辑版本 select + 「当前规则卡已选 X/60 科目」胶囊 + 「保存映射」btn-accent，与 compile `.filter-bar` 视觉语言一致）；③ 左侧规则卡显示规则名（`BM.RULE_EVENT_MAP[scopeKey].desc` = 总经办归口/按人数核定/阶梯压降…）+ 政策表述 + 弹性分类徽章（半刚性/弹性/项目型），**不显示 scopeKey 代码**；④ 右侧顶部加 `.evt-cur-info` 当前规则信息面板（规则名 + 政策）；⑤ `evt-map` 左栏 220→240px。E2E 修：保存按钮选择器 `.evt-right .btn-primary`→`.evt-toolbar .btn-accent`，版本切换断言查 `.rv-title`，新增工具栏/头卡/规则名/徽章 4 条断言 | 真机 E2E：event_map 22/22（重布局全验）+ grouping 9/9 + create_next 19/19 无回归（08-25） |
+
+| M17 | 移动端预算规则概念对齐桌面版 | 松哥指令"手机端代码没有跟桌面版同步"→ 拍板"概念对齐（不带版本化）"：移动端 `website/mobile` 是独立纯前端 demo，将其 4 个规则开关（`renderRules`, budget.js:643）字段名/取值/默认值/语义对齐桌面版 flow 项——`surplus`→`surplusAction`、`recover/hold/carry`→`reclaim/suspend/carry`、`apply`→`advance`、修掉 `allowOverBudget` 语义反的 bug（旧 v:true=不允许/v:false=允许，与 state.js 拦截逻辑矛盾；改为 false=不允许/拦截、true=允许）；`DEFAULT_RULES`(data.js:543) 默认值对齐桌面版 seed（surplusAction:reclaim、allowOverBudget:false）。`RULES_LABELS`/`isPurchaseBlocked` 已是对齐版，不动 | 真机冒烟（Playwright 开 mobile + 注入登录态进规则页）：4 标题正确 + 默认值对齐（自下而上/实际报销为准/收回/不允许）+ 点"允许超预算"→state 切 true + UI 高亮联动；无 JS 报错（08-25） |
+
+---
+
+| M18 | **db.js God Object 解构（工程重构）** | 松哥拍板"按业务拆成不同文件"。把 1435 行 `server/db.js`（77 函数单点耦合枢纽）拆为 11 文件：9 业务模块（`server/modules/`：organization/auth/subjects/events/budget-compile/budget-execution/rules/ai-policy-extract/notifications）+ AI 三件套（ai-gateway 占位 LLM 网关 / ai-budget-decision 决策分析 / 费控导入 expense-import 从 import_module.js 迁入）；`db.js` 退化为组合根，仅 `Object.assign` 合并 ≥91 个导出，公开 API 不变。`aiSuggestion` 下沉到 ai-budget-decision（内部依赖，不进根）。配套新测试 `tests/integration/db-interface.test.cjs` 锁定接口。**顺带修复前端 bug**：`website/core/state.js` 演示通道 BASE 误含 `importView`（与 389 行注释"不作为菜单项"矛盾），致 `roleViews('staff')` 多出一个菜单项，已移除。 | 单元 124/0、集成 API 7/0、接口回归 12/0、e2e 3/0，全绿（08-26） |
 
 ---
 

@@ -27,7 +27,7 @@ BM.renderMonthlySplit = function (container) {
   const page = el2("div", "page");
 
   if (!cat) {
-    page.appendChild(el2("div", "empty", "未选择经济事项，请从「新预算编制」页进入"));
+    page.appendChild(el2("div", "empty", "未选择经济事项，请从「预算编制」页进入"));
     container.appendChild(page);
     return;
   }

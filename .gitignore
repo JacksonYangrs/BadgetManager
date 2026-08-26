@@ -1,5 +1,7 @@
 # 本机运行数据，不纳入源码版本（README 明确说明）
 runtime/
+server/economic_event.db
+server/economic_event.db-journal
 
 # 生成的产物（截图、导出文档等）
 output/

@@ -63,7 +63,7 @@ function defaultState() {
     plan: defaultPlanState(), // 预算编制
     finalDone: false, // 决算是否已确认
     adjustments: [], // 预算调整申请（财务经理发起 / 审批）
-    rules: JSON.parse(JSON.stringify(BM.DEFAULT_RULES)), // 预算规则（财务经理可改）
+    rules: JSON.parse(JSON.stringify(BM.DEFAULT_RULES)), // 预算规划中的规则（财务经理可改）
     chatHistory: [], // [{role:'user'|'ai', text?, card?}]
     /* v0.6：组织范围（组织切换器，默认厦门三安 2010） */
     orgScope: "2010", // 单公司 code / "all" 集团
@@ -385,18 +385,25 @@ BM.curRole = function () {
  * 阶段一：扩展真实角色视图集合（映射文档 §3）。视图 key 复用现有 14 视图；
  *   masterData/归口责任工作台/压降下达/协商谈判区/auditTrail/copilot 为待建（Stage 1 不实现）。
  * 导航收敛（2026-08-23 Sponsor 定稿，2026-08-24 移除组织架构菜单项）：全角色仅 3 个核心功能 + 工作台首页：
- *   1. 新预算编制（compile） 2. 预算看板（kanban） 3. 预算规则（rules）。
+ *   1. 预算编制（compile） 2. 预算跟踪（kanban） 3. 预算规划（rules，规则为其内容）。
+ *   费控导入（importView）不作为菜单项，改为「预算跟踪」页右上角按钮弹出的二级子页面。
  *   系统管理员（admin）额外：预算工作人员（accounts）。
  *   组织架构图保留在「基础数据」页第 3 个 Tab（可编辑，admin/总经办），不再作为独立菜单项。
  * 模块三（2026-08-23）：真实登录用户按其角色 views 白名单取并集；演示通道（无 user）回退默认集合。 */
 BM.roleViews = function (roleId) {
-  /* 真实登录：取该用户全部角色的视图并集（views 来自后端 role 表，含 basedata 迁移） */
+  /* 真实登录：取该用户全部角色的视图并集（views 来自后端 role 表，含 basedata 迁移），
+   * 并兜底基础视图集合 BASE，确保 compile/kanban/rules 始终可见（与演示通道行为一致）。 */
   if (state.user && state.user.roles && state.user.roles.length && !roleId) {
-    const set = new Set(["wb-home"]);
+    const BASE = ["wb-home", "compile", "kanban", "rules"];
+    const BD_ROLES = ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner"];
+    const set = new Set(BASE);
     state.user.roles.forEach((r) => (r.views || []).forEach((v) => set.add(v)));
+    if (state.user.roles.some((r) => BD_ROLES.includes(r.code))) set.add("basedata");
+    if (state.user.roles.some((r) => r.code === "admin")) set.add("accounts");
     return Array.from(set);
   }
-  /* 演示通道 / 显式指定角色：按角色 code 回退（与后端 role.views 对齐） */
+  /* 演示通道 / 显式指定角色：按角色 code 回退（与后端 role.views 对齐）。
+   * importView（费控导入）不作为菜单项（见上方注释），仅经「预算跟踪」页按钮二级弹窗进入，故不入 BASE。 */
   const rid = roleId || state.role;
   const BASE = ["wb-home", "compile", "kanban", "rules"];
   const BD_ROLES = ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner"];
@@ -452,15 +459,14 @@ BM.NAV_LABELS = {
   track: "预算追踪",
   final: "决算",
   adjust: "预算调整",
-  rules: "预算规则",
+  rules: "预算规划",
   basedata: "基础数据",
   accounts: "预算工作人员",
-  org: "组织架构",
   benchmark: "对标",
   collision: "碰撞",
   collisionTune: "碰撞调参",
-  compile: "新预算编制",
-  kanban: "预算看板",
+  compile: "预算编制",
+  kanban: "预算跟踪",
   importView: "费控导入",
   riskView: "AI 风险",
 };

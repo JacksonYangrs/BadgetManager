@@ -544,8 +544,8 @@ BM.MATERIALS = [
 BM.DEFAULT_RULES = {
   planMode: "bottomup", // topdown 自上而下 / bottomup 自下而上
   trackMode: "reimburse", // reimburse 实际报销为主 / advance 申请单预跟踪
-  surplusAction: "suspend", // reclaim 收回 / suspend 挂起 / carry 结转
-  allowOverBudget: true, // 是否允许超预算（false → 走追加流程）
+  surplusAction: "reclaim", // reclaim 收回 / suspend 挂起 / carry 结转
+  allowOverBudget: false, // 是否允许超预算（false → 不允许，拦截+追加流程）
 };
 
 /* ---------- LLM 归类模拟（自上而下自由语言 → 结构化） ---------- */

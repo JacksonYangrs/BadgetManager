@@ -25,11 +25,10 @@ const VIEWS = {
   kanban: BM.renderKanban,
   monthlySplit: BM.renderMonthlySplit,
   unitInbox: BM.renderUnitInbox,
-  unitSummary: BM.renderUnitSummary,
+  unitSummary:  BM.renderUnitSummary,
   finalRisk: BM.renderFinalRisk,
   importView: BM.renderImportView,
   riskView: BM.renderRiskView,
-  org: BM.renderOrg,
   accounts: BM.renderAccounts,
 };
 
@@ -44,7 +43,7 @@ BM.defaultView = function () {
 let currentView = "wb-home";
 
 /* ---------- 打开视图（渲染到右侧内容区） ---------- */
-BM.openView = function (name) {
+BM.openView = function (name, opts) {
   if (!BM.state.loggedIn) return;
   currentView = name;
   const panel = document.getElementById("viewPanel");
@@ -52,7 +51,7 @@ BM.openView = function (name) {
     BM.renderWorkbenchHome(panel);
   } else {
     const fn = VIEWS[name];
-    if (fn) fn(panel);
+    if (fn) fn(panel, opts);
   }
   refreshQuicknav();
 };
@@ -88,31 +87,6 @@ function refreshRoleLabel() {
   const r = BM.curRole();
   document.getElementById("roleLabel").textContent = r.name + " · " + r.title;
 }
-
-/* 顶部导航 + 角色标签整体刷新（供角色切换器调用） */
-BM.refreshNav = function () {
-  refreshQuicknav();
-  refreshRoleLabel();
-};
-
-/* ---------- 轻量角色切换（不 logout、不整页 reload） ---------- */
-BM.switchRole = function (rid, p) {
-  if (!rid || !BM.ROLES[rid]) return;
-  BM.state.role = rid;
-  /* 按角色写入对应参数 */
-  if (rid === "centerOwner") BM.state.centerId = (p && p.centerId) || BM.state.centerId;
-  else if (rid === "expense") BM.state.expenseType = (p && p.expenseType) || BM.state.expenseType;
-  else if (rid === "legalHead" || rid === "adminHead" || rid === "companyBudgeter")
-    BM.state.scopeCompany = (p && p.scopeCompany) || BM.state.scopeCompany;
-  if (rid === "manager") BM.state.deptId = (p && p.deptId) || BM.state.deptId;
-  BM.saveState();
-  BM.refreshNav();
-  /* 导航：当前视图仍在新角色可见集合内则保留，否则跳 defaultView */
-  const views = BM.roleViews(rid);
-  const keep = currentView && views.indexOf(currentView) >= 0;
-  BM.openView(keep ? currentView : BM.defaultView());
-  BM.toast("已切换为 " + BM.curRole().name);
-};
 
 /* ---------- 进入系统 ---------- */
 BM.enterApp = function () {
@@ -281,7 +255,12 @@ BM.renderNotifPanelItems = function () {
       <div class="notif-dot"></div>`;
     item.addEventListener("click", () => {
       if (!n.read) BM.markNotifRead(n.id);
-      if (n.view) BM.openView(n.view);
+      /* 组织架构类通知 → 跳「基础数据」第 3 个 Tab（可编辑架构页），而非遗留的独立只读页 org */
+      if (n.view === "org" || (n.view === "basedata" && n.type === "org")) {
+        BM.openView("basedata", { tab: "org" });
+      } else if (n.view) {
+        BM.openView(n.view);
+      }
       BM.closeNotifPanel();
     });
     list.appendChild(item);
@@ -342,11 +321,6 @@ function init() {
     input.style.height = Math.min(input.scrollHeight, 96) + "px";
   });
 
-  /* 阶段一：切换角色 → 打开角色切换面板（轻量，不退出、不整页 reload） */
-  document.getElementById("switchRoleBtn").addEventListener("click", () => {
-    if (BM.renderRoleSwitch) BM.renderRoleSwitch();
-  });
-
   /* 退出登录 → 回登录页 */
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
@@ -362,12 +336,6 @@ function init() {
     BM.initCopilot();
     refreshRoleLabel();
     BM.loadNotifications();
-  });
-
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    BM.resetState();
-    localStorage.removeItem("bm-demo-state-v1");
-    location.reload();
   });
 
   /* 消息铃铛（D2）：绑定点击 / 面板 / 全局关闭 */
