@@ -1,6 +1,6 @@
 {
   "name": "badget-manager",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "经济事项预算编制平台（前端 + Express 一体化服务 + 单元/集成/E2E 测试）",
   "scripts": {

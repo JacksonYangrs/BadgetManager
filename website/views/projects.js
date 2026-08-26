@@ -17,15 +17,6 @@ function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* 角色说明条（供所有页面复用） */
-BM.renderRoleHint = function (container, viewKey) {
-  const hints = (BM.ROLE_HINTS[viewKey] || {})[BM.state.role];
-  if (!hints) return;
-  const bar = el("div", "role-hint-bar");
-  bar.innerHTML = `<span class="rhb-ico">▍</span>${esc(hints)}`;
-  container.appendChild(bar);
-};
-
 function renderProjects(container) {
   container.innerHTML = "";
   const page = el("div", "page");
