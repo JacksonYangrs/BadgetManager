@@ -471,7 +471,7 @@ BM.NAV_LABELS = {
   collision: "碰撞",
   collisionTune: "碰撞调参",
   compile: "预算编制",
-  balance: "汇总平衡",
+  balance: "预算调整",
   kanban: "预算跟踪",
   importView: "费控导入",
   riskView: "AI 风险",

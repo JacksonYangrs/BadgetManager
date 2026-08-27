@@ -55,8 +55,8 @@ BM.renderBalance = function (container) {
   const page = el("div", "page");
 
   const head = el("div", "page-head");
-  head.appendChild(el("div", "", `<div class="page-title">汇总平衡 · 2026</div>
-    <div class="page-desc">上级领导收到下级提交的预算后，按「弹性分类 + 偏离度」做汇总平衡——优先差异化压降，不一刀切</div>`));
+  head.appendChild(el("div", "", `<div class="page-title">预算调整 · 2026</div>
+    <div class="page-desc">上级领导收到下级提交的预算后，按「弹性分类 + 偏离度」做预算调整——优先差异化压降，不一刀切</div>`));
   page.appendChild(head);
   BM.renderRoleHint(page, "balance");
 
@@ -163,7 +163,7 @@ BM.renderBalance = function (container) {
   const foot = el("div", "bal-foot");
   const confirmBtn = el("button", "btn btn-primary", "确认平衡结果 → 下发");
   confirmBtn.addEventListener("click", () => {
-    BM.toast("✅ 汇总平衡已确认，平衡结论已下发至各编制部门");
+    BM.toast("✅ 预算调整已确认，调整结论已下发至各编制部门");
   });
   foot.appendChild(confirmBtn);
   foot.appendChild(el("span", "hint-text", "确认后将平衡结论（差异化压降指令）下发至对应部门，进入执行跟踪"));

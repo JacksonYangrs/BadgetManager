@@ -110,12 +110,12 @@ function renderHome(content) {
   /* 上级领导：工作台直达「汇总平衡」（收到下级提交后做汇总平衡） */
   if (r === "boss" || r === "finance" || r === "ceo") {
     const balEntry = el("div", "wb-section");
-    balEntry.appendChild(el("div", "wb-section-title", "预算汇总平衡"));
+    balEntry.appendChild(el("div", "wb-section-title", "预算调整"));
     const balCard = el("div", "wb-hero-card");
     balCard.innerHTML = `<div class="wh-ico" style="background:var(--c-primary);color:#fff">⚖️</div>
-      <div class="wh-main"><div class="wh-title">汇总平衡工作台</div>
-      <div class="wh-sub">下级预算已提交，按弹性分类与偏离度做汇总平衡，差异化压降、不一刀切</div></div>`;
-    const goBtn = el("button", "btn btn-primary", "进入汇总平衡 ›");
+      <div class="wh-main"><div class="wh-title">预算调整工作台</div>
+      <div class="wh-sub">下级预算已提交，按弹性分类与偏离度做预算调整，差异化压降、不一刀切</div></div>`;
+    const goBtn = el("button", "btn btn-primary", "进入预算调整 ›");
     goBtn.addEventListener("click", () => BM.openView("balance"));
     balCard.appendChild(goBtn);
     balEntry.appendChild(balCard);
