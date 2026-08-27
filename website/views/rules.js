@@ -78,7 +78,7 @@ BM.renderRules = function (container) {
     { id: "current", label: "当前版本" },
     { id: "history", label: "历史版本" },
     { id: "events", label: "适用经济事项" },
-    { id: "createNext", label: "创建明年新规则" },
+    { id: "createNext", label: "创建新规划" },
   ];
   tabDefs.forEach((t, i) => {
     const b = el("button", "rtab-btn" + (i === 0 ? " active" : ""), t.label);
@@ -134,7 +134,7 @@ function renderRuleCards(pane, version) {
   pane.innerHTML = "";
   const card = el("div", "rule-version-card");
   card.appendChild(el("div", "rv-head", `<span class="rv-title">${esc(version.version)}</span>
-    ${version.status === "active" ? '<span class="rv-badge rv-active">生效中</span>' : (version.status === "draft" ? '<span class="rv-badge rv-draft">草稿</span>' : "")}
+    ${version.status === "active" ? '<span class="rv-badge rv-active">执行中</span>' : (version.status === "draft" ? '<span class="rv-badge rv-draft">草稿</span>' : "")}
     <span class="rv-meta">${esc(version.name || "")}</span>`));
   pane.appendChild(card);
 
@@ -220,7 +220,7 @@ function renderHistoryTab(page) {
 }
 
 function statusBadge(status) {
-  if (status === "active") return `<span class="rv-badge rv-active">生效中</span>`;
+  if (status === "active") return `<span class="rv-badge rv-active">执行中</span>`;
   if (status === "draft") return `<span class="rv-badge rv-draft">草稿</span>`;
   return `<span class="rv-badge rv-archived">已归档</span>`;
 }
@@ -329,7 +329,7 @@ function renderEventsTab(page) {
   versions.forEach((v) => {
     const o = document.createElement("option");
     o.value = String(v.id);
-    const st = v.status === "active" ? "（生效中）" : v.status === "draft" ? "（草案）" : "（已归档）";
+    const st = v.status === "active" ? "（执行中）" : v.status === "draft" ? "（草案）" : "（已归档）";
     o.textContent = `${esc(v.version)} ${st}`;
     if (v.id === target.id) o.selected = true;
     sel.appendChild(o);
@@ -625,7 +625,7 @@ function publishVersion(panel, versionId, source) {
 window.BM.renderRules = BM.renderRules;
 window.BM = BM;
 
-/* ---------- Tab4 创建明年新规则（政策驱动 + AI 抽取生成草案 → 人核对发布） ---------- */
+/* ---------- Tab4 创建新规划（政策驱动 + AI 抽取生成草案 → 人核对发布） ---------- */
 function nextYear() { return new Date().getFullYear() + 1; }
 
 function renderCnExtract(box, proposals, baseline) {
@@ -656,7 +656,7 @@ function renderCreateNextTab(page) {
 
   /* ① 上传 */
   const upBox = el("div", "cn-upload");
-  upBox.appendChild(el("div", "wb-section-title", "① 导入集体预算政策文件"));
+  upBox.appendChild(el("div", "wb-section-title", "① 导入集团预算政策文件"));
   const fileInput = el("input", "cn-file");
   fileInput.type = "file"; fileInput.multiple = true; fileInput.accept = ".pdf,.docx,.xlsx,.pptx,.md,.txt,.csv";
   fileInput.id = "policyFile";
@@ -671,8 +671,15 @@ function renderCreateNextTab(page) {
   const pasteArea = el("textarea", "cn-paste");
   pasteArea.placeholder = "或直接粘贴政策文本 / 会议纪要…";
   const upOps = el("div", "cn-ops");
-  const upBtn = el("button", "btn btn-primary", "解析并抽取");
+  const upBtn = el("button", "btn btn-primary", "生成新的规则");
   upOps.appendChild(upBtn);
+  const mapBtn = el("button", "btn btn-outline", "调整经济事项适用的规则");
+  mapBtn.addEventListener("click", () => {
+    page._data.eventsVersionId = active.id;
+    switchTab(page, "events");
+    renderEventsTab(page);
+  });
+  upOps.appendChild(mapBtn);
   const txtBox = el("div", "cn-text");
   upBox.appendChild(filePicker); upBox.appendChild(upHint); upBox.appendChild(pasteArea);
   upBox.appendChild(upOps); upBox.appendChild(txtBox);

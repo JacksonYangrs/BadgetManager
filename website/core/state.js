@@ -390,6 +390,9 @@ BM.curRole = function () {
  *   系统管理员（admin）额外：预算工作人员（accounts）。
  *   组织架构图保留在「基础数据」页第 3 个 Tab（可编辑，admin/总经办），不再作为独立菜单项。
  * 模块三（2026-08-23）：真实登录用户按其角色 views 白名单取并集；演示通道（无 user）回退默认集合。 */
+/* 导航固定顺序（ roleViews 返回的数组按此排序，确保「预算调整」紧跟「预算编制」之后）。 */
+const NAV_ORDER = ["wb-home", "dashboard", "compile", "balance", "kanban", "rules", "track", "final", "adjust", "basedata", "accounts", "benchmark", "collision", "collisionTune", "importView", "riskView"];
+
 BM.roleViews = function (roleId) {
   /* 汇总平衡：仅上级领导（收到下级提交后做平衡）可见。
    * 上级集合与 canViewBenchmark 一致：boss/ceo/finance/buHead/cooLead/cooAnalyst。 */
@@ -404,17 +407,15 @@ BM.roleViews = function (roleId) {
     if (state.user.roles.some((r) => BD_ROLES.includes(r.code))) set.add("basedata");
     if (state.user.roles.some((r) => r.code === "admin")) set.add("accounts");
     if (state.user.roles.some((r) => UPPER.includes(r.code))) set.add("balance");
-    return Array.from(set);
+    return Array.from(set).sort((a, b) => NAV_ORDER.indexOf(a) - NAV_ORDER.indexOf(b));
   }
   /* 演示通道 / 显式指定角色：按角色 code 回退（与后端 role.views 对齐）。
    * importView（费控导入）不作为菜单项（见上方注释），仅经「预算跟踪」页按钮二级弹窗进入，故不入 BASE。 */
   const rid = roleId || state.role;
-  const BASE = ["wb-home", "compile", "kanban", "rules"];
-  const BD_ROLES = ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner"];
   const extra = BD_ROLES.includes(rid) ? ["basedata"] : [];
-  if (UPPER.includes(rid) && rid !== "admin") return BASE.concat(["balance"]).concat(extra);
+  if (UPPER.includes(rid) && rid !== "admin") return ["wb-home", "compile", "balance", "kanban", "rules"].concat(extra);
   if (rid === "admin") return ["wb-home", "compile", "kanban", "rules", "accounts"].concat(extra);
-  return BASE.concat(extra);
+  return ["wb-home", "compile", "kanban", "rules"].concat(extra);
 };
 
 /* 基础数据维护权限（前端闸门，与后端 requireBaseDataEditor 对齐）：
