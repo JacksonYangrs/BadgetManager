@@ -31,6 +31,7 @@ const VIEWS = {
   importView: BM.renderImportView,
   riskView: BM.renderRiskView,
   accounts: BM.renderAccounts,
+  "ai-config": BM.renderAiConfig,
 };
 
 /* 角色默认首屏：日常打开＝运营监控中枢（wb-home）。

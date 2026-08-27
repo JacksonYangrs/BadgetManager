@@ -1089,6 +1089,18 @@
   width: 15px;
   height: 15px;
 }
+/* ---------- AI 配置页（模块三） ---------- */
+.ai-cfg-card { max-width: 640px; margin-top: 16px; }
+.ai-cfg-form { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.ai-cfg-hint { font-size: 12px; color: var(--c-muted, #6b7280); margin-top: -8px; }
+.ai-cfg-hint.has { color: #2b7a3e; }
+.ai-cfg-status { margin-top: 8px; padding: 10px 14px; border-radius: 8px; font-size: 13px; }
+.ai-cfg-status.on { background: #e8f6ec; color: #1f7a3d; }
+.ai-cfg-status.off { background: #f1f3f6; color: #6b7480; }
+.ai-cfg-test { display: block; margin-top: 10px; font-size: 13px; padding: 8px 10px; border-radius: 6px; background: #f1f3f6; color: #6b7480; }
+.ai-cfg-test.ok { background: #e8f6ec; color: #1f7a3d; }
+.ai-cfg-test.err { background: #fdecec; color: #c0392b; }
+
 .acc-roles {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

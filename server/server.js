@@ -17,6 +17,7 @@ const dbm = require("./db");
 const buildImportModule = require("./modules/expense-import");
 const buildPolicyRules = require("./policy_rules");
 const { buildAuth } = require("./middleware/auth");
+const aiGateway = require("./modules/ai-gateway");
 
 /* markitdown（default venv 已装）解析政策文档为文本；优先用环境变量，回退到本机默认值，最后回退 python3 */
 const MARKITDOWN = process.env.MARKITDOWN_BIN || "/Users/yangjackson/.workbuddy/binaries/python/envs/default/bin/python";
@@ -113,6 +114,34 @@ app.post("/api/rule-versions/:id/publish", auth, requireRuleEditor, (req, res) =
 app.post("/api/rule-versions/:id/extract", auth, requireRuleEditor, (req, res) => {
   const text = (req.body || {}).text || "";
   res.json({ proposals: dbm.extractRuleProposals(db, text) });
+});
+
+/* ---------- AI 配置（模块三 · admin/finance） ---------- */
+app.get("/api/ai-config", auth, requireRuleEditor, (req, res) => {
+  res.json(dbm.getAiConfig(db));
+});
+
+app.put("/api/ai-config", auth, requireRuleEditor, (req, res) => {
+  const r = dbm.saveAiConfig(db, req.body || {});
+  res.json(r);
+});
+
+app.post("/api/ai-config/test", auth, requireRuleEditor, async (req, res) => {
+  const body = req.body || {};
+  /* 优先用本次提交的凭据；未填 key 则回退到已保存配置 */
+  let creds = { provider: body.provider, apiKey: body.apiKey, model: body.model };
+  if (!creds.apiKey) {
+    const saved = dbm.getActiveCredentials(db);
+    if (saved) creds = saved;
+  }
+  if (!creds.provider || !creds.apiKey)
+    return res.status(400).json({ ok: false, error: "缺少 provider 或 apiKey（请先填写或保存配置）" });
+  try {
+    const r = await aiGateway.testConnection(creds);
+    res.json(r);
+  } catch (e) {
+    res.json({ ok: false, error: e && e.message ? e.message : String(e) });
+  }
 });
 
 /* 上传并解析政策文件：前端以 base64 JSON 传 {filename, content}，避开 multer 依赖；

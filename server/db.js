@@ -23,6 +23,7 @@ const budgetExecution = require("./modules/budget-execution");
 const rules = require("./modules/rules");
 const aiPolicyExtract = require("./modules/ai-policy-extract");
 const notifications = require("./modules/notifications");
+const aiConfig = require("./modules/ai-config");
 
 /* ---------- 组合导出（接口稳定） ---------- */
 module.exports = Object.assign(
@@ -35,7 +36,8 @@ module.exports = Object.assign(
   budgetExecution,
   rules,
   aiPolicyExtract,
-  notifications
+  notifications,
+  aiConfig
 );
 
 /* ---------- 初始化（组合编排） ---------- */
@@ -83,6 +85,9 @@ function init() {
   /* 预算规则版本化（D4）+ 加载 active 因子（驱动基线计算） */
   rules.migrateRuleVersions(db);
   rules.loadActiveFactors(db);
+
+  /* AI 接入配置表（scope=ai_gateway），密钥加密存储 */
+  aiConfig.initSystemConfig(db);
 
   return db;
 }
