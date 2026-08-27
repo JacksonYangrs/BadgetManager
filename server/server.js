@@ -160,6 +160,7 @@ app.post("/api/ai-config/test", auth, requireRuleEditor, async (req, res) => {
 });
 
 /* ---------- Copilot 智能问答（模块二 · 受控动态 SQL） ---------- */
+const { CopilotReject } = require("./modules/copilot-retrieval");
 app.post("/api/copilot/ask", auth, async (req, res) => {
   const { question } = req.body || {};
   if (!question || !String(question).trim()) return res.status(400).json({ error: "缺少问题" });
@@ -171,10 +172,23 @@ app.post("/api/copilot/ask", auth, async (req, res) => {
   }
   try {
     const r = await copilot.askCopilot(db, { question: String(question), allowedOrgIds, creds });
-    res.json({ aiEnabled: true, answer: r.answer, evidence: r.evidence });
+    res.json({ aiEnabled: true, answer: r.answer, evidence: r.evidence, source: "ok" });
   } catch (e) {
-    // 校验失败/越权/查询不合规 → 不抛错，回退「建议联系人工」
-    res.json({ aiEnabled: true, answer: "抱歉，该问题暂时无法回答（可能超出您的查询权限或查询不合规）。建议联系人工核对。", evidence: [], source: "fallback" });
+    // 分类回包：白名单拒绝 / AI 解析失败 / 网关失败 / 未知，各自文案 + source，不再统一伪装成"权限拒绝"
+    const reason = e && e.reasons ? JSON.stringify(e.reasons) : (e && e.message ? e.message : String(e));
+    console.error("[copilot] /api/copilot/ask 异常 | question=" + JSON.stringify(question) + " | 用户=" + (req.user ? req.user.username : "?") + " | 原因=" + reason);
+    if (e && e.stack) console.error("[copilot] stack:", e.stack.split("\n").slice(0, 6).join("\n"));
+    if (e instanceof CopilotReject) {
+      return res.json({ aiEnabled: true, answer: "该查询未通过系统校验（超出可查询范围），已拦截未执行。可换更具体的问法，或联系管理员。", evidence: [], source: "reject", reason });
+    }
+    const msg = e && e.message ? e.message : String(e);
+    if (/AI 未返回合法 DSL/.test(msg)) {
+      return res.json({ aiEnabled: true, answer: "AI 未能生成有效的查询条件，请换个说法再试（如「去年食堂费用是多少」）。", evidence: [], source: "dsl_parse", reason: msg });
+    }
+    if (/AI 请求超时|AI 网络请求失败|AI 调用失败|AI 返回为空/.test(msg)) {
+      return res.json({ aiEnabled: true, answer: "AI 服务暂时不可用（模型调用失败），请检查 AI 配置或稍后重试。", evidence: [], source: "gateway", reason: msg });
+    }
+    res.json({ aiEnabled: true, answer: "抱歉，暂时无法回答该问题，请稍后重试或联系管理员。", evidence: [], source: "fallback", reason: msg });
   }
 });
 

@@ -83,6 +83,8 @@ function redactSecrets(s) {
 }
 
 /* ---------- 大模型对话 ---------- */
+const FETCH_TIMEOUT_MS = 20000; /* 坏 baseUrl / 网络黑洞时防挂起（曾见请求数十秒无响应） */
+
 async function chatCompletion({ provider, apiKey, model, messages, jsonMode, baseUrl }) {
   if (!provider || !apiKey) throw new Error("AI 未配置：缺少 provider 或 apiKey");
   const base = baseUrl || PROVIDER_BASE[provider];
@@ -95,14 +97,20 @@ async function chatCompletion({ provider, apiKey, model, messages, jsonMode, bas
   };
   if (jsonMode) body.response_format = { type: "json_object" };
   let resp;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
   try {
     resp = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + apiKey },
       body: JSON.stringify(body),
+      signal: ctrl.signal,
     });
   } catch (e) {
+    if (e && e.name === "AbortError") throw new Error("AI 请求超时（" + FETCH_TIMEOUT_MS / 1000 + "s），请检查 baseUrl 网络连通性");
     throw new Error("AI 网络请求失败：" + (e && e.message ? e.message : String(e)));
+  } finally {
+    clearTimeout(timer);
   }
   if (!resp.ok) {
     const t = await resp.text().catch(() => "");

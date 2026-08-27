@@ -124,7 +124,8 @@ BM.sendChat = async function (text) {
       const data = await resp.json();
       if (data && data.aiEnabled && data.answer != null) {
         const note = Array.isArray(data.evidence) && data.evidence.length
-          ? "（基于 " + data.evidence.length + " 条授权范围内的数据）" : "";
+          ? "（基于 " + data.evidence.length + " 条授权范围内的数据）"
+          : (data.source && data.source !== "ok" ? "（系统提示）" : "");
         BM.addAiText(data.answer + note);
         return;
       }

@@ -16,6 +16,15 @@ const DSL_SYSTEM = `你是预算数据查询助手。根据用户问题，生成
 输出严格格式：
 {"tables":[表名],"fields":[列名],"filters":[{"field":列,"op":"= | > | < | >= | <= | != | LIKE | IN","value":值或数组}],"groupBy":[列],"orderBy":[{"field":列,"dir":"asc | desc"}],"limit":数字}
 规则：① 只允许单表；② fields/op 必须在白名单内；③ 不要输出 SQL 字符串；④ 若问题无需查数据（如闲聊），返回 {"tables":[],"fields":[],"filters":[],"limit":0}。
+
+业务术语映射（必须遵守）：
+- 「去年 / 上年 / 决算的去年实际」→ 查 unit_budget 表，读 last_year 列（上年实际执行年值）；「去年预算」→ 读 last_budget 列。filters 用 cat LIKE 匹配科目名（如"食堂"→{"field":"cat","op":"LIKE","value":"食堂"}）。
+- 「今年 / 本年 / 年度执行 / 已执行」→ 查 budget_execution 表（当年 1-12 月执行流水，month 列为 1-12 数字，无年份列，不可表达"去年"）。
+- 「决算 / 预算执行情况」默认指 budget_execution 按 cat 分组汇总金额（fields 含 cat、month、amount；可用 groupBy:["cat"]）。
+- 「预算 / 预算额 / 申报」→ unit_budget 表，读 amount 列（本年度预算）。
+- 科目名（食堂、宿舍、办公、差旅、绿化、物业等）一律用 cat LIKE 过滤，不建新字段。
+- 单位/部门名（如"股份""氮化镓"）→ 先查 organization 表 name LIKE 定位 id，再用该 id 过滤目标表 org_id（跨表时用两次 DSL 调用，不要 join）。
+
 只输出 JSON，不要其他任何内容。`;
 
 const ANSWER_SYSTEM = `你是预算 Copilot。基于已脱敏的查询结果，用简体中文回答用户问题。
