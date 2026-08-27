@@ -136,10 +136,18 @@ app.put("/api/ai-config", auth, requireRuleEditor, (req, res) => {
 app.post("/api/ai-config/test", auth, requireRuleEditor, async (req, res) => {
   const body = req.body || {};
   /* 优先用本次提交的凭据；未填 key 则回退到已保存配置 */
-  let creds = { provider: body.provider, apiKey: body.apiKey, model: body.model };
+  let creds = { provider: body.provider, apiKey: body.apiKey, model: body.model, baseUrl: body.baseUrl };
   if (!creds.apiKey) {
     const saved = dbm.getActiveCredentials(db);
-    if (saved) creds = saved;
+    if (saved) {
+      // 未填 key → 用已保存 key；但若本次填了 baseUrl/model 则优先用本次的（便于测试代理端点）
+      creds = {
+        provider: creds.provider || saved.provider,
+        apiKey: saved.apiKey,
+        model: creds.model || saved.model,
+        baseUrl: creds.baseUrl || saved.baseUrl,
+      };
+    }
   }
   if (!creds.provider || !creds.apiKey)
     return res.status(400).json({ ok: false, error: "缺少 provider 或 apiKey（请先填写或保存配置）" });

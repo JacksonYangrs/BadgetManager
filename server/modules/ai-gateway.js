@@ -83,9 +83,9 @@ function redactSecrets(s) {
 }
 
 /* ---------- 大模型对话 ---------- */
-async function chatCompletion({ provider, apiKey, model, messages, jsonMode }) {
+async function chatCompletion({ provider, apiKey, model, messages, jsonMode, baseUrl }) {
   if (!provider || !apiKey) throw new Error("AI 未配置：缺少 provider 或 apiKey");
-  const base = PROVIDER_BASE[provider];
+  const base = baseUrl || PROVIDER_BASE[provider];
   if (!base) throw new Error("不支持的 provider：" + provider);
   const url = base + "/chat/completions";
   const body = {
@@ -115,11 +115,11 @@ async function chatCompletion({ provider, apiKey, model, messages, jsonMode }) {
 }
 
 /* 连通性自检：用最小 prompt 验证一次调用 */
-async function testConnection({ provider, apiKey, model }) {
+async function testConnection({ provider, apiKey, model, baseUrl }) {
   const start = Date.now();
   try {
     const content = await chatCompletion({
-      provider, apiKey, model,
+      provider, apiKey, model, baseUrl,
       messages: [{ role: "user", content: "请只回复两个字：连通" }],
     });
     return { ok: true, latencyMs: Date.now() - start, sample: String(content || "").slice(0, 60) };

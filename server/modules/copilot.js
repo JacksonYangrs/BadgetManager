@@ -30,7 +30,7 @@ function deps() { return _deps || { aiConfig, aiGateway }; }
 
 async function generateDSL(question, creds) {
   const content = await deps().aiGateway.chatCompletion({
-    provider: creds.provider, apiKey: creds.apiKey, model: creds.model,
+    provider: creds.provider, apiKey: creds.apiKey, model: creds.model, baseUrl: creds.baseUrl,
     messages: [{ role: "system", content: DSL_SYSTEM }, { role: "user", content: question }],
     jsonMode: true,
   });
@@ -46,7 +46,7 @@ async function generateDSL(question, creds) {
 async function organizeAnswer(question, rows, creds) {
   const dataText = JSON.stringify(rows).slice(0, 4000);
   const content = await deps().aiGateway.chatCompletion({
-    provider: creds.provider, apiKey: creds.apiKey, model: creds.model,
+    provider: creds.provider, apiKey: creds.apiKey, model: creds.model, baseUrl: creds.baseUrl,
     messages: [
       { role: "system", content: ANSWER_SYSTEM },
       { role: "user", content: "问题：" + question + "\n\n查询结果（已脱敏）：\n" + dataText + "\n\n请给出自然语言回答：" },

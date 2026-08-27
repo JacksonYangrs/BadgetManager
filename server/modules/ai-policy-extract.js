@@ -88,7 +88,7 @@ async function extractWithAI(text, creds, db) {
     { role: "user", content: text },
   ];
   const content = await deps().aiGateway.chatCompletion({
-    provider: creds.provider, apiKey: creds.apiKey, model: creds.model,
+    provider: creds.provider, apiKey: creds.apiKey, model: creds.model, baseUrl: creds.baseUrl,
     messages, jsonMode: true,
   });
   let parsed;

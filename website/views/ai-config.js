@@ -24,6 +24,24 @@ const AI_PROVIDERS = [
   { id: "deepseek", name: "DeepSeek" },
 ];
 
+/* 各服务商常用模型版本（选服务商自动带出候选，仍可手填自定义/私有部署模型名） */
+const PROVIDER_MODELS = {
+  openai: ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo", "o1-mini", "o1", "o3-mini"],
+  qwen: ["qwen-max", "qwen-plus", "qwen-turbo", "qwen-long", "qwen2.5-72b-instruct", "qwen2.5-32b-instruct"],
+  zhipu: ["glm-4", "glm-4-plus", "glm-4-air", "glm-4-flash", "glm-3-turbo"],
+  deepseek: ["deepseek-chat", "deepseek-reasoner", "deepseek-coder"],
+};
+/* 各服务商默认官方端点（仅作 placeholder 提示，不参与逻辑） */
+const PROVIDER_DEFAULT_BASE = {
+  openai: "https://api.openai.com/v1",
+  qwen: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  deepseek: "https://api.deepseek.com/v1",
+  zhipu: "https://open.bigmodel.cn/api/paas/v4",
+};
+const PROVIDER_DEFAULT_MODEL = {
+  openai: "gpt-4o-mini", qwen: "qwen-max", zhipu: "glm-4", deepseek: "deepseek-chat",
+};
+
 BM.renderAiConfig = function (container) {
   container.innerHTML = "";
   const page = el("div", "page");
@@ -59,11 +77,20 @@ BM.renderAiConfig = function (container) {
   const keyHint = el("div", "ai-cfg-hint", "尚未保存任何 Key");
   form.appendChild(keyHint);
 
-  /* model */
+  /* model（选服务商自动带出候选 + 可手填自定义） */
+  const modelList = el("datalist");
+  modelList.id = "ai-cfg-model-list";
   const modelInput = el("input", "acc-input");
   modelInput.type = "text";
+  modelInput.setAttribute("list", "ai-cfg-model-list");
   modelInput.placeholder = "如 gpt-4o-mini / qwen-max / glm-4 / deepseek-chat";
   form.appendChild(field("模型名称", modelInput));
+
+  /* baseUrl（可选） */
+  const baseUrlInput = el("input", "acc-input");
+  baseUrlInput.type = "text";
+  baseUrlInput.placeholder = "可选 · 代理/自建/OpenAI 兼容端点（留空用官方默认）";
+  form.appendChild(field("Base URL（可选）", baseUrlInput));
 
   /* 按钮行 */
   const foot = el("div", "login-btn-row");
@@ -79,10 +106,25 @@ BM.renderAiConfig = function (container) {
 
   card.appendChild(form);
   page.appendChild(card);
+  page.appendChild(modelList);
 
   container.appendChild(page);
 
   /* ---------- 行为 ---------- */
+  function fillModelOptions(provider) {
+    modelList.innerHTML = "";
+    (PROVIDER_MODELS[provider] || []).forEach((m) => {
+      const o = el("option"); o.value = m; modelList.appendChild(o);
+    });
+  }
+
+  provSel.addEventListener("change", () => {
+    const p = provSel.value;
+    modelInput.value = PROVIDER_DEFAULT_MODEL[p] || ""; // 自动加载该服务商默认模型
+    fillModelOptions(p);
+    baseUrlInput.placeholder = "可选 · " + (PROVIDER_DEFAULT_BASE[p] || "") + "（留空用官方默认）";
+  });
+
   function refreshStatus(cfg) {
     if (cfg && cfg.enabled && cfg.provider) {
       statusBar.className = "ai-cfg-status on";
@@ -98,6 +140,8 @@ BM.renderAiConfig = function (container) {
       if (!cfg || cfg.error) return;
       if (cfg.provider) provSel.value = cfg.provider;
       if (cfg.model) modelInput.value = cfg.model;
+      if (cfg.baseUrl) baseUrlInput.value = cfg.baseUrl;
+      fillModelOptions(provSel.value);
       if (cfg.apiKeyMasked) {
         keyHint.textContent = "已保存 Key：" + cfg.apiKeyMasked + "（如要更换请填写上方输入框）";
         keyHint.classList.add("has");
@@ -110,7 +154,7 @@ BM.renderAiConfig = function (container) {
   }
 
   saveBtn.addEventListener("click", () => {
-    const body = { provider: provSel.value, model: modelInput.value.trim(), apiKey: keyInput.value };
+    const body = { provider: provSel.value, model: modelInput.value.trim(), apiKey: keyInput.value, baseUrl: baseUrlInput.value.trim() };
     fetch("/api/ai-config", { method: "PUT", headers: BM.authHeaders(), body: JSON.stringify(body) })
       .then((r) => r.json())
       .then((cfg) => {
@@ -129,7 +173,7 @@ BM.renderAiConfig = function (container) {
     testOut.textContent = "连接测试中…";
     testOut.className = "ai-cfg-test";
     const body = keyInput.value
-      ? { provider: provSel.value, apiKey: keyInput.value, model: modelInput.value.trim() }
+      ? { provider: provSel.value, apiKey: keyInput.value, model: modelInput.value.trim(), baseUrl: baseUrlInput.value.trim() }
       : {}; // 留空则用已保存配置测试
     fetch("/api/ai-config/test", { method: "POST", headers: BM.authHeaders(), body: JSON.stringify(body) })
       .then((r) => r.json())

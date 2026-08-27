@@ -42,6 +42,7 @@ function getAiConfig(db) {
     provider: provider || null,
     model: model || null,
     enabled: enabled,
+    baseUrl: _get(db, "base_url") || null,
     apiKeyMasked: encKey ? maskSecret(decryptSecret(encKey)) : null,
   };
 }
@@ -52,9 +53,11 @@ function saveAiConfig(db, body) {
   const provider = body.provider != null ? String(body.provider) : null;
   const model = body.model != null ? String(body.model) : null;
   const apiKey = body.apiKey != null ? String(body.apiKey) : "";
+  const baseUrl = body.baseUrl != null ? String(body.baseUrl).trim() : null;
   if (provider) _set(db, "provider", provider);
   if (model) _set(db, "model", model);
   if (apiKey) _set(db, "api_key", encryptSecret(apiKey));
+  if (body.baseUrl != null) _set(db, "base_url", baseUrl || null); // 空串=清除
   _set(db, "enabled", "1");
   return getAiConfig(db);
 }
@@ -68,7 +71,7 @@ function getActiveCredentials(db) {
   if (!enabled || !provider || !enc) return null;
   const apiKey = decryptSecret(enc);
   if (!apiKey) return null;
-  return { provider, model: model || defaultModel(provider), apiKey };
+  return { provider, model: model || defaultModel(provider), apiKey, baseUrl: _get(db, "base_url") || null };
 }
 
 module.exports = { initSystemConfig, getAiConfig, saveAiConfig, getActiveCredentials };
