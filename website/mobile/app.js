@@ -109,10 +109,28 @@ function bindComposer() {
   }
 }
 
-/* ---------- 发送对话（消息流） ---------- */
-BM.sendChat = function (text) {
+/* ---------- 发送对话（优先后端 Copilot，未启用降级本地 engine.js） ---------- */
+BM.sendChat = async function (text) {
   if (!text || !text.trim()) return;
   BM.addUserMsg(text.trim());
+  // 优先走后端 Copilot（受控动态 SQL + 回灌作答）；未启用 / 异常 → 降级本地确定性 engine.js
+  try {
+    const resp = await fetch("/api/copilot/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + (BM.state.token || "") },
+      body: JSON.stringify({ question: text.trim() }),
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data && data.aiEnabled && data.answer != null) {
+        const note = Array.isArray(data.evidence) && data.evidence.length
+          ? "（基于 " + data.evidence.length + " 条授权范围内的数据）" : "";
+        BM.addAiText(data.answer + note);
+        return;
+      }
+    }
+  } catch (e) { /* 网络异常 → 降级 */ }
+  // 降级：本地确定性 engine.js
   const reply = BM.engineReply(text.trim());
 
   if (reply.type === "text") {

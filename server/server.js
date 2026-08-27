@@ -37,6 +37,7 @@ app.use(express.json());
 
 /* 统一权限中间件（定义见 server/middleware/auth.js，由 db 注入 token  -解析） */
 const { auth, requireAdmin, requireOrgEditor, requireRuleEditor, requireBaseDataEditor, requireAccountsEditor, resolveAllowedOrgIds } = buildAuth(dbm, db);
+const copilot = require("./modules/copilot");
 
 /* ---------- API ---------- */
 app.get("/api/health", (req, res) => res.json({ ok: true, service: "economic-event-module", db: dbm.DB_FILE }));
@@ -111,9 +112,15 @@ app.post("/api/rule-versions/:id/publish", auth, requireRuleEditor, (req, res) =
   res.json(r);
 });
 
-app.post("/api/rule-versions/:id/extract", auth, requireRuleEditor, (req, res) => {
+app.post("/api/rule-versions/:id/extract", auth, requireRuleEditor, async (req, res) => {
   const text = (req.body || {}).text || "";
-  res.json({ proposals: dbm.extractRuleProposals(db, text) });
+  try {
+    const proposals = await dbm.extractRuleProposals(db, text);
+    res.json({ proposals });
+  } catch (e) {
+    // 双保险：任何意外都返回空草案，保证页面不崩溃（前端提示手动录入）
+    res.status(500).json({ proposals: [], error: "提取失败，请重试或手动录入" });
+  }
 });
 
 /* ---------- AI 配置（模块三 · admin/finance） ---------- */
@@ -141,6 +148,25 @@ app.post("/api/ai-config/test", auth, requireRuleEditor, async (req, res) => {
     res.json(r);
   } catch (e) {
     res.json({ ok: false, error: e && e.message ? e.message : String(e) });
+  }
+});
+
+/* ---------- Copilot 智能问答（模块二 · 受控动态 SQL） ---------- */
+app.post("/api/copilot/ask", auth, async (req, res) => {
+  const { question } = req.body || {};
+  if (!question || !String(question).trim()) return res.status(400).json({ error: "缺少问题" });
+  const creds = dbm.getActiveCredentials(db);
+  const allowedOrgIds = resolveAllowedOrgIds(dbm, db, req.user); // null = 全域
+  if (!creds) {
+    // 未配置 AI → 前端走本地 engine.js 确定性兜底（见 task #33）
+    return res.json({ aiEnabled: false, answer: "AI 未启用，已切换本地关键词匹配。", evidence: [] });
+  }
+  try {
+    const r = await copilot.askCopilot(db, { question: String(question), allowedOrgIds, creds });
+    res.json({ aiEnabled: true, answer: r.answer, evidence: r.evidence });
+  } catch (e) {
+    // 校验失败/越权/查询不合规 → 不抛错，回退「建议联系人工」
+    res.json({ aiEnabled: true, answer: "抱歉，该问题暂时无法回答（可能超出您的查询权限或查询不合规）。建议联系人工核对。", evidence: [], source: "fallback" });
   }
 });
 
