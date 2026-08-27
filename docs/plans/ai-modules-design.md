@@ -164,15 +164,17 @@ Copilot 的「数据访问」在 ①②③ 红线之外，还受以下**展示 /
 
 遵循「模块结构纪律」：先定规格再写码；依赖方向单一（页面→driver→ai-gateway）；共享状态最小化（配置仅经 system_config 显式读写）。
 
-## 6. 任务拆分（顺序：三→一→二）
+## 6. 任务拆分（顺序：三→一→二）· 状态
 
-1. **[模块三]** 后端：`system_config` 表 + `ai-gateway.js` 重构（chatCompletion 骨架+兜底）+ `/api/ai-config` 三接口 + AES 加密
-2. **[模块三]** 前端：AI 配置页（provider/key/模型/测试/状态）+ 菜单入口（admin/finance）
-3. **[模块一]** 后端：`/api/rule-versions/:id/extract` 增加 AI 分支（未配置走正则兜底）
-4. **[模块一]** 验证：草案规则卡渲染（UI 已就绪）
-5. **[模块二]** 后端：`copilot-retrieval.js`（白名单校验 + 参数化查询构建，受控动态 SQL）+ `/api/copilot/ask`（AI 生成 DSL→校验执行→回灌作答；未配置走 engine.js 兜底）
-6. **[模块二]** 前端：Copilot 调用 `/api/copilot/ask`（未配置自动降级 engine.js）
-7. 部署 + 真机验证（多角色）
+1. ✅ **[模块三]** 后端：`system_config` 表 + `ai-gateway.js` 重构（chatCompletion 骨架+兜底）+ `/api/ai-config` 三接口 + AES 加密
+2. ✅ **[模块三]** 前端：AI 配置页（provider/key/模型/测试/状态）+ 菜单入口（admin/finance）
+3. ✅ **[模块一]** 后端：`/api/rule-versions/:id/extract` 增加 AI 分支（调参+造新卡，未配置走正则兜底，`isNew` 标记 A/B 路由）
+4. ✅ **[模块一]** 验证：草案规则卡渲染（UI 已就绪，isNew 字段被前端忽略不影响）
+5. ✅ **[模块二]** 后端：`copilot-retrieval.js`（白名单校验 + 参数化查询构建，受控动态 SQL + 组织注入 + 脱敏 + 拒绝）+ `/api/copilot/ask`（AI 生成 DSL→校验执行→**回灌作答**；未配置走 engine.js 兜底）
+6. ✅ **[模块二]** 前端：Copilot 调用 `/api/copilot/ask`（未配置自动降级 engine.js）
+7. ✅ 部署 + 真机验证（多角色待松哥在 AWS 配 key 后走真实 LLM 路径复核；本地+生产无 key 路径已验证）
+
+> 交付：commit `48649e3` · tag **v1.3.0**（已推 GitHub + 部署 AWS `/opt/badgetmanager`，systemd `badgetmanager` active）。
 
 ## 7. 验收标准
 - 配置页：未配 key 时全站 AI 功能走确定性兜底、不报错；配 key+测试连接成功后可切真 LLM。
