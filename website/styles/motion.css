@@ -1,0 +1,112 @@
+/* ===== 控件微动效 · motion.css =====
+ * 全部 transform / opacity 驱动；尊重 prefers-reduced-motion。
+ * 主色已统一为 logo 蓝 #003CB4（见 base.css）。
+ */
+
+/* ---------- 按钮 ---------- */
+.btn {
+  transition: background var(--t-base), box-shadow var(--t-base), transform var(--t-fast), color var(--t-fast);
+  will-change: transform;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 60, 180, 0.18);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ---------- 顶部导航 ---------- */
+.qn-btn {
+  position: relative;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.qn-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--c-accent);
+  animation: qnBarIn 0.22s ease;
+}
+@keyframes qnBarIn {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+/* ---------- 卡片 / 模块块 ---------- */
+.ai-card,
+.method-chip,
+.risk-card-view,
+.sug-btn {
+  transition: transform var(--t-base), box-shadow var(--t-base), border-color var(--t-base);
+}
+.ai-card:hover,
+.method-chip:hover,
+.risk-card-view:hover,
+.sug-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 16px rgba(16, 22, 40, 0.12);
+}
+
+/* ---------- 表单控件 ---------- */
+input,
+textarea,
+select {
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+/* ---------- 登录卡进场 ---------- */
+.login-card {
+  animation: loginIn 0.4s var(--t-slow);
+}
+@keyframes loginIn {
+  from { opacity: 0; transform: scale(0.98) translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- Copilot 消息进场 ---------- */
+.msg {
+  animation: msgIn 0.26s var(--t-base);
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- 弹窗 ---------- */
+.modal-mask {
+  animation: fadeIn 0.2s ease;
+}
+.modal {
+  animation: modalIn 0.26s var(--t-slow);
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- 降级：减少动效 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

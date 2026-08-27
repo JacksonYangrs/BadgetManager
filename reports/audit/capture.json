@@ -1,0 +1,258 @@
+{
+  "url": "http://localhost:8300/",
+  "capturedAt": "2026-08-26T13:50:00.769Z",
+  "desktop": {
+    "loginPath": "/Users/yangjackson/AIProjects/BadgetManager/reports/audit/assets/login-desktop.png",
+    "appPath": "/Users/yangjackson/AIProjects/BadgetManager/reports/audit/assets/app-desktop.png",
+    "loginMeta": {
+      "title": "三安光电 AI 费用预决算管理系统 · DEMO",
+      "description": "三安光电 AI 费用预决算管理系统 · 交互式产品 Demo",
+      "lang": "zh-CN",
+      "h1s": [],
+      "h2s": [],
+      "h3s": [],
+      "buttons": [
+        "登 录 →",
+        "🔔0",
+        "退出登录",
+        "发送"
+      ],
+      "links": [],
+      "imagesWithoutAlt": 0,
+      "totalImages": 0,
+      "landmarks": {
+        "main": true,
+        "nav": true,
+        "footer": false,
+        "header": true,
+        "aside": false
+      }
+    },
+    "appMeta": {
+      "title": "三安光电 AI 费用预决算管理系统 · DEMO",
+      "h1s": [],
+      "h2s": [],
+      "h3s": [],
+      "buttons": [
+        "登 录 →",
+        "工作台首页",
+        "预算编制",
+        "预算跟踪",
+        "预算规划",
+        "预算工作人员",
+        "基础数据",
+        "🔔0",
+        "退出登录",
+        "我负责的项目还剩多少预算？ →",
+        "我的采购申请到哪一步了？ →",
+        "我发起的报销合规吗？ →",
+        "发送"
+      ],
+      "links": [],
+      "navLabels": [
+        "工作台首页",
+        "预算编制",
+        "预算跟踪",
+        "预算规划",
+        "预算工作人员",
+        "基础数据"
+      ],
+      "copilotMessages": [
+        "您好，我是 AI Budget Copilot。您负责的项目预算与申请进度，我帮您跟进。\n21:49",
+        "💡 试试这样问：\n我负责的项目还剩多少预算？\n→\n我的采购申请到哪一步了？\n→\n我发起的报销合规吗？\n→\n⚠️ 今日风险（AI 主动预警）：\n▲\n显示器项目：额度 7.8 万 · 剩余 2.4 万\n已用 54%，新申请需谨慎\n›\ni\n办公电脑更换项目：30 万待启动\n可发起首笔采购\n›"
+      ],
+      "totalImages": 0,
+      "imagesWithoutAlt": 0,
+      "wordCount": 111,
+      "landmarks": {
+        "main": true,
+        "nav": true,
+        "footer": false,
+        "header": true,
+        "aside": false
+      }
+    },
+    "perfLogin": {
+      "ttfb": 2.699999999254942,
+      "domContentLoaded": 38.19999999925494,
+      "loadComplete": 38.399999998509884
+    },
+    "perfApp": {
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0,
+      "longTaskCount": 0
+    },
+    "palette": [
+      {
+        "selector": "topbar",
+        "backgroundColor": "rgb(30, 42, 74)",
+        "color": "rgb(255, 255, 255)",
+        "borderColor": "rgb(255, 255, 255)"
+      },
+      {
+        "selector": "btn btn-primary",
+        "backgroundColor": "rgb(30, 42, 74)",
+        "color": "rgb(255, 255, 255)",
+        "borderColor": "rgb(255, 255, 255)"
+      },
+      {
+        "selector": "btn btn-accent login-submit",
+        "backgroundColor": "rgb(201, 164, 74)",
+        "color": "rgb(20, 29, 54)",
+        "borderColor": "rgb(20, 29, 54)"
+      },
+      {
+        "selector": "copilot-panel",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "rgb(28, 36, 56)",
+        "borderColor": "rgb(227, 230, 238)"
+      },
+      {
+        "selector": "view-panel",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "rgb(28, 36, 56)",
+        "borderColor": "rgb(227, 230, 238)"
+      },
+      {
+        "selector": "login-card",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "rgb(28, 36, 56)",
+        "borderColor": "rgb(28, 36, 56)"
+      },
+      {
+        "selector": "BODY",
+        "backgroundColor": "rgb(244, 245, 248)",
+        "color": "rgb(28, 36, 56)",
+        "borderColor": "rgb(28, 36, 56)"
+      }
+    ]
+  },
+  "mobile": {
+    "loginPath": "/Users/yangjackson/AIProjects/BadgetManager/reports/audit/assets/login-mobile.png",
+    "appPath": "/Users/yangjackson/AIProjects/BadgetManager/reports/audit/assets/app-mobile.png",
+    "loginMeta": {
+      "title": "三安光电 AI 费用预决算管理系统 · DEMO",
+      "description": "三安光电 AI 费用预决算管理系统 · 交互式产品 Demo",
+      "lang": "zh-CN",
+      "h1s": [],
+      "h2s": [],
+      "h3s": [],
+      "buttons": [
+        "登 录 →",
+        "🔔0",
+        "退出登录",
+        "发送"
+      ],
+      "links": [],
+      "imagesWithoutAlt": 0,
+      "totalImages": 0,
+      "landmarks": {
+        "main": true,
+        "nav": true,
+        "footer": false,
+        "header": true,
+        "aside": false
+      }
+    },
+    "appMeta": {
+      "title": "三安光电 AI 费用预决算管理系统 · DEMO",
+      "h1s": [],
+      "h2s": [],
+      "h3s": [],
+      "buttons": [
+        "登 录 →",
+        "工作台首页",
+        "预算编制",
+        "预算跟踪",
+        "预算规划",
+        "预算工作人员",
+        "基础数据",
+        "🔔0",
+        "退出登录",
+        "我负责的项目还剩多少预算？ →",
+        "我的采购申请到哪一步了？ →",
+        "我发起的报销合规吗？ →",
+        "发送"
+      ],
+      "links": [],
+      "navLabels": [
+        "工作台首页",
+        "预算编制",
+        "预算跟踪",
+        "预算规划",
+        "预算工作人员",
+        "基础数据"
+      ],
+      "copilotMessages": [
+        "您好，我是 AI Budget Copilot。您负责的项目预算与申请进度，我帮您跟进。\n21:49",
+        "💡 试试这样问：\n我负责的项目还剩多少预算？\n→\n我的采购申请到哪一步了？\n→\n我发起的报销合规吗？\n→\n⚠️ 今日风险（AI 主动预警）：\n▲\n显示器项目：额度 7.8 万 · 剩余 2.4 万\n已用 54%，新申请需谨慎\n›\ni\n办公电脑更换项目：30 万待启动\n可发起首笔采购\n›"
+      ],
+      "totalImages": 0,
+      "imagesWithoutAlt": 0,
+      "wordCount": 105,
+      "landmarks": {
+        "main": true,
+        "nav": true,
+        "footer": false,
+        "header": true,
+        "aside": false
+      }
+    },
+    "perfLogin": {
+      "ttfb": 1.2000000029802322,
+      "domContentLoaded": 28.200000002980232,
+      "loadComplete": 28.5
+    },
+    "perfApp": {
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0,
+      "longTaskCount": 0
+    },
+    "palette": [
+      {
+        "selector": "topbar",
+        "backgroundColor": "rgb(30, 42, 74)",
+        "color": "rgb(255, 255, 255)",
+        "borderColor": "rgb(255, 255, 255)"
+      },
+      {
+        "selector": "btn btn-primary",
+        "backgroundColor": "rgb(30, 42, 74)",
+        "color": "rgb(255, 255, 255)",
+        "borderColor": "rgb(255, 255, 255)"
+      },
+      {
+        "selector": "btn btn-accent login-submit",
+        "backgroundColor": "rgb(201, 164, 74)",
+        "color": "rgb(20, 29, 54)",
+        "borderColor": "rgb(20, 29, 54)"
+      },
+      {
+        "selector": "copilot-panel",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "rgb(28, 36, 56)",
+        "borderColor": "rgb(227, 230, 238)"
+      },
+      {
+        "selector": "view-panel",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "rgb(28, 36, 56)",
+        "borderColor": "rgb(227, 230, 238)"
+      },
+      {
+        "selector": "login-card",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "rgb(28, 36, 56)",
+        "borderColor": "rgb(28, 36, 56)"
+      },
+      {
+        "selector": "BODY",
+        "backgroundColor": "rgb(244, 245, 248)",
+        "color": "rgb(28, 36, 56)",
+        "borderColor": "rgb(28, 36, 56)"
+      }
+    ]
+  }
+}

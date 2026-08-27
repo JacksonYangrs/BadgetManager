@@ -167,9 +167,10 @@ function renderCompile(container) {
     const table = el("table");
     table.innerHTML = `<thead><tr>
       <th>经济事项</th><th>会计科目</th>
-      <th style="text-align:right">本年度预算值</th><th>月度拆分</th>
+      <th style="text-align:right">本年度预算值</th>
       <th style="text-align:right">上年预算</th><th style="text-align:right">上年决算</th><th>偏差</th>
       <th class="ai-suggest-th">AI 建议</th>
+      <th>月度拆分</th>
     </tr></thead>`;
     tbody = el("tbody");
     src.forEach((r) => {
@@ -212,11 +213,10 @@ function renderCompile(container) {
         BM.state.monthlySplit = { id: r.id, cat: r.cat, total: total, ratio: curMonths.map((m) => (total ? m / total : 0)) };
         BM.openView("monthlySplit");
       };
-      const monthBtn = el("button", "btn btn-outline btn-sm", "月度拆分 ›");
+      const monthBtn = el("button", "btn btn-primary btn-sm", "月度拆分 ›");
       monthBtn.title = "打开月度拆解二级页（方案 B：双堆叠条 · 总量守恒）";
       monthBtn.addEventListener("click", openSplit);
       monthTd.appendChild(monthBtn);
-      tr.appendChild(monthTd);
 
       /* 5 上年预算（年初下达） | 6 上年决算（实际执行） */
       tr.appendChild(el("td", "tbl-num", `<span>${r.lastBudget != null ? BM.money(r.lastBudget) : "—"}</span>`));
@@ -241,7 +241,7 @@ function renderCompile(container) {
       if (sug && sug.lo != null) {
         const aiRow = el("div", "ai-suggest-row-inline");
         const range = el("span", "ai-range-compact", BM.money(sug.lo) + " ~ " + BM.money(sug.hi));
-        const useBtn = el("button", "btn btn-primary btn-sm", "采纳中值");
+        const useBtn = el("button", "btn btn-outline-primary btn-sm", "采纳中值");
         useBtn.addEventListener("click", () => {
           applyInput.value = sug.mid;
           applySlider.value = sug.mid;
@@ -259,6 +259,7 @@ function renderCompile(container) {
         aiTd.appendChild(adviceBtn);
       }
       tr.appendChild(aiTd);
+      tr.appendChild(monthTd);
 
       /* 独立弹层：遮罩 + 居中卡片（默认隐藏，点击 💡 打开） */
       const adviceOverlay = el("div", "advice-overlay");
@@ -427,77 +428,10 @@ function renderCompile(container) {
   const saveBtn = el("button", "btn btn-primary", "保存草稿");
   const submitBtn = el("button", "btn btn-accent", "提交编制 → 汇总");
   const resetBtn = el("button", "btn btn-outline", "清空草稿");
-  const balanceBtn = el("button", "btn btn-outline", "⚖️ 上级平衡预览");
-  balanceBtn.title = "按平衡原则（弹性分类 + 偏离度）预览哪些项该压、该平衡";
   actions.appendChild(saveBtn);
   actions.appendChild(submitBtn);
-  actions.appendChild(balanceBtn);
   actions.appendChild(resetBtn);
   actions.appendChild(el("span", "hint-text", "保存草稿后刷新页面仍可恢复；提交后进入汇总/审批流"));
-
-  /* 上级平衡预览面板（松哥 2026-08-24：平衡原则 = 规则4弹性分类 + 规则2/6偏离度排序） */
-  const balancePanel = el("div", "cmp-balance");
-  balancePanel.style.display = "none";
-  balancePanel.style.margin = "14px 0";
-  page.insertBefore(balancePanel, dualToggle);
-
-  /* method → 弹性类型（规则 4：刚性/半刚性/弹性/项目型） */
-  const ELASTIC_TYPE = {
-    fixed:     { type: "刚性",   tag: "合同驱动",  E: 0 },
-    manageStd: { type: "半刚性", tag: "人数/业务量驱动", E: 0.3 },
-    perCapita: { type: "半刚性", tag: "人数驱动",  E: 0.3 },
-    history:   { type: "弹性",   tag: "历史+业务驱动", E: 0.6 },
-    yoy:       { type: "弹性",   tag: "历史+趋势",  E: 0.6 },
-    volume:    { type: "弹性",   tag: "业务量驱动", E: 0.8 },
-    keyEvent:  { type: "项目型", tag: "事件驱动",  E: null },
-    manual:    { type: "项目型", tag: "据实事件",  E: null },
-  };
-
-  function renderBalancePreview() {
-    /* 汇总所有项：取当前填的值 + 建议区间，计算偏离，按弹性分类 */
-    const rows = src.map((r) => {
-      const advice = BM.budgetAdvice(r);
-      const amt = r.amount != null ? r.amount : (advice.mid || 0);
-      const dev = BM.adviceDeviation(advice, amt);
-      const et = ELASTIC_TYPE[advice.method] || ELASTIC_TYPE.history;
-      const overPct = dev.pct != null && dev.pct > 0 ? dev.pct : 0;
-      return {
-        cat: r.cat, method: advice.method, kind: et.type, tag: et.tag,
-        amt: amt, lo: advice.lo, hi: advice.hi, mid: advice.mid,
-        overPct: overPct, inRange: dev.inRange,
-      };
-    });
-    /* 按"高于区间的偏离度"降序，给上级看"该压哪些" */
-    rows.sort((a, b) => b.overPct - a.overPct);
-    const total = rows.reduce((s, x) => s + x.amt, 0);
-    const overItems = rows.filter((x) => x.overPct > 0);
-    const overSum = overItems.reduce((s, x) => s + x.amt, 0);
-    const byType = {};
-    rows.forEach((x) => { byType[x.kind] = (byType[x.kind] || 0) + x.amt; });
-
-    let typeHtml = "";
-    Object.keys(byType).forEach((k) => {
-      typeHtml += `<span class="bl-type"><b>${k}</b> ${BM.money(byType[k])}</span>`;
-    });
-    let listHtml = rows.map((x) => {
-      const flag = x.overPct > 0 ? `<span class="badge badge-danger">偏高 +${x.overPct}%</span>` : (x.inRange === true ? `<span class="badge badge-ok">区间内</span>` : `<span class="hint-text">—</span>`);
-      const range = x.lo != null ? BM.money(x.lo) + "~" + BM.money(x.hi) : "—";
-      return `<tr><td><b>${esc(x.cat)}</b></td><td>${x.kind}·${x.tag}</td>
-        <td class="tbl-num">${BM.money(x.amt)}</td><td class="hint-text">${range}</td>
-        <td>${flag}</td></tr>`;
-    }).join("");
-
-    balancePanel.innerHTML = `<div class="bl-head">⚖️ 上级平衡预览（平衡原则：弹性分类 + 偏离度排序）</div>
-      <div class="bl-summary">编制总额 <b>${BM.money(total)}</b>　|　弹性分布：${typeHtml}　|　偏高项 ${overItems.length} 个，涉及 <b>${BM.money(overSum)}</b></div>
-      <div class="bl-tip">👉 平衡建议：优先对「弹性/项目型 + 偏高」项做差异化压降（规则6 压降潜力），刚性项直接核对合同；不建议集团一刀切。</div>
-      <table class="bl-table"><thead><tr><th>经济事项</th><th>弹性分类</th><th>本年度预算值</th><th>建议区间</th><th>平衡标记</th></tr></thead>
-      <tbody>${listHtml}</tbody></table>`;
-    balancePanel.style.display = "";
-  }
-  balanceBtn.addEventListener("click", () => {
-    if (balancePanel.style.display === "none") renderBalancePreview();
-    else balancePanel.style.display = "none";
-  });
   page.appendChild(actions);
 
   saveBtn.addEventListener("click", () => {
@@ -542,6 +476,11 @@ function renderCompile(container) {
 
   container.appendChild(page);
 }
+
+/* 供「汇总平衡」视图等复用同一份经济事项数据源（API 优先，离线回退 mock） */
+BM.buildCompileSource = function () {
+  return BM.eventsData && BM.eventsData.length ? BM.eventsData : buildMockList();
+};
 
 window.BM.renderCompile = renderCompile;
 window.BM = BM;

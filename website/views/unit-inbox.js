@@ -81,8 +81,8 @@ BM.renderUnitInbox = function (container) {
   selBox.appendChild(sumBtn);
   page.appendChild(selBox);
 
-  fetch("/api/orgs")
-    .then((r) => (r.ok ? r.json() : Promise.reject()))
+  fetch("/api/orgs", { headers: BM.authHeaders() })
+    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
     .then(({ root, units }) => {
       box.innerHTML = "";
       if (!units || !units.length) { box.appendChild(el("div", "empty", "暂无下级单位（组织结构未配置）")); return; }
@@ -104,7 +104,7 @@ BM.renderUnitInbox = function (container) {
             detail.style.display = "block";
             if (!tbWrap.children.length) {
               tbWrap.appendChild(el("div", "hint-text", "加载该单位预算…"));
-              fetch("/api/unit-budgets?org=" + u.code)
+              fetch("/api/unit-budgets?org=" + u.code, { headers: BM.authHeaders() })
                 .then((r) => r.json())
                 .then((list) => renderUnitTable(tbWrap, list))
                 .catch(() => (tbWrap.innerHTML = '<div class="hint-text">加载失败</div>'));

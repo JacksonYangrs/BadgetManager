@@ -147,7 +147,14 @@ function renderImportView(container) {
   fileInput.type = "file";
   fileInput.accept = ".csv,.xlsx,.xls";
   fileInput.id = "importFile";
-  upRow.appendChild(fileInput);
+  const pickLabel = el("label", "btn btn-primary file-pick-label", "选择文件");
+  pickLabel.setAttribute("for", "importFile");
+  const pickName = el("span", "file-picker-name empty", "未选择文件");
+  const filePicker = el("div", "file-picker");
+  filePicker.appendChild(pickLabel);
+  filePicker.appendChild(pickName);
+  filePicker.appendChild(fileInput);
+  upRow.appendChild(filePicker);
   const demoBtn = el("button", "btn btn-outline btn-sm", "使用示例数据试解析");
   upRow.appendChild(demoBtn);
   page.appendChild(upRow);
@@ -222,6 +229,13 @@ function renderImportView(container) {
 
   fileInput.addEventListener("change", () => {
     const f = fileInput.files && fileInput.files[0];
+    if (f) {
+      pickName.classList.remove("empty");
+      pickName.innerHTML = "<b>" + esc(f.name) + "</b>";
+    } else {
+      pickName.classList.add("empty");
+      pickName.textContent = "未选择文件";
+    }
     if (!f) return;
     /* 尝试作为 CSV 读取（Excel 实际由后端解析，前端一期仅模拟） */
     if (typeof FileReader !== "undefined" && /\.csv$/i.test(f.name)) {

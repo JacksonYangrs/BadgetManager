@@ -22,6 +22,7 @@ const VIEWS = {
   collision: BM.renderCollision,
   collisionTune: BM.renderCollisionTune,
   compile: BM.renderCompile,
+  balance: BM.renderBalance,
   kanban: BM.renderKanban,
   monthlySplit: BM.renderMonthlySplit,
   unitInbox: BM.renderUnitInbox,

@@ -35,7 +35,7 @@ BM.renderKanban = function (container) {
   );
   /* 右上角：费控导入入口（弹出二级子页面，非左侧菜单） */
   const headRight = el("div", "page-head-right");
-  const importBtn = el("button", "btn btn-primary btn-sm", "📥 费控导入");
+  const importBtn = el("button", "btn btn-primary", "费控导入");
   importBtn.addEventListener("click", () => BM.openImportModal && BM.openImportModal());
   headRight.appendChild(importBtn);
   head.appendChild(headRight);

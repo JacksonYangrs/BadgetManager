@@ -1,8 +1,8 @@
 /* ===== 视觉系统 · base.css ===== */
 :root {
-  --c-primary: #1e2a4a;
-  --c-primary-deep: #141d36;
-  --c-primary-light: #2b3c6e;
+  --c-primary: #003cb4;
+  --c-primary-deep: #002a7e;
+  --c-primary-light: #1e5fd0;
   --c-accent: #c9a44a;
   --c-accent-light: #e6cf8f;
   --c-bg: #f4f5f8;
@@ -20,6 +20,13 @@
   --c-danger-bg: #fdeaea;
   --c-info: #185fa5;
   --c-info-bg: #e8f1fb;
+  --c-primary-tint: #e8f0fe;
+  --c-primary-soft: #1e5fd0;
+  --c-disabled: #c2c8d4;
+  --c-disabled-bg: #eef0f4;
+  --t-fast: 0.12s ease;
+  --t-base: 0.2s ease;
+  --t-slow: 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 3px rgba(20, 29, 54, 0.08);
@@ -152,8 +159,8 @@ body {
 }
 
 .role-btn.active {
-  background: var(--c-accent);
-  color: var(--c-primary-deep);
+  background: var(--c-primary);
+  color: #fff;
   font-weight: 600;
 }
 
@@ -187,13 +194,13 @@ body {
 }
 
 .btn-accent {
-  background: var(--c-accent);
-  color: var(--c-primary-deep);
+  background: var(--c-primary);
+  color: #fff;
   font-weight: 600;
 }
 
 .btn-accent:hover {
-  background: var(--c-accent-light);
+  background: var(--c-primary-light);
 }
 
 .btn-outline {
@@ -205,6 +212,19 @@ body {
 .btn-outline:hover {
   border-color: var(--c-primary-light);
   color: var(--c-primary);
+}
+
+.btn-outline-primary {
+  background: transparent;
+  border: 1px solid var(--c-primary);
+  color: var(--c-primary);
+  font-weight: 500;
+}
+
+.btn-outline-primary:hover {
+  background: rgba(0, 60, 180, 0.08);
+  color: var(--c-primary-deep);
+  border-color: var(--c-primary-deep);
 }
 
 .btn-sm {

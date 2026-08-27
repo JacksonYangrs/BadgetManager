@@ -115,7 +115,7 @@
 
 .dash-tab.active {
   color: var(--c-primary);
-  border-bottom-color: var(--c-accent);
+  border-bottom-color: var(--c-primary);
 }
 
 /* 项目视图容器 */

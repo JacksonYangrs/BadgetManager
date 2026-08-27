@@ -30,17 +30,11 @@
 }
 
 .login-logo {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--c-accent), #8a6d2f);
-  color: var(--c-primary-deep);
-  font-size: 22px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 120px;
+  height: 48px;
   margin: 0 auto 14px;
+  background: var(--logo-sanan) center / contain no-repeat;
+  background-color: transparent;
 }
 
 .login-title {
@@ -190,8 +184,8 @@
 }
 
 .mt-btn.active {
-  background: var(--c-accent);
-  color: var(--c-primary-deep);
+  background: var(--c-primary);
+  color: #fff;
   font-weight: 600;
 }
 
@@ -379,6 +373,90 @@
   margin-top: 4px;
   line-height: 1.5;
 }
+
+/* 工作台 · 汇总平衡直达卡 */
+.wb-hero-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--c-border);
+  border-left: 3px solid var(--c-primary);
+  border-radius: 12px;
+  padding: 16px 18px;
+  background: var(--c-surface);
+}
+.wb-hero-card .wh-ico {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; flex: 0 0 auto;
+}
+.wb-hero-card .wh-main { flex: 1 1 auto; min-width: 0; }
+.wb-hero-card .wh-title { font-size: 14.5px; font-weight: 600; color: var(--c-text); }
+.wb-hero-card .wh-sub { font-size: 12px; color: var(--c-text-3); margin-top: 3px; line-height: 1.5; }
+
+/* ---------- 汇总平衡页 ---------- */
+.bal-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.bal-kpi {
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--c-surface);
+}
+.bal-kpi-primary .bk-val { color: var(--c-primary); }
+.bal-kpi-danger .bk-val { color: var(--c-danger); }
+.bal-kpi-ok .bk-val { color: var(--c-ok); }
+.bk-val { font-size: 22px; font-weight: 700; color: var(--c-text); }
+.bk-label { font-size: 12px; color: var(--c-text-3); margin-top: 4px; }
+
+.bal-dist { margin: 12px 0; }
+.bal-dist-title { font-size: 13px; font-weight: 600; color: var(--c-text-2); margin-bottom: 8px; }
+.bal-dist-bar { display: flex; gap: 6px; height: 30px; }
+.bal-dist-seg {
+  background: var(--c-primary);
+  border-radius: 6px;
+  min-width: 48px;
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 8px;
+  line-height: 1.2;
+}
+.bal-dist-seg[data-kind="刚性"] { background: #475569; }
+.bal-dist-seg[data-kind="半刚性"] { background: #2b6cb0; }
+.bal-dist-seg[data-kind="弹性"] { background: #1e5fd0; }
+.bal-dist-seg[data-kind="项目型"] { background: #c9a44a; }
+.bds-kind { font-weight: 600; }
+
+.bal-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 14px 0 10px; }
+.bal-filter-label { font-size: 12px; color: var(--c-text-3); }
+.bal-filter-btn {
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text-2);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .15s;
+}
+.bal-filter-btn.active,
+.bal-filter-btn:hover { border-color: var(--c-primary); color: var(--c-primary); background: var(--c-primary-tint); }
+
+.balance-table-wrap { margin-top: 8px; }
+.balance-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.balance-table th { text-align: left; padding: 8px 10px; background: #eef2f7; font-weight: 600; border-bottom: 2px solid var(--c-border); }
+.balance-table td { padding: 8px 10px; border-top: 1px solid var(--c-border-2, #eef2f7); }
+.balance-table tr:hover td { background: var(--c-surface-2); }
+
+.bal-foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
 
 /* 待办列表 */
 .todo-list {

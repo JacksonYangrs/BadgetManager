@@ -4,9 +4,9 @@
  * ================================================================ */
 
 :root {
-  --c-primary: #1e2a4a;
-  --c-primary-deep: #141d36;
-  --c-primary-light: #2b3c6e;
+  --c-primary: #003cb4;
+  --c-primary-deep: #002a7e;
+  --c-primary-light: #1e5fd0;
   --c-accent: #c9a44a;
   --c-accent-light: #e6cf8f;
   --c-surface: #ffffff;
@@ -23,6 +23,13 @@
   --c-danger-bg: #fdeaea;
   --c-info: #185fa5;
   --c-info-bg: #e8f1fb;
+  --c-primary-tint: #e8f0fe;
+  --c-primary-soft: #1e5fd0;
+  --c-disabled: #c2c8d4;
+  --c-disabled-bg: #eef0f4;
+  --t-fast: 0.12s ease;
+  --t-base: 0.2s ease;
+  --t-slow: 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
   --font: -apple-system, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -317,7 +324,7 @@ textarea {
 }
 
 .tab-btn.active .tab-ico {
-  color: var(--c-accent);
+  color: var(--c-primary);
 }
 
 /* ===== 通用卡片 ===== */
@@ -583,9 +590,9 @@ textarea {
 }
 
 .btn-accent {
-  background: linear-gradient(135deg, var(--c-accent), #8a6d2f);
-  color: var(--c-primary-deep);
-  box-shadow: 0 2px 8px rgba(138, 109, 47, 0.25);
+  background: var(--c-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 60, 180, 0.22);
 }
 
 .btn-outline {
@@ -628,7 +635,7 @@ textarea {
 .nav-tab.active {
   color: var(--c-primary);
   font-weight: 500;
-  border-bottom-color: var(--c-accent);
+  border-bottom-color: var(--c-primary);
 }
 
 /* ===== 切换器（视图/筛选切换 · 浅灰胶囊 = 纯选择，区别于操作按钮） ===== */

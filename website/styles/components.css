@@ -1044,13 +1044,13 @@
 .rules-tabs { display: flex; gap: 8px; margin: 14px 0 4px; border-bottom: 1px solid var(--c-border); }
 .rtab-btn { border: none; background: transparent; padding: 9px 16px; font-size: 14px; font-weight: 600; color: var(--c-text-2); cursor: pointer; border-bottom: 2px solid transparent; }
 .rtab-btn:hover { color: var(--c-text); }
-.rtab-btn.active { color: var(--c-accent); border-bottom-color: var(--c-accent); }
+.rtab-btn.active { color: var(--c-primary); border-bottom-color: var(--c-primary); }
 .rules-panes { margin-top: 14px; }
 .rtab-pane.hidden { display: none; }
 .scope-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
 .scope-card { border: 1px solid var(--c-border); border-radius: 10px; padding: 12px; background: var(--c-surface-2); cursor: pointer; transition: border-color .15s, box-shadow .15s; }
 .scope-card:hover { border-color: var(--c-accent); }
-.scope-card.active { border-color: var(--c-accent); box-shadow: 0 0 0 2px rgba(59,130,246,0.18); background: var(--c-surface); }
+.scope-card.active { border-color: var(--c-primary); box-shadow: 0 0 0 2px rgba(0,60,180,0.18); background: var(--c-surface); }
 .sc-k { font-size: 13px; font-weight: 700; }
 .sc-v { font-size: 22px; font-weight: 800; color: var(--c-accent); margin: 4px 0; }
 .sc-unit { font-size: 13px; font-weight: 600; margin-left: 2px; }
@@ -1060,9 +1060,44 @@
 .se-row { display: flex; gap: 10px; padding: 4px 0; font-size: 13px; }
 .se-k { color: var(--c-text-2); flex: 0 0 72px; }
 .se-v { font-weight: 600; }
-.evt-map { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; }
-.evt-cards { display: flex; flex-direction: column; gap: 8px; }
-.evt-cards .scope-card { padding: 10px 12px; }
+/* ---------- 预算规则 · 适用经济事项（横版规则卡 + 注释框 + 经济事项，2026-08-26） ---------- */
+.evt-map { display: flex; flex-direction: column; gap: 16px; }
+.evt-cards {
+  display: flex; flex-direction: row; gap: 12px;
+  overflow-x: auto; overflow-y: hidden;
+  padding: 4px 4px 12px; margin: -4px -4px 0;
+  scroll-behavior: smooth;
+  /* 显式滚动条 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-primary-soft, #1E5FD0) var(--c-surface-2);
+}
+.evt-cards::-webkit-scrollbar { height: 8px; }
+.evt-cards::-webkit-scrollbar-track { background: var(--c-surface-2); border-radius: 4px; }
+.evt-cards::-webkit-scrollbar-thumb { background: var(--c-primary-soft, #1E5FD0); border-radius: 4px; }
+.evt-cards .scope-card {
+  flex: 0 0 auto; min-width: 180px; max-width: 220px; padding: 10px 12px;
+  transition: transform .2s ease, border-color .15s, box-shadow .15s;
+}
+.evt-cards .scope-card.active { transform: translateY(-2px); }
+/* 规则说明 / 注释：标签在框内左侧，与输入框共占一行，框高减半 */
+.evt-comment-row {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--c-border); border-radius: 10px;
+  background: var(--c-surface); padding: 0 12px; min-height: 40px;
+  transition: opacity .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.evt-comment-row:focus-within { box-shadow: 0 0 0 3px rgba(0, 60, 180, 0.15); border-color: var(--c-primary); }
+.evt-comment-row.changing { opacity: 0; transform: translateY(8px); }
+.evt-comment-label {
+  font-size: 13px; font-weight: 600; color: var(--c-text-2);
+  white-space: nowrap; flex: 0 0 auto; line-height: 20px;
+}
+.evt-comment {
+  flex: 1 1 auto; min-height: 20px; border: none; background: transparent; outline: none;
+  color: var(--c-text); font-size: 13px; line-height: 20px;
+  white-space: pre-wrap; word-break: break-word;
+}
+.evt-comment:empty:before { content: attr(data-ph); color: var(--c-text-2); }
 .evt-sub { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--c-text-2); }
 .evt-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px; max-height: 420px; overflow: auto; padding: 4px; border: 1px solid var(--c-border); border-radius: 10px; background: var(--c-surface-2); }
 .evt-check { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 3px; cursor: pointer; }
@@ -1298,3 +1333,21 @@
 .cn-ex-warn { font-size: 12px; color: #b45309; margin-top: 4px; }
 .cn-draft-view { margin-top: 8px; border: 1px dashed var(--c-border); border-radius: 12px; padding: 12px; background: var(--c-surface); }
 .cn-draft-ops { display: flex; gap: 10px; margin-top: 12px; }
+
+/* ---------- 文件选择按钮统一美化（2026-08-26，redesign A） ---------- */
+/* 原生 <input type="file"> 隐藏，用 .btn 标签按钮触发，保持主色（logo 蓝）统一 */
+.file-picker { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.file-picker input[type="file"] {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.file-pick-label {
+  cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.file-pick-label::before { content: "📄"; font-size: 14px; line-height: 1; }
+.file-picker-name {
+  font-size: 13px; color: var(--c-text-2);
+  max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.file-picker-name b { color: var(--c-text); }
+.file-picker-name.empty { font-style: italic; opacity: 0.8; }

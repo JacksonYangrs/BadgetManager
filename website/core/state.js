@@ -391,6 +391,9 @@ BM.curRole = function () {
  *   组织架构图保留在「基础数据」页第 3 个 Tab（可编辑，admin/总经办），不再作为独立菜单项。
  * 模块三（2026-08-23）：真实登录用户按其角色 views 白名单取并集；演示通道（无 user）回退默认集合。 */
 BM.roleViews = function (roleId) {
+  /* 汇总平衡：仅上级领导（收到下级提交后做平衡）可见。
+   * 上级集合与 canViewBenchmark 一致：boss/ceo/finance/buHead/cooLead/cooAnalyst。 */
+  const UPPER = ["boss", "ceo", "finance", "buHead", "cooLead", "cooAnalyst"];
   /* 真实登录：取该用户全部角色的视图并集（views 来自后端 role 表，含 basedata 迁移），
    * 并兜底基础视图集合 BASE，确保 compile/kanban/rules 始终可见（与演示通道行为一致）。 */
   if (state.user && state.user.roles && state.user.roles.length && !roleId) {
@@ -400,6 +403,7 @@ BM.roleViews = function (roleId) {
     state.user.roles.forEach((r) => (r.views || []).forEach((v) => set.add(v)));
     if (state.user.roles.some((r) => BD_ROLES.includes(r.code))) set.add("basedata");
     if (state.user.roles.some((r) => r.code === "admin")) set.add("accounts");
+    if (state.user.roles.some((r) => UPPER.includes(r.code))) set.add("balance");
     return Array.from(set);
   }
   /* 演示通道 / 显式指定角色：按角色 code 回退（与后端 role.views 对齐）。
@@ -408,6 +412,7 @@ BM.roleViews = function (roleId) {
   const BASE = ["wb-home", "compile", "kanban", "rules"];
   const BD_ROLES = ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner"];
   const extra = BD_ROLES.includes(rid) ? ["basedata"] : [];
+  if (UPPER.includes(rid) && rid !== "admin") return BASE.concat(["balance"]).concat(extra);
   if (rid === "admin") return ["wb-home", "compile", "kanban", "rules", "accounts"].concat(extra);
   return BASE.concat(extra);
 };
@@ -466,6 +471,7 @@ BM.NAV_LABELS = {
   collision: "碰撞",
   collisionTune: "碰撞调参",
   compile: "预算编制",
+  balance: "汇总平衡",
   kanban: "预算跟踪",
   importView: "费控导入",
   riskView: "AI 风险",

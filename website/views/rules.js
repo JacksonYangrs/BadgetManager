@@ -146,13 +146,14 @@ function renderRuleCards(pane, version) {
   /* ---- 组1 编制规则 ---- */
   const g1 = el("div", "rule-group");
   g1.appendChild(el("div", "rule-group-title", "编制规则"));
-  g1.appendChild(el("div", "wb-section-title", "控制基线比例（相对上年决算）"));
+  g1.appendChild(el("div", "wb-section-title", "规则卡片"));
   const cGrid = el("div", "scope-cards");
   bl.forEach((it, idx) => {
     const pct = it.factor != null ? Math.round(it.factor * 1000) / 10 : null;
     const c = el("div", "scope-card" + (idx === 0 ? " active" : ""));
     c.dataset.scope = it.scopeKey;
-    c.innerHTML = `<div class="sc-k">${esc(it.scopeKey)}</div>
+    const name = ruleNameFor(it.scopeKey).desc || it.scopeKey;
+    c.innerHTML = `<div class="sc-k">${esc(name)}</div>
       <div class="sc-v">${pct != null ? pct : "—"}<span class="sc-unit">%</span></div>
       <div class="sc-l">${esc(it.baseLogic || "")}</div>`;
     c.addEventListener("click", () => {
@@ -345,16 +346,32 @@ function renderEventsTab(page) {
   toolbar.appendChild(saveBtn);
   pane.appendChild(toolbar);
 
-  /* 主体两列：左规则卡 + 右当前规则信息 + 科目勾选 */
+  /* 主体：上规则卡横向滚动 + 注释文本框 + 下经济事项勾选 */
   pane.appendChild(el("div", "wb-section-title", "规则卡与适用科目"));
   const wrap = el("div", "evt-map");
-  const left = el("div", "evt-cards");
-  const right = el("div", "evt-right");
-  wrap.appendChild(left); wrap.appendChild(right);
   pane.appendChild(wrap);
 
-  const curInfo = el("div", "evt-cur-info");
-  right.appendChild(curInfo);
+  /* ① 规则卡横向条 */
+  const cardStrip = el("div", "evt-cards");
+  wrap.appendChild(cardStrip);
+
+  /* ② 注释文本框（标签在框内左侧，与输入共占一行，随卡片选择切换带动效） */
+  const commentRow = el("div", "evt-comment-row");
+  commentRow.appendChild(el("span", "evt-comment-label", "规则说明 / 注释"));
+  const commentBox = el("div", "evt-comment");
+  commentBox.setAttribute("contenteditable", "true");
+  commentBox.setAttribute("data-ph", "点击上方规则卡查看说明，可在此补充注释…");
+  commentBox.addEventListener("input", () => {
+    const scope = pane._currentScope;
+    if (scope) {
+      pane._comments = pane._comments || {};
+      pane._comments[scope] = commentBox.innerText;
+    }
+  });
+  commentRow.appendChild(commentBox);
+  wrap.appendChild(commentRow);
+
+  /* ③ 经济事项勾选列表 */
   const subList = el("div", "evt-list");
   subjects.forEach((s) => {
     const lab = s.code ? `${esc(s.code)} ${esc(s.name)}` : esc(s.name);
@@ -363,24 +380,32 @@ function renderEventsTab(page) {
     chk.querySelector("input").addEventListener("change", () => { syncChecks(page); updateCounter(page, counter); });
     subList.appendChild(chk);
   });
-  right.appendChild(subList);
+  wrap.appendChild(subList);
 
-  /* 左侧：规则卡（显示规则名 + 政策表述 + 弹性分类徽章，不显示代码） */
+  /* 初始化注释缓存 */
+  pane._comments = {};
+  bl.forEach((it) => {
+    const meta = ruleNameFor(it.scopeKey);
+    pane._comments[it.scopeKey] = meta.policy || it.baseLogic || "";
+  });
+
+  /* 规则卡 */
   bl.forEach((it, idx) => {
     const meta = ruleNameFor(it.scopeKey);
     const c = el("div", "scope-card" + (idx === 0 ? " active" : ""));
     c.dataset.scope = it.scopeKey;
     const badge = meta.typeLabel ? `<span class="sc-badge">${esc(meta.typeLabel)}</span>` : "";
-    c.innerHTML = `<div class="sc-k">${esc(meta.desc)}</div>
-      <div class="sc-l">${esc(meta.policy || it.baseLogic || "")}</div>${badge}`;
+    c.innerHTML = `<div class="sc-k">${esc(meta.desc)}</div>${badge}`;
     c.addEventListener("click", () => {
       syncChecks(page);
-      left.querySelectorAll(".scope-card").forEach((x) => x.classList.remove("active"));
+      cardStrip.querySelectorAll(".scope-card").forEach((x) => x.classList.remove("active"));
       c.classList.add("active");
-      highlightScope(page, it.scopeKey);
-      updateCounter(page, counter);
+      animateCommentSwitch(pane, commentRow, commentBox, it.scopeKey, () => {
+        highlightScope(page, it.scopeKey);
+        updateCounter(page, counter);
+      });
     });
-    left.appendChild(c);
+    cardStrip.appendChild(c);
   });
 
   /* 加载已存映射 */
@@ -391,10 +416,27 @@ function renderEventsTab(page) {
       const byScope = {};
       (map || []).forEach((m) => { byScope[m.scopeKey] = m.subjectIds; });
       pane._byScope = byScope;
-      if (bl[0]) highlightScope(page, bl[0].scopeKey);
+      if (bl[0]) { highlightScope(page, bl[0].scopeKey); setCommentValue(pane, commentBox, bl[0].scopeKey); }
       updateCounter(page, counter);
     })
-    .catch(() => { if (bl[0]) highlightScope(page, bl[0].scopeKey); updateCounter(page, counter); });
+    .catch(() => {
+      if (bl[0]) { highlightScope(page, bl[0].scopeKey); setCommentValue(pane, commentBox, bl[0].scopeKey); }
+      updateCounter(page, counter);
+    });
+}
+
+function setCommentValue(pane, box, scopeKey) {
+  const text = (pane._comments && pane._comments[scopeKey]) || "";
+  box.innerText = text;
+}
+
+function animateCommentSwitch(page, row, box, scopeKey, done) {
+  row.classList.add("changing");
+  setTimeout(() => {
+    setCommentValue(page, box, scopeKey);
+    row.classList.remove("changing");
+    if (done) done();
+  }, 180);
 }
 
 function highlightScope(page, scopeKey) {
@@ -404,9 +446,6 @@ function highlightScope(page, scopeKey) {
   const set = new Set(ids.map(Number));
   pane.querySelectorAll('input[type=checkbox][data-sub]').forEach((cb) => { cb.checked = set.has(Number(cb.dataset.sub)); });
   pane.querySelectorAll(".evt-cards .scope-card").forEach((c) => c.classList.toggle("active", c.dataset.scope === scopeKey));
-  const meta = ruleNameFor(scopeKey);
-  const curInfo = pane.querySelector(".evt-cur-info");
-  if (curInfo) curInfo.innerHTML = `<div class="evt-cur-name">${esc(meta.desc)}</div><div class="evt-cur-policy">${esc(meta.policy || "")}</div>`;
 }
 
 function syncChecks(page) {
@@ -620,6 +659,14 @@ function renderCreateNextTab(page) {
   upBox.appendChild(el("div", "wb-section-title", "① 导入集体预算政策文件"));
   const fileInput = el("input", "cn-file");
   fileInput.type = "file"; fileInput.multiple = true; fileInput.accept = ".pdf,.docx,.xlsx,.pptx,.md,.txt,.csv";
+  fileInput.id = "policyFile";
+  const pickLabel = el("label", "btn btn-primary file-pick-label", "选择文件");
+  pickLabel.setAttribute("for", "policyFile");
+  const pickName = el("span", "file-picker-name empty", "未选择文件");
+  const filePicker = el("div", "file-picker");
+  filePicker.appendChild(pickLabel);
+  filePicker.appendChild(pickName);
+  filePicker.appendChild(fileInput);
   const upHint = el("div", "cn-hint", "支持 PDF / Word / Excel / Markdown / TXT / CSV（多文件）。图片 OCR 后续支持。");
   const pasteArea = el("textarea", "cn-paste");
   pasteArea.placeholder = "或直接粘贴政策文本 / 会议纪要…";
@@ -627,9 +674,19 @@ function renderCreateNextTab(page) {
   const upBtn = el("button", "btn btn-primary", "解析并抽取");
   upOps.appendChild(upBtn);
   const txtBox = el("div", "cn-text");
-  upBox.appendChild(fileInput); upBox.appendChild(upHint); upBox.appendChild(pasteArea);
+  upBox.appendChild(filePicker); upBox.appendChild(upHint); upBox.appendChild(pasteArea);
   upBox.appendChild(upOps); upBox.appendChild(txtBox);
   pane.appendChild(upBox);
+  fileInput.addEventListener("change", () => {
+    const files = Array.from(fileInput.files || []);
+    if (files.length) {
+      pickName.classList.remove("empty");
+      pickName.innerHTML = "<b>" + files.map((f) => esc(f.name)).join("</b> · <b>") + "</b>";
+    } else {
+      pickName.classList.add("empty");
+      pickName.textContent = "未选择文件";
+    }
+  });
 
   /* ② 抽取对照 */
   const exBox = el("div", "cn-extract");
