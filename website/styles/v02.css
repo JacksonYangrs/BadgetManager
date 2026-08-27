@@ -419,20 +419,24 @@
 .bal-dist-seg {
   background: var(--c-primary);
   border-radius: 6px;
-  min-width: 48px;
+  min-width: 76px;
   color: #fff;
   font-size: 11px;
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  gap: 4px;
   padding: 0 8px;
-  line-height: 1.2;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .bal-dist-seg[data-kind="刚性"] { background: #475569; }
 .bal-dist-seg[data-kind="半刚性"] { background: #2b6cb0; }
 .bal-dist-seg[data-kind="弹性"] { background: #1e5fd0; }
 .bal-dist-seg[data-kind="项目型"] { background: #c9a44a; }
 .bds-kind { font-weight: 600; }
+.bds-pct { opacity: 0.92; }
 
 .bal-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 14px 0 10px; }
 .bal-filter-label { font-size: 12px; color: var(--c-text-3); }
