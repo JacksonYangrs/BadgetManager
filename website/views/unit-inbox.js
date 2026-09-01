@@ -62,7 +62,7 @@ BM.renderUnitInbox = function (container) {
   page.appendChild(head);
   BM.renderRoleHint(page, "unitInbox");
 
-  const box = el("div", "");
+  const box = el("div", "unit-inbox-grid");
   page.appendChild(box);
   box.appendChild(el("div", "empty", "正在加载组织结构…"));
 
@@ -86,7 +86,9 @@ BM.renderUnitInbox = function (container) {
     .then(({ root, units }) => {
       box.innerHTML = "";
       if (!units || !units.length) { box.appendChild(el("div", "empty", "暂无下级单位（组织结构未配置）")); return; }
-      units.forEach((u) => {
+      const dataUnits = units.filter((u) => u.hasBudget);
+      if (!dataUnits.length) { box.appendChild(el("div", "empty", "暂无可汇总的下级单位（所有单位暂无预算数据）")); return; }
+      dataUnits.forEach((u) => {
         const hasData = !!u.hasBudget;
         const card = el("div", "todo-item ui-unit" + (hasData ? "" : " no-data"));
         card.innerHTML = `<div class="td-ico">🏢</div>

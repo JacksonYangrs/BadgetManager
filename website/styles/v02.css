@@ -542,6 +542,19 @@
   opacity: 0.55;
 }
 
+/* 收件箱单位卡片网格（2026-09-01，桌面 3 列 / 响应式降到 2 列 / 1 列） */
+.unit-inbox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 900px) {
+  .unit-inbox-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .unit-inbox-grid { grid-template-columns: 1fr; }
+}
+
 /* ---------- 编制页 ---------- */
 .plan-modes {
   display: flex;
