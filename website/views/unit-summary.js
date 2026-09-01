@@ -23,7 +23,7 @@ function money(n) {
 /* 保存某格的压降 + 注释 */
 function saveReduction(id, payload, done) {
   fetch("/api/unit-budgets/" + id + "/reduction", {
-    method: "PUT", headers: { "Content-Type": "application/json" },
+    method: "PUT", headers: BM.authHeaders(),
     body: JSON.stringify(payload),
   }).then((r) => r.json()).then((d) => done && done(d)).catch(() => BM.toast("保存失败：后端不可用"));
 }
@@ -59,11 +59,11 @@ BM.renderUnitSummary = function (container) {
   qcPanel.style.display = "none";
   page.appendChild(qcPanel);
 
-  fetch("/api/orgs").then((r) => r.json()).then(({ units }) => {
+  fetch("/api/orgs", { headers: BM.authHeaders() }).then((r) => r.json()).then(({ units }) => {
     const orgMeta = {};
     units.forEach((u) => (orgMeta[u.code] = u.name));
     return Promise.all(orgs.map((code) =>
-      fetch("/api/unit-budgets?org=" + code).then((r) => r.json()).then((list) => ({ code, name: orgMeta[code] || code, list }))
+      fetch("/api/unit-budgets?org=" + code, { headers: BM.authHeaders() }).then((r) => r.json()).then((list) => ({ code, name: orgMeta[code] || code, list }))
     ));
   }).then((data) => {
     box.innerHTML = "";
