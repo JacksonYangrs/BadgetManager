@@ -87,10 +87,11 @@ BM.renderUnitInbox = function (container) {
       box.innerHTML = "";
       if (!units || !units.length) { box.appendChild(el("div", "empty", "暂无下级单位（组织结构未配置）")); return; }
       units.forEach((u) => {
-        const card = el("div", "todo-item ui-unit");
+        const hasData = !!u.hasBudget;
+        const card = el("div", "todo-item ui-unit" + (hasData ? "" : " no-data"));
         card.innerHTML = `<div class="td-ico">🏢</div>
           <div class="td-main"><div class="td-title">${esc(u.name)}</div>
-          <div class="td-sub">预算编制已完成 · 点击查看填报明细</div></div>
+          <div class="td-sub">${hasData ? "预算编制已完成 · 点击查看填报明细" : "暂无预算数据"}</div></div>
           <input type="checkbox" class="ui-check" data-code="${esc(u.code)}" title="勾选加入组合">
           <div class="td-go">›</div>`;
         const detail = el("div", "ui-detail");

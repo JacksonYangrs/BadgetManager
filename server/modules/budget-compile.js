@@ -25,6 +25,14 @@ function listUnitBudgets(db, orgCode) {
   return db.prepare("SELECT * FROM unit_budget WHERE org_id = ? ORDER BY id").all(org.id).map(ubRowToEvent);
 }
 
+/* 单位预算数据标记：org_id → 记录数（收件箱无数据灰标用，2026-09-01） */
+function orgBudgetFlags(db) {
+  const m = {};
+  db.prepare("SELECT org_id, COUNT(*) AS n FROM unit_budget GROUP BY org_id").all()
+    .forEach((r) => { m[r.org_id] = r.n; });
+  return m;
+}
+
 /* 按事项汇总多单位（管理线：部门级预算汇总）
  * 返回每项含：年预算 amount、12 月预算分布 monthly[]、上年实际 lastYear、
  * 当期 months 执行累计 exec（来自 budget_execution，无则按 lastYear×占比推算）。 */
@@ -103,6 +111,7 @@ function updateUnitBudgetReduction(db, id, { reduceRatio, reduceAmount, note }) 
 
 module.exports = {
   listUnitBudgets,
+  orgBudgetFlags,
   summaryByCat,
   ubRowToEvent,
   updateUnitBudgetReduction,

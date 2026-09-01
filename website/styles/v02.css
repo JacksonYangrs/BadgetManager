@@ -524,6 +524,24 @@
   font-size: 16px;
 }
 
+/* ---------- 收件箱单位卡片：紧凑化 + 无数据灰标（2026-09-01） ---------- */
+.todo-item.ui-unit {
+  padding: 8px 14px;
+  gap: 10px;
+}
+.todo-item.ui-unit .td-ico {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.todo-item.ui-unit .td-sub {
+  margin-top: 1px;
+}
+.todo-item.ui-unit.no-data {
+  opacity: 0.55;
+}
+
 /* ---------- 编制页 ---------- */
 .plan-modes {
   display: flex;

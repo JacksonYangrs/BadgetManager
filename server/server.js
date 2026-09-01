@@ -360,6 +360,8 @@ app.get("/api/orgs", auth, (req, res) => {
   const root = orgs.find((o) => o.code === "HQ") || orgs[0];
   let units = orgs.filter((o) => o.level === "company");
   if (allowed) units = units.filter((u) => allowed.indexOf(u.id) >= 0);
+  const flags = dbm.orgBudgetFlags(db); // org_id → 记录数（收件箱无数据灰标）
+  units = units.map((u) => Object.assign({}, u, { hasBudget: !!flags[u.id] }));
   res.json({ root, units });
 });
 
