@@ -5,16 +5,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 let _finalBox = null;
 function renderFinal(container) {
@@ -80,7 +71,7 @@ function renderFinal(container) {
 
   /* 决算操作 */
   const actions = el("div", "final-actions");
-  if (role === "boss" || role === "finance") {
+  if (role === "ceo" || role === "cooAnalyst") {
     if (BM.state.finalDone) {
       actions.appendChild(el("span", "badge badge-ok", "✅ 本年度决算已确认"));
       actions.appendChild(el("span", "hint-text", "决算报告已归档，可通过 Copilot 查看报告摘要"));
@@ -95,7 +86,7 @@ function renderFinal(container) {
       actions.appendChild(el("span", "hint-text", "AI 已生成决算摘要与结余/超支处理建议"));
     }
   } else {
-    actions.appendChild(el("span", "hint-text", "仅总经理 / 财务管理员可确认决算"));
+    actions.appendChild(el("span", "hint-text", "仅集团 CEO / 总经办预算管理员可确认决算"));
   }
   page.appendChild(actions);
 

@@ -5,22 +5,9 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const LOGIN_ICONS = {
-  boss: "👔",
-  manager: "🗂",
-  staff: "🧑‍💻",
-  finance: "🧾",
   ceo: "🏛",
   cooLead: "🤝",
   cooAnalyst: "📊",
@@ -30,7 +17,6 @@ const LOGIN_ICONS = {
   centerOwner: "🎯",
   expense: "🧾",
   admin: "🛡",
-  buHead: "🏭",
 };
 
 /* 演示账号（DEMO_GROUPS）：测试/演示用，客户登录界面已隐藏，定义移除避免死代码 */

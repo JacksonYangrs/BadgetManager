@@ -1,20 +1,11 @@
 /* ================================================================
- * adjust.js — 预算调整中心（财务经理专属，v0.3）
+ * adjust.js — 预算调整中心（总经办预算管理员发起，集团 CEO 审批，v0.3）
  * 项目级 调剂 / 追加 / 调减 申请与审批流
  * ================================================================ */
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 function renderAdjust(container) {
   container.innerHTML = "";
@@ -29,8 +20,8 @@ function renderAdjust(container) {
   page.appendChild(head);
   BM.renderRoleHint(page, "adjust");
 
-  /* 新建调整（财务经理） */
-  if (role === "finance") {
+  /* 新建调整（总经办预算管理员） */
+  if (role === "cooAnalyst") {
     page.appendChild(renderNewAdjustForm());
   }
 
@@ -115,7 +106,7 @@ function renderAdjustCard(a, role) {
     card.appendChild(el("div", "ai-opinion " + verdictCls, `<b>${a.ai.verdict === "pass" ? "AI 初审：建议通过" : "AI 初审：建议人工复核"}</b><br>${esc(a.ai.text)}`));
   }
 
-  if (a.status === "pending" && role === "boss") {
+  if (a.status === "pending" && role === "ceo") {
     const actions = el("div", "appr-actions");
     const btnApprove = el("button", "btn btn-primary btn-sm", "批准调整");
     const btnReject = el("button", "btn btn-outline btn-sm", "驳回");

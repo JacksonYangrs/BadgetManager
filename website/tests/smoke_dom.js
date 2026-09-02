@@ -22,6 +22,7 @@ class El {
     this.checked = false;
     this.classList = { add() {}, remove() {}, toggle() {} };
   }
+  setAttribute() {}
   set className(v) { this._cls = v; }
   get className() { return this._cls || ""; }
   set innerHTML(v) {
@@ -46,7 +47,9 @@ class El {
 const documentStub = {
   createElement: (t) => new El(t),
   getElementById: (id) => idMap[id] || null,
+  querySelector: () => new El("div"),
   addEventListener: () => {},
+  body: new El("body"),
 };
 
 /* ---------- 运行沙箱 ---------- */
@@ -69,6 +72,7 @@ function load(file) {
 let errs = [];
 try {
   load("data/data.js");
+  load("core/utils.js");
   load("core/state.js");
   load("core/engine.js");
   load("core/calc.js");
@@ -83,7 +87,7 @@ try {
   load("views/risk-view.js");
   /* 预置登录态，保证依赖 BM.state.role 的渲染路径可用 */
   sandbox.window.BM.state.loggedIn = true;
-  sandbox.window.BM.state.role = "manager";
+  sandbox.window.BM.state.role = "adminHead";
 } catch (e) {
   errs.push("加载阶段异常：" + e.stack);
 }

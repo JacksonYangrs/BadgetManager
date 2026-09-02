@@ -33,44 +33,8 @@ BM.ROLES = {
     desc: "账户 / 组织 / 角色管理 · 平台运维",
     scope: "all",
   },
-  boss: {
-    id: "boss",
-    name: "总经理",
-    title: "张明远",
-    desc: "全局决策 · 审批 · 决算",
-    scope: "all",
-  },
-  manager: {
-    id: "manager",
-    name: "部门经理",
-    title: "王敏（行政部）",
-    desc: "本部门编制 · 追踪 · 审批",
-    scope: "dept",
-  },
-  staff: {
-    id: "staff",
-    name: "员工",
-    title: "张伟（IT 部）",
-    desc: "负责采购项目 · 发起采购 / 报销",
-    scope: "self",
-  },
-  finance: {
-    id: "finance",
-    name: "财务经理",
-    title: "李静",
-    desc: "预算总控 · 汇总 · 调整 · 决算",
-    scope: "all",
-  },
-  buHead: {
-    id: "buHead",
-    name: "事业部负责人",
-    title: "孙悦（行政服务事业部）",
-    desc: "事业部预算统筹 · 压降落实 · 经营线审核",
-    scope: "group",
-  },
 
-  /* ================= 阶段一：真实角色模型（V2 §2.1 / 映射文档 §2） =================
-   * 新增 8 个真实角色 key，旧 4 角色（boss/manager/staff/finance）保留作兼容深链。
+  /* ================= V2 标准 9 角色（设计文档 2026-09-02） =================
    * scope 语义：group=集团全量 / company=本公司+下属 / center=归口科目跨公司 / self=仅本人项目。
    */
   ceo: {
@@ -450,16 +414,16 @@ BM.SUMMARY = (function () {
 /* ---------- 采购项目（预算最小颗粒度） ---------- */
 /* owner: 负责人姓名；ownerRole: 负责人角色 */
 BM.PROJECTS = [
-  { id: "P001", name: "办公电脑更换（30 台）", deptId: "it", catId: "it", budget: 300000, used: 0, frozen: 0, owner: "张伟", ownerRole: "staff", status: "执行中", desc: "按年度更换老旧办公电脑" },
-  { id: "P002", name: "显示器批量采购（10 台）", deptId: "it", catId: "it", budget: 78000, used: 42000, frozen: 12000, owner: "张伟", ownerRole: "staff", status: "执行中", desc: "新员工办公显示器补充" },
-  { id: "P003", name: "服务器扩容采购", deptId: "it", catId: "it", budget: 220000, used: 0, frozen: 220000, owner: "陈凯", ownerRole: "manager", status: "审批中", desc: "业务系统扩容" },
-  { id: "P004", name: "网络设备升级", deptId: "it", catId: "it", budget: 160000, used: 0, frozen: 160000, owner: "陈凯", ownerRole: "manager", status: "审批中", desc: "办公网络升级改造" },
-  { id: "P005", name: "公务车维修保养", deptId: "admin", catId: "vehicle", budget: 300000, used: 186000, frozen: 0, owner: "王敏", ownerRole: "manager", status: "执行中", desc: "6 辆公务车年度维保" },
-  { id: "P006", name: "季度办公用品集采", deptId: "admin", catId: "office", budget: 250000, used: 148000, frozen: 0, owner: "王敏", ownerRole: "manager", status: "执行中", desc: "办公耗材季度框架采购" },
-  { id: "P007", name: "年度培训计划", deptId: "hr", catId: "training", budget: 350000, used: 210000, frozen: 0, owner: "周芳", ownerRole: "manager", status: "执行中", desc: "全员技能与管理培训" },
-  { id: "P008", name: "管理干部集训营", deptId: "hr", catId: "training", budget: 150000, used: 62000, frozen: 0, owner: "周芳", ownerRole: "manager", status: "执行中", desc: "中层管理能力提升" },
-  { id: "P009", name: "办公环境物业维护", deptId: "admin", catId: "property", budget: 2000000, used: 1323000, frozen: 0, owner: "王敏", ownerRole: "manager", status: "执行中", desc: "办公楼物业与保洁服务" },
-  { id: "P010", name: "市场推广物料制作", deptId: "market", catId: "office", budget: 80000, used: 45000, frozen: 0, owner: "赵磊", ownerRole: "manager", status: "执行中", desc: "展会与活动物料" },
+  { id: "P001", name: "办公电脑更换（30 台）", deptId: "it", catId: "it", budget: 300000, used: 0, frozen: 0, owner: "张伟", ownerRole: "expense", status: "执行中", desc: "按年度更换老旧办公电脑" },
+  { id: "P002", name: "显示器批量采购（10 台）", deptId: "it", catId: "it", budget: 78000, used: 42000, frozen: 12000, owner: "张伟", ownerRole: "expense", status: "执行中", desc: "新员工办公显示器补充" },
+  { id: "P003", name: "服务器扩容采购", deptId: "it", catId: "it", budget: 220000, used: 0, frozen: 220000, owner: "陈凯", ownerRole: "adminHead", status: "审批中", desc: "业务系统扩容" },
+  { id: "P004", name: "网络设备升级", deptId: "it", catId: "it", budget: 160000, used: 0, frozen: 160000, owner: "陈凯", ownerRole: "adminHead", status: "审批中", desc: "办公网络升级改造" },
+  { id: "P005", name: "公务车维修保养", deptId: "admin", catId: "vehicle", budget: 300000, used: 186000, frozen: 0, owner: "王敏", ownerRole: "adminHead", status: "执行中", desc: "6 辆公务车年度维保" },
+  { id: "P006", name: "季度办公用品集采", deptId: "admin", catId: "office", budget: 250000, used: 148000, frozen: 0, owner: "王敏", ownerRole: "adminHead", status: "执行中", desc: "办公耗材季度框架采购" },
+  { id: "P007", name: "年度培训计划", deptId: "hr", catId: "training", budget: 350000, used: 210000, frozen: 0, owner: "周芳", ownerRole: "adminHead", status: "执行中", desc: "全员技能与管理培训" },
+  { id: "P008", name: "管理干部集训营", deptId: "hr", catId: "training", budget: 150000, used: 62000, frozen: 0, owner: "周芳", ownerRole: "adminHead", status: "执行中", desc: "中层管理能力提升" },
+  { id: "P009", name: "办公环境物业维护", deptId: "admin", catId: "property", budget: 2000000, used: 1323000, frozen: 0, owner: "王敏", ownerRole: "adminHead", status: "执行中", desc: "办公楼物业与保洁服务" },
+  { id: "P010", name: "市场推广物料制作", deptId: "market", catId: "office", budget: 80000, used: 45000, frozen: 0, owner: "赵磊", ownerRole: "adminHead", status: "执行中", desc: "展会与活动物料" },
 ];
 
 /* 计算项目已用/冻结（与单据流水关联：按项目 desc/名称匹配太脆，直接用预置值） */
@@ -477,109 +441,112 @@ BM.projectInfo = function (p) {
 
 /* 当前角色可见的项目 */
 BM.scopedProjects = function () {
-  const r = BM.state.role;
-  if (r === "boss" || r === "finance") return BM.PROJECTS;
-  if (r === "manager") return BM.PROJECTS.filter((p) => p.deptId === BM.state.deptId);
-  if (r === "staff") return BM.PROJECTS.filter((p) => p.owner === "张伟" && p.ownerRole === "staff");
+  /* 数据范围统一由 BM.scopedData（公司/中心/本人项目）承担；项目清单全量返回，视图层再裁剪。 */
   return BM.PROJECTS;
 };
 
 /* 角色说明条文案 */
 BM.ROLE_HINTS = {
   "wb-home": {
-    boss: "这是您的工作台：今日待办与 AI 主动推送的风险，您负责拍板。",
-    finance: "这是您的工作台：预算总控与调整入口，您负责把控资金口径。",
-    manager: "这是您的工作台：本部门预算与项目执行，您负责把控部门支出。",
-    staff: "这是您的工作台：您负责的采购项目与申请进度。",
+    admin: "这是您的工作台：账户、组织与角色管理，平台运维。",
+    ceo: "这是您的工作台：今日待办与 AI 主动推送的风险，您负责拍板。",
+    cooLead: "这是您的工作台：组织审核、牵头协商、推动压降下达。",
+    cooAnalyst: "这是您的工作台：预算总控与调整入口，您负责把控资金口径。",
+    legalHead: "这是您的工作台：审核本公司预算、参与协商、重大调整。",
+    adminHead: "这是您的工作台：本公司预算与项目执行，您负责把控支出。",
+    companyBudgeter: "这是您的工作台：汇总校验、规则校验、提交、导入。",
+    centerOwner: "这是您的工作台：归口科目专业标准、跨公司查看。",
+    expense: "这是您的工作台：您负责的采购项目与申请进度。",
   },
   dashboard: {
-    boss: "全局预算执行与风险，您是最终决策人。",
-    finance: "预算口径与执行总控，超支科目需您审核调整。",
-    manager: "仅显示本部门口径，偏差科目需您说明原因。",
-    staff: "全局预算仅供了解，您的工作重点是负责的项目。",
+    ceo: "全局预算执行与风险，您是最终决策人。",
+    cooAnalyst: "预算口径与执行总控，超支科目需您审核调整。",
+    adminHead: "仅显示本部门口径，偏差科目需您说明原因。",
+    expense: "全局预算仅供了解，您的工作重点是负责的项目。",
   },
   projects: {
-    boss: "全局采购项目总览，重点项目需您关注。",
-    finance: "所有采购项目的预算约束，超约束项目需您介入。",
-    manager: "本部门采购项目与预算约束，负责把控执行。",
-    staff: "您负责的采购项目，管理项目预算与申请。",
+    ceo: "全局采购项目总览，重点项目需您关注。",
+    cooAnalyst: "所有采购项目的预算约束，超约束项目需您介入。",
+    adminHead: "本部门采购项目与预算约束，负责把控执行。",
+    expense: "您负责的采购项目，管理项目预算与申请。",
   },
   approval: {
-    boss: "终审决策：AI 初审供参考，最终由您批准。",
-    finance: "财务环节审核：AI 已做预算与合规初审。",
-    manager: "部门内单据审批，把控部门支出。",
-    staff: "您发起的申请进度查看（无审批权限）。",
+    ceo: "终审决策：AI 初审供参考，最终由您批准。",
+    cooAnalyst: "财务环节审核：AI 已做预算与合规初审。",
+    adminHead: "部门内单据审批，把控部门支出。",
+    expense: "您发起的申请进度查看（无审批权限）。",
   },
   decisions: {
-    boss: "AI 优化建议，采纳即自动执行，您可回滚。",
-    finance: "AI 优化建议，采纳即自动执行，体现总控价值。",
-    manager: "仅查看，建议执行由总经理/财务决定。",
-    staff: "",
+    ceo: "AI 优化建议，采纳即自动执行，您可回滚。",
+    cooAnalyst: "AI 优化建议，采纳即自动执行，体现总控价值。",
+    adminHead: "仅查看，建议执行由总经理/财务决定。",
+    expense: "",
   },
   plan: {
-    boss: "年度预算编制，您可自上而下分解并最终批准。",
-    finance: "编制汇总与审核，把控全局口径。",
-    manager: "填报本部门预算与项目额度。",
-    staff: "项目负责人在此填报所负责项目的预算。",
+    ceo: "年度预算编制，您可自上而下分解并最终批准。",
+    cooAnalyst: "编制汇总与审核，把控全局口径。",
+    adminHead: "填报本部门预算与项目额度。",
+    expense: "项目负责人在此填报所负责项目的预算。",
   },
   track: {
-    boss: "全局月度执行追踪，偏差一目了然。",
-    finance: "执行追踪与偏差归因，用于控制与调整。",
-    manager: "本部门执行追踪，偏差需及时说明。",
-    staff: "",
+    ceo: "全局月度执行追踪，偏差一目了然。",
+    cooAnalyst: "执行追踪与偏差归因，用于控制与调整。",
+    adminHead: "本部门执行追踪，偏差需及时说明。",
+    expense: "",
   },
   final: {
-    boss: "年度决算：审批结余/超支处理方案。",
-    finance: "决算收口：核对全年口径，生成处理建议。",
-    manager: "",
-    staff: "",
+    ceo: "年度决算：审批结余/超支处理方案。",
+    cooAnalyst: "决算收口：核对全年口径，生成处理建议。",
+    adminHead: "",
+    expense: "",
   },
   adjust: {
-    boss: "预算调整审批：调剂/追加/调减需您批准。",
-    finance: "预算调整中心：您发起或审核项目级调整。",
-    manager: "",
-    staff: "",
+    ceo: "预算调整审批：调剂/追加/调减需您批准。",
+    cooAnalyst: "预算调整中心：您发起或审核项目级调整。",
+    adminHead: "",
+    expense: "",
   },
   rules: {
-    boss: "",
-    finance: "预算规划由您制定：编制/追踪/余量/超预算策略，影响全系统行为。（预算规则是预算规划的核心内容）",
-    manager: "",
-    staff: "",
+    ceo: "",
+    cooAnalyst: "预算规划由您制定：编制/追踪/余量/超预算策略，影响全系统行为。（预算规则是预算规划的核心内容）",
+    adminHead: "",
+    expense: "",
   },
   collisionTune: {
-    boss: "拖动滑块试算压降：调申报额 / 压降比率 / 压降幅度，右侧实时看差异与对标，边调边谈。",
-    finance: "用即时反馈试算压降方案，确认后回写争议项并留痕。",
-    manager: "试算本部门反馈方案：调整申报额与可接受的压降，直观看到与集团建议的差距。",
-    staff: "",
+    ceo: "拖动滑块试算压降：调申报额 / 压降比率 / 压降幅度，右侧实时看差异与对标，边调边谈。",
+    cooAnalyst: "用即时反馈试算压降方案，确认后回写争议项并留痕。",
+    adminHead: "试算本部门反馈方案：调整申报额与可接受的压降，直观看到与集团建议的差距。",
+    expense: "",
   },
   compile: {
-    boss: "编制工作台：您定总额与规则，AI 按九法预填建议，部门在约束内分解。",
-    finance: "编制工作台：汇总各部门编制、把控规则基线、复核偏离原因。",
-    manager: "编制工作台：在本部门额度内按项目/物料填报，九法任选，月度分解。",
-    staff: "编制工作台：按您负责的项目填报预算，九法任选，保存草稿。",
+    ceo: "编制工作台：您定总额与规则，AI 按九法预填建议，部门在约束内分解。",
+    cooAnalyst: "编制工作台：汇总各部门编制、把控规则基线、复核偏离原因。",
+    adminHead: "编制工作台：在本部门额度内按项目/物料填报，九法任选，月度分解。",
+    expense: "编制工作台：按您负责的项目填报预算，九法任选，保存草稿。",
   },
   importView: {
-    boss: "费控导入：查看全集团实际执行导入与对账结果。",
-    finance: "费控导入：负责模板下发、上传解析、映射对账与错误修正。",
-    manager: "费控导入：导入本部门费控实际，进入执行跟踪对账。",
-    staff: "",
+    ceo: "费控导入：查看全集团实际执行导入与对账结果。",
+    cooAnalyst: "费控导入：负责模板下发、上传解析、映射对账与错误修正。",
+    adminHead: "费控导入：导入本部门费控实际，进入执行跟踪对账。",
+    expense: "",
   },
   riskView: {
-    boss: "AI 风险筛查：全局高风险对象一目了然，您决定采纳或驳回。",
-    finance: "AI 风险筛查：核对异常金额/费用转移，给出复核结论并留痕。",
-    manager: "AI 风险筛查：关注本部门相关风险，配合总部核查。",
-    staff: "AI 风险筛查：可查看风险提示（无复核权限）。",
+    ceo: "AI 风险筛查：全局高风险对象一目了然，您决定采纳或驳回。",
+    cooAnalyst: "AI 风险筛查：核对异常金额/费用转移，给出复核结论并留痕。",
+    adminHead: "AI 风险筛查：关注本部门相关风险，配合总部核查。",
+    expense: "AI 风险筛查：可查看风险提示（无复核权限）。",
   },
 };
 
-/* 阶段一：为新增真实角色补齐各视图说明（缺省沿用财务/老板视角，关键视图差异化覆盖）
+/* 为 9 标准角色补齐各视图说明（缺省沿用总经办预算管理员/CEO 视角，关键视图差异化覆盖）
  * 避免 BM.renderRoleHint 在缺省时取空；真实文案后续可按角色细化。 */
 (function fillRoleHints() {
   const newRoles = ["ceo", "cooLead", "cooAnalyst", "legalHead", "adminHead", "companyBudgeter", "centerOwner", "expense"];
   Object.keys(BM.ROLE_HINTS).forEach(function (view) {
     const h = BM.ROLE_HINTS[view];
-    if (h.ceo !== undefined) return;
-    newRoles.forEach(function (rid) { h[rid] = h.finance || h.boss || ""; });
+    newRoles.forEach(function (rid) {
+      if (h[rid] === undefined) h[rid] = h.cooAnalyst || h.ceo || "";
+    });
   });
   /* 关键视图差异化文案 */
   BM.ROLE_HINTS.dashboard.centerOwner = "归口维度：仅看您归口的职能中心科目，跨公司聚合。";
@@ -806,7 +773,7 @@ BM.RULE_OWNERS = {
   "宿舍费用": "expense",
   "差旅费": "expense",
   "绿化费": "expense",
-  "按实际预算类": "manager",
+  "按实际预算类": "adminHead",
 };
 /* 当前角色负责的经济事项（编制页「我负责的」筛选）；无归属则回退全部 */
 BM.myRules = function (roleId) {
@@ -1138,8 +1105,7 @@ BM.orgTreeCache = null;
 BM.loadOrgTree = function () {
   if (BM.orgTreeCache) return Promise.resolve(BM.orgTreeCache);
   if (typeof fetch !== "function") return Promise.resolve(null);
-  return fetch("/api/orgs/tree", { headers: BM.authHeaders ? BM.authHeaders() : {} })
-    .then((r) => (r.ok ? r.json() : Promise.reject()))
+  return BM.apiGet("/api/orgs/tree")
     .then((t) => { BM.orgTreeCache = t || []; return BM.orgTreeCache; })
     .catch(() => { BM.orgTreeCache = []; return []; });
 };
@@ -1152,7 +1118,7 @@ BM.userOrgCode = function () {
 };
 
 /* 受限角色（事业部/中心/公司/部门负责人）：看板只定位到自己组织子树，不能看全部。 */
-BM.RESTRICTED_ROLES = new Set(["buHead", "centerOwner", "legalHead", "companyBudgeter", "adminHead", "manager"]);
+BM.RESTRICTED_ROLES = new Set(["centerOwner", "legalHead", "companyBudgeter", "adminHead"]);
 
 /* 角色 → 可见组织 code 集合（null = 全部）。
  * 入参 orgTree：/api/orgs/tree 结构（HQ→BU→U）。 */
@@ -1200,8 +1166,7 @@ BM.loadKanbanData = function (orgCodes, period) {
   if (!orgCodes || !orgCodes.length) return Promise.resolve([]);
   const months = BM.periodMonths(period).map((i) => i + 1); // 0-based → 1-based 月序
   const url = "/api/unit-summary?orgs=" + encodeURIComponent(orgCodes.join(",")) + "&months=" + months.join(",");
-  const hd = BM.authHeaders ? BM.authHeaders() : {};
-  return fetch(url, { headers: hd }).then((r) => (r.ok ? r.json() : [])).catch(() => []);
+  return BM.apiGet(url).then((d) => d).catch(() => []);
 };
 
 /* 单事项当期切片聚合：预算 / 执行 / 偏差 / 执行率 / 预警（输入为真实汇总项） */
@@ -1451,13 +1416,11 @@ BM.RISK_SCREENING = [
  * ================================================================ */
 
 /* 角色 → 数据范围层级（V2 §2.2 权限原则）
- *   group=集团全量 / company=本公司+下属 / center=归口科目跨公司 / self=仅本人项目
- * 旧 4 角色沿用原 scope 语义映射：boss/finance→group，manager→company(部门)，staff→self */
+ *   group=集团全量 / company=本公司+下属 / center=归口科目跨公司 / self=仅本人项目 */
 BM.SCOPE_LEVELS = {
   ceo: "group", cooLead: "group", cooAnalyst: "group",
   legalHead: "company", adminHead: "company", companyBudgeter: "company",
   centerOwner: "center", expense: "self",
-  boss: "group", finance: "group", manager: "company", staff: "self",
 };
 
 /* 11 职能中心（管理维度主体，跨法人公司）

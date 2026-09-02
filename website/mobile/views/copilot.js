@@ -5,16 +5,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const ICONS = { predict: "预", analyze: "析", recommend: "荐", execute: "行" };
 

@@ -4,16 +4,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const STATUS_UI = {
   pending: `<span class="badge badge-info">待处理</span>`,

@@ -11,16 +11,6 @@ function uid(prefix) {
   return prefix + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 9999);
 }
 
-function money(n) {
-  if (n >= 100000000) return (n / 100000000).toFixed(2) + " 亿";
-  if (n >= 10000) return (n / 10000).toFixed(1) + " 万";
-  return String(n);
-}
-
-function fmtMoney(n) {
-  return "¥" + money(n);
-}
-
 function pct(n) {
   return Math.round(n * 10) / 10 + "%";
 }
@@ -38,7 +28,7 @@ function defaultPlanState() {
   BM.DEPTS.forEach((d) => (rows[d.id] = topdown[d.id] || 0));
   return {
     mode: "topdown", // topdown 自上而下 / bottomup 自下而上
-    status: "draft", // draft 编制中 / submitted 已提交（待财务汇总） / finance_approved 财务已汇总（待总经理批） / approved 已批准 / rejected
+    status: "draft", // draft 编制中 / submitted 已提交（待公司预算管理员汇总） / finance_approved 已汇总（待集团 CEO 审批） / approved 已批准 / rejected
     totalBudget: total,
     rows: rows, // { deptId: amount }
     submittedBy: null,
@@ -48,7 +38,7 @@ function defaultPlanState() {
 
 function defaultState() {
   return {
-    role: "boss", // boss 总经理 / manager 部门经理 / staff 员工 / finance 财务管理员
+    role: "ceo", // 默认主角色（未登录 / 深链未指定时）
     deptId: "admin", // 部门经理所属部门
     loggedIn: false, // 是否已登录（v0.2：先登录再进入）
     /* 模块三：真实登录用户（后端认证）。user = {id, username, realName, org, roles[]}，token = 会话令牌 */
@@ -124,8 +114,7 @@ BM.loadState = loadState;
 loadState(); // 立即初始化，确保任何调用路径 state 就绪
 BM.saveState = saveState;
 BM.resetState = resetState;
-BM.money = money;
-BM.fmtMoney = fmtMoney;
+/* money / fmtMoney / el / esc 已收敛到 core/utils.js（先于本文件加载） */
 BM.pct = pct;
 BM.uid = uid;
 BM.today = todayStr;
@@ -338,46 +327,12 @@ BM.login = function (roleId, deptId) {
   saveState();
 };
 
-/* 真实登录：调用后端 POST /api/auth/login，成功后写回 user/token */
-BM.apiLogin = function (username, password, cb) {
-  fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  })
-    .then((res) => res.json().then((d) => ({ ok: res.ok, d })))
-    .then(({ ok, d }) => {
-      if (!ok) return cb({ error: d.error || "登录失败" });
-      state.user = d.user;
-      state.token = d.token;
-      state.role = d.user.roles[0] ? d.user.roles[0].code : state.role; /* 主角色 */
-      state.loggedIn = true;
-      saveState();
-      cb({ ok: true, user: d.user });
-    })
-    .catch(() => cb({ error: "无法连接认证服务" }));
-};
-
-/* 带认证的 API 请求封装（页面数据用） */
-BM.apiGet = function (path) {
-  const headers = {};
-  if (state.token) headers["Authorization"] = "Bearer " + state.token;
-  return fetch(path, { headers }).then((res) => res.json());
-};
-
-BM.logout = function () {
-  if (state.token) {
-    fetch("/api/auth/logout", { method: "POST", headers: { Authorization: "Bearer " + state.token } }).catch(() => {});
-  }
-  state.user = null;
-  state.token = null;
-  state.loggedIn = false;
-  saveState();
-};
+/* 认证与统一请求层（apiLogin / apiFetch / apiGet / apiSend / handleSessionExpired / logout）
+ * 已抽取到 core/api.js（共享内核，桌面端与移动端复用），保持单一真源。 */
 
 /* 当前角色信息 */
 BM.curRole = function () {
-  return BM.ROLES[state.role] || BM.ROLES.boss;
+  return BM.ROLES[state.role] || BM.ROLES.ceo;
 };
 
 /* ---------- 可见页面（按角色） ---------- */
@@ -394,19 +349,20 @@ BM.curRole = function () {
 const NAV_ORDER = ["wb-home", "dashboard", "compile", "balance", "kanban", "rules", "track", "final", "adjust", "basedata", "accounts", "ai-config", "benchmark", "collision", "collisionTune", "importView", "riskView"];
 
 BM.roleViews = function (roleId) {
-  /* 汇总平衡：仅上级领导（收到下级提交后做平衡）可见。
-   * 上级集合与 canViewBenchmark 一致：boss/ceo/finance/buHead/cooLead/cooAnalyst。 */
-  const UPPER = ["boss", "ceo", "finance", "buHead", "cooLead", "cooAnalyst"];
+  /* 汇总平衡：仅集团管理层可见（能看 balance）。
+   * 上级集合与 canViewBenchmark 一致：ceo/cooLead/cooAnalyst。 */
+  const UPPER = ["ceo", "cooLead", "cooAnalyst"];
+  /* 基础数据维护角色（真实登录与演示通道共用，提升到函数作用域供下方两分支引用） */
+  const BD_ROLES = ["admin", "cooAnalyst", "cooLead", "centerOwner"];
   /* 真实登录：取该用户全部角色的视图并集（views 来自后端 role 表，含 basedata 迁移），
    * 并兜底基础视图集合 BASE，确保 compile/kanban/rules 始终可见（与演示通道行为一致）。 */
   if (state.user && state.user.roles && state.user.roles.length && !roleId) {
     const BASE = ["wb-home", "compile", "kanban", "rules"];
-    const BD_ROLES = ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner"];
     const set = new Set(BASE);
     state.user.roles.forEach((r) => (r.views || []).forEach((v) => set.add(v)));
     if (state.user.roles.some((r) => BD_ROLES.includes(r.code))) set.add("basedata");
     if (state.user.roles.some((r) => r.code === "admin")) set.add("accounts");
-    if (state.user.roles.some((r) => ["admin", "finance"].includes(r.code))) set.add("ai-config");
+    if (state.user.roles.some((r) => ["admin", "cooAnalyst"].includes(r.code))) set.add("ai-config");
     if (state.user.roles.some((r) => UPPER.includes(r.code))) set.add("balance");
     return Array.from(set).sort((a, b) => NAV_ORDER.indexOf(a) - NAV_ORDER.indexOf(b));
   }
@@ -416,7 +372,7 @@ BM.roleViews = function (roleId) {
   const extra = BD_ROLES.includes(rid) ? ["basedata"] : [];
   if (UPPER.includes(rid) && rid !== "admin") {
     const arr = ["wb-home", "compile", "balance", "kanban", "rules"].concat(extra);
-    if (rid === "finance") arr.push("ai-config");
+    if (rid === "cooAnalyst") arr.push("ai-config");
     return arr;
   }
   if (rid === "admin") return ["wb-home", "compile", "kanban", "rules", "accounts", "ai-config"].concat(extra);
@@ -424,18 +380,18 @@ BM.roleViews = function (roleId) {
 };
 
 /* 基础数据维护权限（前端闸门，与后端 requireBaseDataEditor 对齐）：
- * 管理员 / 财务经理 / 总经办负责人 / 总经办预算管理员 / 职能中心归口责任人 可编辑。 */
+ * 管理员 / 总经办预算管理员 / 总经办负责人 / 职能中心归口责任人 可编辑。 */
 BM.canEditBaseData = function () {
-  const BD = ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner"];
+  const BD = ["admin", "cooAnalyst", "cooLead", "centerOwner"];
   if (BM.state.user && BM.state.user.roles && BM.state.user.roles.length) {
     return BM.state.user.roles.some((r) => BD.includes(r.code));
   }
   return BD.includes(BM.state.role);
 };
 
-/* 预算工作人员（用户账户）维护权限闸门：管理员 / 财务 / 总经办 / 归口责任人 / 总经理(boss,ceo)（与后端 requireAccountsEditor 对齐） */
+/* 预算工作人员（用户账户）维护权限闸门：管理员 / 总经办 / 归口责任人 / 集团 CEO（与后端 requireAccountsEditor 对齐） */
 BM.canEditAccounts = function () {
-  const AC = ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner", "boss", "ceo"];
+  const AC = ["admin", "cooAnalyst", "cooLead", "centerOwner", "ceo"];
   if (BM.state.user && BM.state.user.roles && BM.state.user.roles.length) {
     return BM.state.user.roles.some((r) => AC.includes(r.code));
   }
@@ -456,7 +412,7 @@ BM.canEditOrg = function () {
  * 对应 Sponsor 约束「横向比较 功能只能给更高一级的领导或部门」。看板·总揽面板据此显隐对标子面板。 */
 BM.canViewBenchmark = function (roleId) {
   const r = roleId || state.role;
-  return r === "boss" || r === "ceo" || r === "finance" || r === "buHead" || r === "cooLead" || r === "cooAnalyst";
+  return r === "ceo" || r === "cooLead" || r === "cooAnalyst";
 };
 
 /* 导航标签 */
@@ -485,14 +441,9 @@ BM.NAV_LABELS = {
 };
 
 /* ---------- 数据范围过滤 ---------- */
-/* 当前角色可见的部门 id 集合（null = 全部；旧 4 角色语义，兼容保留） */
+/* 当前角色可见的部门 id 集合（null = 全部；范围统一由 BM.scopedData 承担） */
 BM.scopeDeptIds = function () {
-  const r = state.role;
-  if (r === "boss" || r === "finance") return null; // 全部
-  if (r === "manager") return [state.deptId]; // 本部门
-  if (r === "staff") return ["it"]; // 员工所在部门（张伟 IT 部）
-  /* 阶段一真实角色：数据范围走 BM.scopedData（按公司/中心/本人项目），
-     此处对部门维度返回 null（全局）作为保守默认，避免 scopeInfo 取空。 */
+  /* 数据范围走 BM.scopedData（按公司/中心/本人项目），部门维度返回 null（全局）作为保守默认。 */
   return null;
 };
 
@@ -532,11 +483,7 @@ BM.scopedData = function () {
  * 归口=仅归口科目（TODO 按 subjectFilter 过滤 catName）；基层=本人发起。 */
 BM.scopedApprovals = function () {
   const r = state.role;
-  if (r === "boss" || r === "finance" || r === "ceo" || r === "cooLead" || r === "cooAnalyst") return state.approvals;
-  if (r === "manager") {
-    const deptName = (BM.DEPTS.find((d) => d.id === state.deptId) || {}).name;
-    return state.approvals.filter((a) => a.deptName === deptName || !a.deptName);
-  }
+  if (r === "ceo" || r === "cooLead" || r === "cooAnalyst") return state.approvals;
   if (r === "legalHead" || r === "adminHead" || r === "companyBudgeter") {
     /* TODO（V2 §8-14）：法人公司数据是否可被横向查看未确认；mock 暂全量，后续按 scopeCompany 过滤 */
     return state.approvals;
@@ -546,7 +493,7 @@ BM.scopedApprovals = function () {
     if (!subs.length) return state.approvals;
     return state.approvals.filter((a) => subs.indexOf(a.catName) >= 0);
   }
-  if (r === "expense" || r === "staff") {
+  if (r === "expense") {
     return state.approvals.filter((a) => a.requester);
   }
   return state.approvals;
@@ -563,16 +510,16 @@ BM.planSetMode = function (mode) {
   saveState();
 };
 
-/* 提交编制（部门经理提交 → 财务汇总；财务汇总 → 总经理批） */
+/* 提交编制（公司行政负责人提交 → 公司预算管理员汇总；汇总后 → 集团审批） */
 BM.planSubmit = function () {
   const p = state.plan;
   const r = state.role;
-  if (r === "manager") {
-    p.status = "submitted"; // 已提交，待财务汇总
-    p.submittedBy = "部门经理 · " + (BM.DEPTS.find((d) => d.id === state.deptId) || {}).name;
-  } else if (r === "finance") {
-    p.status = "finance_approved"; // 财务已汇总，待总经理批
-    p.submittedBy = "财务管理员 · 李静";
+  if (r === "adminHead") {
+    p.status = "submitted"; // 已提交，待公司预算管理员汇总
+    p.submittedBy = "公司行政负责人 · " + (BM.DEPTS.find((d) => d.id === state.deptId) || {}).name;
+  } else if (r === "companyBudgeter") {
+    p.status = "finance_approved"; // 已汇总，待集团审批
+    p.submittedBy = "公司预算管理员 · 李静";
   }
   p.submittedTime = todayStr();
   saveState();

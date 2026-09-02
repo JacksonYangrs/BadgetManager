@@ -1,20 +1,11 @@
 /* ================================================================
  * dashboard.js — 预算总览看板（v0.2：支持角色数据范围）
- * boss/finance：全局；manager/staff：本部门口径
+ * ceo/cooLead/cooAnalyst：全局；adminHead/expense：本公司/本人口径
  * ================================================================ */
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 /* 当前范围描述 */
 function scopeInfo() {
@@ -99,9 +90,9 @@ function renderDashboard(container) {
 /* 当前激活的 dashboard 子 Tab（跨重渲染保留，避免切换器/重绘后跳回默认 Tab） */
 let dashActiveTab = "cat";
 
-/* 按角色返回可见视角（v0.5.1：总经理=部门视角，财务/经理=人员视角） */
+/* 按角色返回可见视角（v0.5.1：集团 CEO=部门视角，其余=人员视角） */
 function dashTabs(role) {
-  if (role === "staff" || role === "expense") {
+  if (role === "expense") {
     return [
       { key: "proj", label: "项目视角" },
       { key: "mat", label: "物料视角" },
@@ -112,15 +103,15 @@ function dashTabs(role) {
     { key: "proj", label: "项目视角" },
     { key: "mat", label: "物料视角" },
   ];
-  /* 总经理 → 部门视角；财务/部门经理 → 人员视角 */
-  base.push(role === "boss" ? { key: "dept", label: "部门视角" } : { key: "people", label: "人员视角" });
-  /* 总经理 / 财务 → 组织树（客户真实四级结构） */
-  if (role === "boss" || role === "finance") {
+  /* 集团 CEO → 部门视角；其余 → 人员视角 */
+  base.push(role === "ceo" ? { key: "dept", label: "部门视角" } : { key: "people", label: "人员视角" });
+  /* 集团层 → 组织树（客户真实四级结构） */
+  if (["ceo", "cooLead", "cooAnalyst"].indexOf(role) >= 0) {
     base.push({ key: "org", label: "组织树" });
   }
   /* 阶段一：维度扩展（映射文档 §4.1.2 / §4.1.3）
    * 集团层 → 事业部维度 + 职能中心维度；归口责任人 → 职能中心维度（跨公司看归口科目）。 */
-  const isGroup = ["ceo", "cooLead", "cooAnalyst", "boss", "finance"].indexOf(role) >= 0;
+  const isGroup = ["ceo", "cooLead", "cooAnalyst"].indexOf(role) >= 0;
   if (isGroup) {
     base.push({ key: "bd", label: "事业部维度" });
     base.push({ key: "center", label: "职能中心维度" });

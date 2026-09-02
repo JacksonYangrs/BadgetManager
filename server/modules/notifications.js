@@ -1,9 +1,9 @@
 /** notifications module (auto-extracted from db.js) */
 
 
-const GRASSROOTS = new Set(["expense", "staff"]);
+const GRASSROOTS = new Set(["expense"]);
 
-const UPPER_ROLES = new Set(["admin", "ceo", "boss", "cooLead", "cooAnalyst", "finance", "buHead", "legalHead", "adminHead", "companyBudgeter", "centerOwner", "manager"]);
+const UPPER_ROLES = new Set(["admin", "ceo", "cooLead", "cooAnalyst", "legalHead", "adminHead", "companyBudgeter", "centerOwner"]);
 
 function isGrassroots(roles) {
   return roles.length > 0 && roles.every((r) => GRASSROOTS.has(r));
@@ -41,9 +41,9 @@ function seedNotifications(db) {
   const seeds = [
     [null, "all", null, "compile", "2026 年度预算编制工作已启动", "请各预算编制人于 9 月 30 日前完成编制提交，逾期将影响集团汇总。", "compile", null, "normal"],
     [null, "all", null, "compile", "预算编制模板（V2）已发布", "请使用最新版《2026 年费控系统预算数据收集模板》填报，旧模板作废。", "compile", null, "normal"],
-    [null, "finance,manager,buHead,ceo", null, "execution", "总办·食堂费用 执行预警", "本年累计执行已达年度预算 92%，请关注并控制后续支出。", "kanban", null, "danger"],
-    [null, "finance,buHead,ceo", null, "deviation", "8 项经济事项预算偏差超 5%", "偏差事项待财务复核确认，请在预算系统中逐条核对。", "kanban", null, "danger"],
-    [null, "finance,buHead,ceo", null, "summary", "厦门市三安光电科技有限公司 预算汇总完成", "该公司预算汇总已编制完成，请上级审核并下达压降目标。", "unitInbox", null, "normal"],
+    [null, "cooAnalyst,adminHead,ceo", null, "execution", "总办·食堂费用 执行预警", "本年累计执行已达年度预算 92%，请关注并控制后续支出。", "kanban", null, "danger"],
+    [null, "cooAnalyst,ceo", null, "deviation", "8 项经济事项预算偏差超 5%", "偏差事项待财务复核确认，请在预算系统中逐条核对。", "kanban", null, "danger"],
+    [null, "cooAnalyst,ceo", null, "summary", "厦门市三安光电科技有限公司 预算汇总完成", "该公司预算汇总已编制完成，请上级审核并下达压降目标。", "unitInbox", null, "normal"],
     [null, "admin", null, "org", "组织架构更新", "新增安徽科技事业部，相关预算归口部门已同步至组织树。", "basedata", null, "normal"],
     [null, "admin", null, "account", "账户与角色变更", "新增 2 名预算编制人账号，权限已分配。", "accounts", null, "normal"],
     [uid("wangmin"), null, null, "execution", "您负责的 2010 公司·宿舍费用 执行预警", "请于本周内说明超支原因并提交整改计划。", "kanban", null, "danger"],

@@ -9,16 +9,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 function companyName(code) {
   const c = BM.COMPANIES.find((x) => x.code === code);
@@ -71,8 +62,8 @@ function renderRiskView(container) {
   const companySel = el("select");
   const companies = [{ code: "all", name: "全部公司" }].concat(BM.COMPANIES);
   companySel.innerHTML = companies.map((c) => `<option value="${c.code}">${esc(c.name)}</option>`).join("");
-  /* 角色默认：部门经理归于厦门三安 2010 */
-  if (role === "manager") companySel.value = "2010";
+  /* 角色默认：公司行政负责人归于厦门三安 2010 */
+  if (role === "adminHead") companySel.value = "2010";
   filterBar.appendChild(companySel);
   page.appendChild(filterBar);
 

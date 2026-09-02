@@ -1,7 +1,7 @@
 /* ================================================================
  * smoke_kanban.js — 预算看板（kanban）渲染冒烟测试（无浏览器）
  * 复用 smoke_dom.js 的轻量 DOM 桩，真实执行 BM.renderKanban，
- * 覆盖两种角色：boss（集团层，含横向对标面板）与 expense（基层，对标锁定）。
+ * 覆盖两种角色：ceo（集团层，含横向对标面板）与 expense（基层，对标锁定）。
  * 运行：node tests/smoke_kanban.js
  * ================================================================ */
 const fs = require("fs");
@@ -64,6 +64,7 @@ function load(file) {
 let errs = [];
 try {
   load("data/data.js");
+  load("core/utils.js");
   load("core/state.js");
   load("core/engine.js");
   load("core/calc.js");
@@ -85,15 +86,15 @@ try {
 
 const BM = sandbox.window.BM;
 
-/* 角色 1：boss（集团层）→ 看板含横向对标面板 */
+/* 角色 1：ceo（集团层）→ 看板含横向对标面板 */
 try {
-  BM.state.role = "boss";
+  BM.state.role = "ceo";
   const c1 = new El("div");
   BM.renderKanban(c1);
   if (!c1.children.length) throw new Error("看板未生成内容");
-  console.log("✓ renderKanban(boss) 渲染无异常（应含对标面板）");
+  console.log("✓ renderKanban(ceo) 渲染无异常（应含对标面板）");
 } catch (e) {
-  errs.push("renderKanban(boss) 异常：" + e.stack);
+  errs.push("renderKanban(ceo) 异常：" + e.stack);
 }
 
 /* 角色 2：expense（基层）→ 对标面板应锁定（不渲染 renderBenchmark） */
@@ -109,21 +110,21 @@ try {
 /* 权限谓词复核 */
 try {
   const can = BM.canViewBenchmark;
-  if (can("boss") !== true || can("expense") !== false || can("finance") !== true) {
-    throw new Error("canViewBenchmark 权限谓词不符：" + [can("boss"), can("expense"), can("finance")].join(","));
+  if (can("ceo") !== true || can("expense") !== false || can("cooAnalyst") !== true) {
+    throw new Error("canViewBenchmark 权限谓词不符：" + [can("ceo"), can("expense"), can("cooAnalyst")].join(","));
   }
-  console.log("✓ canViewBenchmark 权限谓词正确（boss/finance=可见，expense=不可见）");
+  console.log("✓ canViewBenchmark 权限谓词正确（ceo/cooAnalyst=可见，expense=不可见）");
 } catch (e) {
   errs.push("canViewBenchmark 异常：" + e.stack);
 }
 
 /* 导航集合复核：基础 3 功能 + 首页；组织架构已收敛进「基础数据」第 3 Tab，不再作为独立菜单（模块三） */
 try {
-  const v = BM.roleViews("staff").join(",");
+  const v = BM.roleViews("expense").join(",");
   if (v !== "wb-home,compile,kanban,rules") throw new Error("roleViews 集合不符：" + v);
   console.log("✓ roleViews 已收敛为 wb-home,compile,kanban,rules（无独立组织架构入口）");
   const a = BM.roleViews("admin").join(",");
-  if (a !== "wb-home,compile,kanban,rules,accounts,basedata") throw new Error("admin roleViews 不符：" + a);
+  if (a !== "wb-home,compile,kanban,rules,accounts,ai-config,basedata") throw new Error("admin roleViews 不符：" + a);
   console.log("✓ admin roleViews 含 accounts 账户管理 + basedata 基础数据");
 } catch (e) {
   errs.push("roleViews 异常：" + e.stack);

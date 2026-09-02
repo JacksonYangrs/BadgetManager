@@ -42,11 +42,11 @@ python3 -m http.server 4173 --directory .
 
 ### URL deep-link（演示/截图用）
 
-- `?as=boss` — 总经理
-- `?as=manager&dept=admin` — 部门经理（行政部）
-- `?as=staff` — 员工（IT 部张伟）
-- `?as=finance` — 财务管理员（李静）
-- 配合 hash：`?as=boss#plan` 直接进入预算编制
+- `?as=ceo` — 集团 CEO
+- `?as=adminHead&dept=admin` — 公司行政负责人（行政部）
+- `?as=expense` — 基层费用责任岗（IT 部张伟）
+- `?as=cooAnalyst` — 总经办预算管理员（李静）
+- 配合 hash：`?as=ceo#plan` 直接进入预算编制
 
 ## 三条演示主线（保留 v0.1）
 
@@ -62,13 +62,13 @@ python3 -m http.server 4173 --directory .
 |---|---|---|
 | **登录页** | 全部 | 4 角色卡 + 部门选择 |
 | **角色工作台首页** | 全部 | 欢迎语 + 今日待办 + 常用功能 + AI 关注 |
-| **预算总览**（v0.1 改造） | boss/finance/manager | 按数据范围过滤 KPI、科目表、预测曲线、部门 TOP |
+| **预算总览**（v0.1 改造） | ceo/cooLead/cooAnalyst/adminHead | 按数据范围过滤 KPI、科目表、预测曲线、部门 TOP |
 | **明细**（v0.1 改造） | 全部 | 按数据范围过滤单据流水 |
 | **审批中心**（v0.1 改造） | 全部 | 按数据范围过滤审批单；员工无审批按钮 |
-| **决策中心**（v0.1 保留） | boss/finance | AI 建议 + 采纳 + 回滚 |
-| **预算编制**（新） | boss/finance/manager | 双模式 + AI 编制助手 + 流程状态 |
-| **预算追踪**（新） | boss/finance/manager | 月度执行表 + AI 偏差归因 |
-| **决算**（新） | boss/finance | 全年预算 vs 预计执行 + AI 处理建议 |
+| **决策中心**（v0.1 保留） | ceo/cooAnalyst | AI 建议 + 采纳 + 回滚 |
+| **预算编制**（新） | ceo/companyBudgeter/adminHead | 双模式 + AI 编制助手 + 流程状态 |
+| **预算追踪**（新） | ceo/cooLead/cooAnalyst/adminHead | 月度执行表 + AI 偏差归因 |
+| **决算**（新） | ceo/cooAnalyst | 全年预算 vs 预计执行 + AI 处理建议 |
 
 ## 预算编制双模式
 
@@ -82,7 +82,7 @@ python3 -m http.server 4173 --directory .
 ## 状态机（编制流程）
 
 ```text
-编制中(draft) → 部门填报(submitted) → 财务汇总(finance_approved) → 总经理审批(approved)
+编制中(draft) → 部门填报(submitted) → 公司预算管理员汇总(finance_approved) → 集团 CEO 审批(approved)
                     ↓
                 退回修改(rejected) ← 总经理驳回
 ```

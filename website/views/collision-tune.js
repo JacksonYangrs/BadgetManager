@@ -5,21 +5,12 @@
  *   右侧实时刷新 差异额 / 差异比例 / 可压降空间 / 协商确认额 / 同类对标。
  *   不提交即可边调边看，确认后回写争议项并留痕。
  * 计算：全部走 BM.calc.tuneNegotiation（确定性纯函数，可单测）。
- * 范围：boss / finance / manager 可见（HQ 提压降、子公司试反馈）。
+ * 范围：cooLead / legalHead / adminHead 可见（集团提压降、法人子公司试反馈）。
  * ================================================================ */
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 function companyName(code) {
   const c = BM.COMPANIES.find((x) => x.code === code);

@@ -6,16 +6,7 @@
  * ================================================================ */
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const AI_PROVIDERS = [
   { id: "openai", name: "OpenAI（GPT 系列）" },
@@ -155,8 +146,7 @@ BM.renderAiConfig = function (container) {
 
   saveBtn.addEventListener("click", () => {
     const body = { provider: provSel.value, model: modelInput.value.trim(), apiKey: keyInput.value, baseUrl: baseUrlInput.value.trim() };
-    fetch("/api/ai-config", { method: "PUT", headers: BM.authHeaders(), body: JSON.stringify(body) })
-      .then((r) => r.json())
+    BM.apiSend("/api/ai-config", "PUT", body)
       .then((cfg) => {
         keyInput.value = ""; // 清空明文输入
         if (cfg.apiKeyMasked) {
@@ -175,8 +165,7 @@ BM.renderAiConfig = function (container) {
     const body = keyInput.value
       ? { provider: provSel.value, apiKey: keyInput.value, model: modelInput.value.trim(), baseUrl: baseUrlInput.value.trim() }
       : {}; // 留空则用已保存配置测试
-    fetch("/api/ai-config/test", { method: "POST", headers: BM.authHeaders(), body: JSON.stringify(body) })
-      .then((r) => r.json())
+    BM.apiSend("/api/ai-config/test", "POST", body)
       .then((res) => {
         if (res.ok) {
           testOut.className = "ai-cfg-test ok";

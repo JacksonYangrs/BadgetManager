@@ -10,16 +10,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 /* 模板列（费控导出规范，一期约定） */
 const IMPORT_COLUMNS = ["公司代码", "部门", "科目", "经济事项", "金额", "日期", "供应商", "类型", "说明"];

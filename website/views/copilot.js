@@ -12,12 +12,6 @@ const ICONS = {
   execute: "行",
 };
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
 function escapeHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -31,9 +25,9 @@ BM.initCopilot = function () {
 
   const hello = el("div", "msg msg-ai");
   const helloText =
-    role === "boss" ? "您好，我是 AI Budget Copilot。全局预算的风险、趋势与决策，我帮您盯住。"
-    : role === "finance" ? "您好，我是 AI Budget Copilot。预算口径、执行总控与调整，我帮您把关。"
-    : role === "manager" ? "您好，我是 AI Budget Copilot。本部门的预算执行与项目偏差，我帮您盯住。"
+    role === "ceo" ? "您好，我是 AI Budget Copilot。全局预算的风险、趋势与决策，我帮您盯住。"
+    : role === "cooAnalyst" ? "您好，我是 AI Budget Copilot。预算口径、执行总控与调整，我帮您把关。"
+    : role === "adminHead" ? "您好，我是 AI Budget Copilot。本公司的预算执行与项目偏差，我帮您盯住。"
     : "您好，我是 AI Budget Copilot。您负责的项目预算与申请进度，我帮您跟进。";
   hello.innerHTML = `<div class="msg-bubble" style="background:transparent;border:none;padding:0;font-size:13.5px;line-height:1.6">${escapeHtml(helloText)}</div>
     <div class="msg-time">${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}</div>`;
@@ -46,36 +40,36 @@ BM.initCopilot = function () {
 };
 
 function roleQuestions(role) {
-  if (role === "boss") {
+  if (role === "ceo") {
     return ["哪个部门今年最容易超预算？", "今年费用整体情况怎么样？", "IT 设备超支怎么解决？"];
   }
-  if (role === "finance") {
+  if (role === "cooAnalyst") {
     return ["哪些项目需要调整预算？", "今年决算大概是什么情况？", "有没有成本优化建议？"];
   }
-  if (role === "manager") {
-    return ["本部门哪个项目风险最高？", "本部门预算还剩多少？", "部门费用为什么上涨？"];
+  if (role === "adminHead") {
+    return ["本公司哪个项目风险最高？", "本公司预算还剩多少？", "费用为什么上涨？"];
   }
   return ["我负责的项目还剩多少预算？", "我的采购申请到哪一步了？", "我发起的报销合规吗？"];
 }
 
 function roleRisks(role) {
-  if (role === "boss") {
+  if (role === "ceo") {
     return [
       { text: "IT 设备已用 + 冻结超预算，预计超支 35%", sub: "8 月集中采购所致 · 含在途 38 万", level: "danger", catId: "it" },
       { text: "车辆维修按当前趋势预计 11 月超支 18%", sub: "维修单价环比 +9%", level: "danger", catId: "vehicle" },
       { text: "培训费执行偏低，预计节余 30 万可调剂", sub: "可调剂给 IT 设备", level: "warn", catId: "training" },
     ];
   }
-  if (role === "finance") {
+  if (role === "cooAnalyst") {
     return [
-      { text: "4 张单据待财务环节，AI 已初审", sub: "2 张建议人工复核", level: "warn", catId: "" },
-      { text: "预算编制 6 个部门已填报 4 个", sub: "待财务汇总", level: "info", catId: "" },
+      { text: "4 张单据待预算管理员环节，AI 已初审", sub: "2 张建议人工复核", level: "warn", catId: "" },
+      { text: "预算编制 6 个部门已填报 4 个", sub: "待汇总", level: "info", catId: "" },
       { text: "培训费执行偏低，已建议调剂 30 万", sub: "决策中心可一键执行", level: "warn", catId: "training" },
     ];
   }
-  if (role === "manager") {
+  if (role === "adminHead") {
     return [
-      { text: "本部门车辆维修执行偏高，近 3 月 +9%", sub: "建议引入供应商比价", level: "warn", catId: "vehicle" },
+      { text: "本公司车辆维修执行偏高，近 3 月 +9%", sub: "建议引入供应商比价", level: "warn", catId: "vehicle" },
       { text: "办公用品增长合理（员工 +28%）", sub: "无需削减，可优化采购成本", level: "info", catId: "office" },
     ];
   }

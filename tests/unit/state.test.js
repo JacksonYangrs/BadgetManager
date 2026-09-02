@@ -58,30 +58,30 @@ suite("Suite B · state.js 预算派生/权限/审批/采购/调整/报销", () 
     assert.ok(v.includes("wb-home") && v.includes("kanban") && v.includes("rules"));
   });
 
-  check("roleViews · boss 不含 accounts/basedata（非 BD 角色）", () => {
+  check("roleViews · ceo 不含 accounts/basedata（非 BD 角色）", () => {
     reset();
-    BM.state.role = "boss";
+    BM.state.role = "ceo";
     const v = BM.roleViews();
     assert.ok(!v.includes("accounts"));
     assert.ok(!v.includes("basedata"));
     assert.ok(v.includes("compile"));
   });
 
-  check("roleViews · staff = 基础四视图", () => {
+  check("roleViews · expense = 基础四视图", () => {
     reset();
-    BM.state.role = "staff";
+    BM.state.role = "expense";
     assert.deepStrictEqual(BM.roleViews(), ["wb-home", "compile", "kanban", "rules"]);
   });
 
   check("roleViews · 真实登录补 BASE 兜底（核心入口始终可见）", () => {
     reset();
-    BM.state.role = "staff"; // 演示通道回退值，应被忽略
-    BM.state.user = { roles: [{ code: "finance", views: ["wb-home", "rules"] }, { code: "centerOwner", views: ["basedata"] }] };
+    BM.state.role = "expense"; // 演示通道回退值，应被忽略
+    BM.state.user = { roles: [{ code: "companyBudgeter", views: ["wb-home", "rules"] }, { code: "centerOwner", views: ["basedata"] }] };
     const v = BM.roleViews();
-    // 修复后真实登录分支兜底 BASE=[wb-home,compile,kanban,rules]，再并入角色 views 并集
+    // 真实登录分支兜底 BASE=[wb-home,compile,kanban,rules]，再并入角色 views 并集
     assert.ok(v.includes("wb-home") && v.includes("compile") && v.includes("kanban") && v.includes("rules"));
     assert.ok(v.includes("basedata")); // 角色 views 并集（centerOwner）并入
-    assert.ok(!v.includes("accounts")); // finance 非 admin → 不应有 accounts
+    assert.ok(!v.includes("accounts")); // companyBudgeter 非 admin → 不应有 accounts
   });
 
   check("roleViews · 真实登录 admin 角色补 accounts + basedata", () => {
@@ -94,44 +94,44 @@ suite("Suite B · state.js 预算派生/权限/审批/采购/调整/报销", () 
   });
 
   /* ---------- 编辑权限闸门 ---------- */
-  check("canEditBaseData · admin 可 / staff 不可", () => {
+  check("canEditBaseData · admin 可 / expense 不可", () => {
     reset();
     BM.state.role = "admin"; assert.strictEqual(BM.canEditBaseData(), true);
-    BM.state.role = "staff"; assert.strictEqual(BM.canEditBaseData(), false);
+    BM.state.role = "expense"; assert.strictEqual(BM.canEditBaseData(), false);
   });
-  check("canEditBaseData · 真实角色 finance 优先", () => {
+  check("canEditBaseData · 真实角色 cooAnalyst 优先", () => {
     reset();
-    BM.state.role = "staff";
-    BM.state.user = { roles: [{ code: "finance" }] };
+    BM.state.role = "expense";
+    BM.state.user = { roles: [{ code: "cooAnalyst" }] };
     assert.strictEqual(BM.canEditBaseData(), true);
   });
 
-  check("canEditAccounts · ceo 可 / staff 不可", () => {
+  check("canEditAccounts · ceo 可 / expense 不可", () => {
     reset();
     BM.state.role = "ceo"; assert.strictEqual(BM.canEditAccounts(), true);
-    BM.state.role = "staff"; assert.strictEqual(BM.canEditAccounts(), false);
+    BM.state.role = "expense"; assert.strictEqual(BM.canEditAccounts(), false);
   });
 
-  check("canEditOrg · admin 可 / finance 不可 / cooLead 可", () => {
+  check("canEditOrg · admin 可 / ceo 不可 / cooLead 可", () => {
     reset();
     BM.state.role = "admin"; assert.strictEqual(BM.canEditOrg(), true);
-    BM.state.role = "finance"; assert.strictEqual(BM.canEditOrg(), false);
+    BM.state.role = "ceo"; assert.strictEqual(BM.canEditOrg(), false);
     BM.state.user = { roles: [{ code: "cooLead" }] };
     assert.strictEqual(BM.canEditOrg(), true);
   });
 
-  check("canViewBenchmark · 集团层可见 / 部门经理不可", () => {
+  check("canViewBenchmark · 集团层可见 / 法人公司层不可", () => {
     reset();
-    BM.state.role = "boss"; assert.strictEqual(BM.canViewBenchmark(), true);
-    BM.state.role = "finance"; assert.strictEqual(BM.canViewBenchmark(), true);
-    BM.state.role = "manager"; assert.strictEqual(BM.canViewBenchmark(), false);
+    BM.state.role = "ceo"; assert.strictEqual(BM.canViewBenchmark(), true);
+    BM.state.role = "cooAnalyst"; assert.strictEqual(BM.canViewBenchmark(), true);
+    BM.state.role = "adminHead"; assert.strictEqual(BM.canViewBenchmark(), false);
   });
 
   /* ---------- 数据范围 ---------- */
   check("scopedData · 角色→层级映射", () => {
     reset();
-    BM.state.role = "boss"; assert.strictEqual(BM.scopedData().level, "group");
-    BM.state.role = "manager"; assert.strictEqual(BM.scopedData().level, "company");
+    BM.state.role = "ceo"; assert.strictEqual(BM.scopedData().level, "group");
+    BM.state.role = "adminHead"; assert.strictEqual(BM.scopedData().level, "company");
     BM.state.role = "centerOwner"; BM.state.centerId = "hr";
     const c = BM.scopedData();
     assert.strictEqual(c.level, "center");
@@ -139,14 +139,13 @@ suite("Suite B · state.js 预算派生/权限/审批/采购/调整/报销", () 
     BM.state.role = "expense"; assert.strictEqual(BM.scopedData().level, "self");
   });
 
-  check("scopedApprovals · 总经理全量 / 部门经理按部门", () => {
+  check("scopedApprovals · 集团层全量 / 法人层全量(mock)", () => {
     reset();
-    BM.state.role = "boss";
+    BM.state.role = "ceo";
     assert.strictEqual(BM.scopedApprovals().length, BM.state.approvals.length);
     reset();
-    BM.state.role = "manager"; BM.state.deptId = "admin";
-    const mgr = BM.scopedApprovals();
-    assert.ok(mgr.every((a) => a.deptName === "行政部" || !a.deptName));
+    BM.state.role = "adminHead";
+    assert.strictEqual(BM.scopedApprovals().length, BM.state.approvals.length);
   });
 
   check("scopedApprovals · 归口责任人仅见归口科目", () => {
@@ -158,9 +157,9 @@ suite("Suite B · state.js 预算派生/权限/审批/采购/调整/报销", () 
     assert.ok(c.every((a) => a.catName === "培训费"));
   });
 
-  check("scopedApprovals · 员工仅见本人发起（含 requester）", () => {
+  check("scopedApprovals · 基层岗位仅见本人发起（含 requester）", () => {
     reset();
-    BM.state.role = "staff";
+    BM.state.role = "expense";
     BM.requestPurchase({ amount: 1 });
     const st = BM.scopedApprovals();
     assert.ok(st.some((a) => a.requester));

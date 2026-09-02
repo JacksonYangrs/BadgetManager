@@ -6,26 +6,13 @@
  * ================================================================ */
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
-function money(n) {
-  return BM.money(n);
-}
 
 /* 保存某格的压降 + 注释 */
 function saveReduction(id, payload, done) {
-  fetch("/api/unit-budgets/" + id + "/reduction", {
-    method: "PUT", headers: BM.authHeaders(),
-    body: JSON.stringify(payload),
-  }).then((r) => r.json()).then((d) => done && done(d)).catch(() => BM.toast("保存失败：后端不可用"));
+  BM.apiSend("/api/unit-budgets/" + id + "/reduction", "PUT", payload)
+    .then((d) => done && done(d))
+    .catch(() => BM.toast("保存失败：后端不可用"));
 }
 
 BM.renderUnitSummary = function (container) {
@@ -59,11 +46,11 @@ BM.renderUnitSummary = function (container) {
   qcPanel.style.display = "none";
   page.appendChild(qcPanel);
 
-  fetch("/api/orgs", { headers: BM.authHeaders() }).then((r) => r.json()).then(({ units }) => {
+  BM.apiGet("/api/orgs").then(({ units }) => {
     const orgMeta = {};
     units.forEach((u) => (orgMeta[u.code] = u.name));
     return Promise.all(orgs.map((code) =>
-      fetch("/api/unit-budgets?org=" + code, { headers: BM.authHeaders() }).then((r) => r.json()).then((list) => ({ code, name: orgMeta[code] || code, list }))
+      BM.apiGet("/api/unit-budgets?org=" + code).then((list) => ({ code, name: orgMeta[code] || code, list }))
     ));
   }).then((data) => {
     box.innerHTML = "";

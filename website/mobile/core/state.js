@@ -11,16 +11,6 @@ function uid(prefix) {
   return prefix + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 9999);
 }
 
-function money(n) {
-  if (n >= 100000000) return (n / 100000000).toFixed(2) + " 亿";
-  if (n >= 10000) return (n / 10000).toFixed(1) + " 万";
-  return String(n);
-}
-
-function fmtMoney(n) {
-  return "¥" + money(n);
-}
-
 function pct(n) {
   return Math.round(n * 10) / 10 + "%";
 }
@@ -102,8 +92,7 @@ BM.loadState = loadState;
 loadState(); // 立即初始化，确保任何调用路径 state 就绪
 BM.saveState = saveState;
 BM.resetState = resetState;
-BM.money = money;
-BM.fmtMoney = fmtMoney;
+/* money / fmtMoney / el / esc 已收敛到 ../core/utils.js（先于本文件加载） */
 BM.pct = pct;
 BM.uid = uid;
 BM.today = todayStr;
@@ -305,10 +294,8 @@ BM.login = function (roleId, deptId) {
   saveState();
 };
 
-BM.logout = function () {
-  state.loggedIn = false;
-  saveState();
-};
+/* logout / apiLogin / apiFetch / apiGet / apiSend / handleSessionExpired
+ * 由 ../core/api.js（共享内核）提供，此处不重复定义，保持单一真源。 */
 
 /* 当前角色信息 */
 BM.curRole = function () {

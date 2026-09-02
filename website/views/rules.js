@@ -9,16 +9,7 @@
 (function () {
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 /* 财务流程规则元数据（flow 类条目的可选值与中文标签） */
 const FLOW_META = {
@@ -46,13 +37,11 @@ BM.authHeaders = BM.authHeaders || function () {
 };
 
 BM.loadRuleVersions = function () {
-  return fetch("/api/rule-versions", { headers: BM.authHeaders() })
-    .then((r) => (r.ok ? r.json() : Promise.reject(new Error("rule-versions"))));
+  return BM.apiGet("/api/rule-versions");
 };
 
 BM.loadSubjects = function () {
-  return fetch("/api/subjects", { headers: BM.authHeaders() })
-    .then((r) => (r.ok ? r.json() : Promise.reject(new Error("subjects"))));
+  return BM.apiGet("/api/subjects");
 };
 
 BM.renderRules = function (container) {
@@ -66,8 +55,8 @@ BM.renderRules = function (container) {
   page.appendChild(head);
   BM.renderRoleHint(page, "rules");
 
-  if (role !== "finance" && role !== "admin") {
-    page.appendChild(el("div", "empty", `<div class="empty-ico">🔒</div>仅财务经理 / 系统管理员可管理预算规划`));
+  if (["cooAnalyst", "centerOwner", "companyBudgeter", "admin"].indexOf(role) < 0) {
+    page.appendChild(el("div", "empty", `<div class="empty-ico">🔒</div>仅总经办预算管理员 / 归口责任人 / 公司预算管理员 / 系统管理员可管理预算规划`));
     container.appendChild(page);
     return;
   }
@@ -259,8 +248,7 @@ function renderHistoryRow(page, v) {
     const del = el("button", "btn btn-ghost btn-sm", "删除");
     del.addEventListener("click", () => {
       if (!confirm(`确认删除版本 ${v.version}？该操作不可恢复（草稿/归档版本可删，生效版本受保护）。`)) return;
-      fetch(`/api/rule-versions/${v.id}`, { method: "DELETE", headers: BM.authHeaders() })
-        .then((r) => (r.ok ? r.json() : r.json().then((e) => Promise.reject(e))))
+      BM.apiSend(`/api/rule-versions/${v.id}`, "DELETE")
         .then(() => {
           BM.toast("已删除版本 " + v.version);
           BM.loadRuleVersions().then((vs) => { page._data.versions = vs; renderHistoryTab(page); renderCurrentTab(page); });
@@ -410,8 +398,7 @@ function renderEventsTab(page) {
 
   /* 加载已存映射 */
   pane._byScope = {};
-  fetch(`/api/rule-versions/${target.id}/event-map`, { headers: BM.authHeaders() })
-    .then((r) => (r.ok ? r.json() : Promise.reject()))
+  BM.apiGet(`/api/rule-versions/${target.id}/event-map`)
     .then((map) => {
       const byScope = {};
       (map || []).forEach((m) => { byScope[m.scopeKey] = m.subjectIds; });
@@ -464,10 +451,7 @@ function saveEventMap(page, versionId) {
   const bl = baselineItems(ver);
   const byScope = pane._byScope || {};
   const payload = bl.map((it) => ({ scopeKey: it.scopeKey, subjectIds: byScope[it.scopeKey] || [] }));
-  fetch(`/api/rule-versions/${versionId}/event-map`, {
-    method: "PUT", headers: BM.authHeaders(), body: JSON.stringify(payload),
-  })
-    .then((r) => (r.ok ? r.json() : Promise.reject()))
+  BM.apiSend(`/api/rule-versions/${versionId}/event-map`, "PUT", payload)
     .then(() => BM.toast("已保存适用经济事项映射"))
     .catch(() => BM.toast("保存失败"));
 }
@@ -480,8 +464,7 @@ function openDraftWizard(page) {
   wrap.appendChild(el("div", "page-head", `<div class="page-title">生成新预测版本</div>
     <div class="page-desc">已从当前生效版本克隆为草稿，调整后标注来源并发布</div>`));
 
-  fetch("/api/rule-versions", { method: "POST", headers: BM.authHeaders(), body: JSON.stringify({ name: "新预测版本（草稿）" }) })
-    .then((r) => (r.ok ? r.json() : Promise.reject()))
+  BM.apiSend("/api/rule-versions", "POST", { name: "新预测版本（草稿）" })
     .then((draft) => buildDraftEditor(wrap, draft))
     .catch(() => { wrap.innerHTML = ""; wrap.appendChild(el("div", "empty", `<div class="empty-ico">⚠️</div>创建草稿失败`)); });
 
@@ -535,9 +518,9 @@ function buildDraftEditor(wrap, draft) {
   wrap.appendChild(extractBox);
   extractBox.querySelector("#extractBtn").addEventListener("click", () => {
     const text = extractBox.querySelector(".extract-area").value;
-    fetch(`/api/rule-versions/${draft.id}/extract`, { method: "POST", headers: BM.authHeaders(), body: JSON.stringify({ text }) })
-      .then((r) => r.json())
-      .then((d) => renderExtractResult(d.proposals || [], baseline, factorInputs));
+    BM.apiSend(`/api/rule-versions/${draft.id}/extract`, "POST", { text })
+      .then((d) => renderExtractResult(d.proposals || [], baseline, factorInputs))
+      .catch(() => BM.toast("抽取失败"));
   });
 
   /* 来源标注 */
@@ -583,9 +566,7 @@ function saveDraft(draftId, baseline, flow, factorInputs, flowInputs) {
   flow.forEach((it) => {
     items.push({ scopeKey: it.scopeKey, value: String(flowInputs[it.scopeKey].value) });
   });
-  return fetch(`/api/rule-versions/${draftId}/items`, {
-    method: "PUT", headers: BM.authHeaders(), body: JSON.stringify({ items }),
-  }).then((r) => (r.ok ? r.json() : Promise.reject()));
+  return BM.apiSend(`/api/rule-versions/${draftId}/items`, "PUT", { items });
 }
 
 function renderExtractResult(proposals, baseline, factorInputs) {
@@ -611,10 +592,7 @@ function renderExtractResult(proposals, baseline, factorInputs) {
 }
 
 function publishVersion(panel, versionId, source) {
-  fetch(`/api/rule-versions/${versionId}/publish`, {
-    method: "POST", headers: BM.authHeaders(), body: JSON.stringify(source),
-  })
-    .then((r) => (r.ok ? r.json() : Promise.reject()))
+  BM.apiSend(`/api/rule-versions/${versionId}/publish`, "POST", source)
     .then(() => {
       BM.toast("✅ 已发布为新生效版本，全系统基线已同步");
       BM.renderRules(panel);
@@ -741,8 +719,8 @@ function renderCreateNextTab(page) {
     const items = baselineItems(draft).map((it) => ({ scopeKey: it.scopeKey, factor: it.factor, value: it.value }))
       .concat(flowItems(draft).map((it) => ({ scopeKey: it.scopeKey, value: ov[it.scopeKey] != null ? String(ov[it.scopeKey]) : String(it.value) })));
     (draft.items || []).forEach((it) => { if (it.category === "flow" && ov[it.scopeKey] != null) it.value = String(ov[it.scopeKey]); });
-    fetch(`/api/rule-versions/${draft.id}/items`, { method: "PUT", headers: BM.authHeaders(), body: JSON.stringify({ items }) })
-      .then((r) => { if (r.ok) { draftView.innerHTML = ""; renderRuleCards(draftView, draft); } else { BM.toast("同步监督规则失败"); } })
+    BM.apiSend(`/api/rule-versions/${draft.id}/items`, "PUT", { items })
+      .then(() => { draftView.innerHTML = ""; renderRuleCards(draftView, draft); })
       .catch(() => BM.toast("同步监督规则失败"));
   }
   flowKeys.forEach((k) => { if (flowSel[k]) flowSel[k].addEventListener("change", pushFlowOverrides); });
@@ -782,8 +760,8 @@ function renderCreateNextTab(page) {
         r.onload = () => res({ filename: f.name, content: String(r.result).split(",")[1] });
         r.readAsDataURL(f);
       }))).then((parts) => Promise.all(parts.map((p) =>
-        fetch("/api/policy-upload", { method: "POST", headers: BM.authHeaders(), body: JSON.stringify(p) })
-          .then((r) => (r.ok ? r.json() : { text: "" })).then((d) => d.text || ""))))
+        BM.apiSend("/api/policy-upload", "POST", p)
+          .then((d) => d.text || "").catch(() => ""))))
         .then((texts) => finish(texts.join("\n")))
         .catch(() => BM.toast("文件解析失败"));
     } else if (pasted) {
@@ -794,8 +772,7 @@ function renderCreateNextTab(page) {
   });
 
   function runExtract() {
-    fetch(`/api/rule-versions/${active.id}/extract`, { method: "POST", headers: BM.authHeaders(), body: JSON.stringify({ text: getPolicyText() }) })
-      .then((r) => r.json())
+    BM.apiSend(`/api/rule-versions/${active.id}/extract`, "POST", { text: getPolicyText() })
       .then((d) => renderCnExtract(exResult, d.proposals || [], baselineItems(active)))
       .catch(() => BM.toast("抽取失败"));
   }
@@ -803,26 +780,25 @@ function renderCreateNextTab(page) {
   genBtn.addEventListener("click", () => {
     const text = getPolicyText();
     if (!text) { BM.toast("请先导入政策文件或粘贴文本"); return; }
-    fetch(`/api/rule-versions/${active.id}/extract`, { method: "POST", headers: BM.authHeaders(), body: JSON.stringify({ text }) })
-      .then((r) => r.json())
+    BM.apiSend(`/api/rule-versions/${active.id}/extract`, "POST", { text })
       .then((d) => {
         const proposals = d.proposals || [];
         const name = nextYear() + " 年度预算规则（政策 AI 生成）";
-        return fetch("/api/rule-versions", { method: "POST", headers: BM.authHeaders(), body: JSON.stringify({ year: nextYear(), name, note: "ai_policy：基于政策文件抽取生成" }) })
-          .then((r) => (r.ok ? r.json() : Promise.reject())).then((dv) => {
+        return BM.apiSend("/api/rule-versions", "POST", { year: nextYear(), name, note: "ai_policy：基于政策文件抽取生成" })
+          .then((dv) => {
             const items = baselineItems(dv).map((it) => {
               const pr = proposals.find((p) => p.scopeKey === it.scopeKey);
               return { scopeKey: it.scopeKey, factor: pr ? pr.factor : it.factor, value: it.value };
             });
             const ov = currentFlowValues();
             flowItems(dv).forEach((it) => items.push({ scopeKey: it.scopeKey, value: ov[it.scopeKey] != null ? String(ov[it.scopeKey]) : String(it.value) }));
-            return fetch(`/api/rule-versions/${dv.id}/items`, { method: "PUT", headers: BM.authHeaders(), body: JSON.stringify({ items }) })
-              .then((r) => (r.ok ? r.json() : Promise.reject())).then(() => dv);
+            return BM.apiSend(`/api/rule-versions/${dv.id}/items`, "PUT", { items })
+              .then(() => dv);
           });
       })
       .then((dv) => {
         draft = dv;
-        fetch("/api/policy-document", { method: "POST", headers: BM.authHeaders(), body: JSON.stringify({ versionId: dv.id, filename: "policy", text }) }).catch(() => {});
+        BM.apiSend("/api/policy-document", "POST", { versionId: dv.id, filename: "policy", text }).catch(() => {});
         draftView.innerHTML = "";
         renderRuleCards(draftView, dv);
         pubBtn.disabled = false; discardBtn.disabled = false; genBtn.disabled = true;
@@ -834,8 +810,7 @@ function renderCreateNextTab(page) {
   pubBtn.addEventListener("click", () => {
     if (!draft) return;
     if (!confirm(`确认将 ${draft.version} 正式发布为 ${nextYear()} 年生效版本？当前生效版本将归档。`)) return;
-    fetch(`/api/rule-versions/${draft.id}/publish`, { method: "POST", headers: BM.authHeaders(), body: JSON.stringify({ sourceType: "budget-file", sourceRef: "政策文件 AI 生成", note: nextYear() + " 年度预算规则" }) })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
+    BM.apiSend(`/api/rule-versions/${draft.id}/publish`, "POST", { sourceType: "budget-file", sourceRef: "政策文件 AI 生成", note: nextYear() + " 年度预算规则" })
       .then(() => {
         BM.syncStateRules(draft);
         BM.loadRuleVersions().then((vs) => { page._data.versions = vs; renderCreateNextTab(page); switchTab(page, "createNext"); BM.toast("✅ 已发布为 " + nextYear() + " 年生效版本"); });
@@ -846,8 +821,7 @@ function renderCreateNextTab(page) {
   discardBtn.addEventListener("click", () => {
     if (!draft) return;
     if (!confirm(`确认丢弃草案 ${draft.version}？`)) return;
-    fetch(`/api/rule-versions/${draft.id}`, { method: "DELETE", headers: BM.authHeaders() })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
+    BM.apiSend(`/api/rule-versions/${draft.id}`, "DELETE")
       .then(() => { draft = null; draftView.innerHTML = ""; pubBtn.disabled = true; discardBtn.disabled = true; genBtn.disabled = false; BM.toast("已丢弃草案"); })
       .catch(() => BM.toast("丢弃失败"));
   });

@@ -41,6 +41,7 @@
 |---|---|---|---|
 | O1 | 2 家公司 BU 推断纠偏 | ⚪ 待启动 | 2170 泉州三安半导体、2160 厦门三安半导体被 `inferBuCode` 错归 BU-09 光通讯；可在「基础数据 → 组织架构」UI 改 `bu_code`（运行时已推断初值，松哥可纠偏） |
 | O2 | 预算执行数据录入 UI | ⚪ 待启动 | `PUT /api/executions` 已有后端，前端录入表单待补（之前拍板「先只接数据层+种子」，表单列为后续迭代） |
+| R1–R7 | **角色模型重构（14 角色收敛）** | ✅ T1–T6b 全部完成 · 全量回归绿 | 松哥 2026-09-02 拍板「决策二 = A 完整重构 14 角色」。**已完成**：T1 后端角色收敛（9 code + 幂等迁移）、T2 权限闸门、T3 前端字典、T4 状态闸门、T5 切换器/登录、**T6a 桌面端 ~50 处旧角色死分支清理**、**T7 回归 E2E 22/0**（`role-convergence.e2e.cjs`）。**顺手修 F1**：`views/roleSwitch.js` 孤儿文件未接线 → 加入 `index.html` + `app.js` 实现 `BM.switchRole`（轻量切换，写回 centerId/expenseType/scopeCompany）+ roleLabel 点击入口 + `refreshRoleLabel` 改用当前激活角色名；新增回归 `smoke_roleswitch.js`（11/0）。**T6b wb-home 差异化首页**：`workbench.js` 的 `renderHome` 重构为 5 层骨架（hello 9 分支责任叙事 → roleHint → 预算业务提醒 → scope 分组专属面板 → AI 关注），总览卡接真实表 `/api/workbench-overview`、roleTips 走 Copilot 动态接口（`/api/copilot/ask`）+ 降级占位；新增 `smoke_workbench.js`（40/0）+ `wb-home-diff.e2e.cjs`（21/0） |
 
 ---
 
@@ -53,6 +54,6 @@
 
 ## 四、下一步建议
 
-当前**无硬阻塞任务**。M1–M12 全部交付。O1 / O2 为可选增强，建议顺序 **O1（小，顺手纠偏）→ O2（中，补录入表单）**，均由你点将后再动。
+当前**首要任务 = 角色模型重构（14 角色收敛，R1–R7）**：松哥已拍板 A 完整重构，设计文档 `docs/plans/2026-09-02-角色模型重构14角色设计.md` 已产（草案待定稿）。定稿后按 T1–T7 交开发。O1 / O2 为可选增强，排在角色重构之后，均由你点将后再动。
 
 **⚠️ 系统性隐患（建议后续排期）**：各视图是经典 `<script>`（非 module），顶层 `function` 声明会污染全局，`index.html` 后加载的文件覆盖先加载的同名函数。本次 `renderEventsTab` 冲突已用 IIFE 修掉；`el`/`esc`/`companyName` 等同名是逻辑一致的副本（无害）。但同类地雷仍可能在其他视图间出现——建议统一把视图文件改为 IIFE 包裹或 ES Module，从根上消除全局污染。

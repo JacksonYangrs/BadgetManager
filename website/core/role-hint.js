@@ -6,17 +6,6 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
-
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 /* 角色说明条（供所有页面复用） */
 BM.renderRoleHint = function (container, viewKey) {
   const hints = (BM.ROLE_HINTS[viewKey] || {})[BM.state.role];

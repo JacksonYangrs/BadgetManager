@@ -78,17 +78,45 @@ function refreshQuicknav() {
 function refreshRoleLabel() {
   const u = BM.state.user;
   if (u && u.username) {
-    /* 真实登录用户：姓名 · 角色（取主角色；姓名与角色同名时只显示一个） */
-    const main = u.roles && u.roles[0] ? u.roles[0].name : "";
+    /* 真实登录用户：姓名 · 当前激活角色（取 state.role 对应角色名；单角色且姓名=角色名时只显示一个） */
     const def = BM.ROLES[BM.state.role] || {};
+    const cur = (u.roles && u.roles.find((x) => x.code === BM.state.role)) || (u.roles && u.roles[0]) || {};
     const name = u.realName || u.username;
-    const roleName = main || def.name || "用户";
+    const roleName = cur.name || def.name || "用户";
     document.getElementById("roleLabel").textContent = name === roleName ? name : name + " · " + roleName;
     return;
   }
   const r = BM.curRole();
   document.getElementById("roleLabel").textContent = r.name + " · " + r.title;
 }
+
+/* ---------- 切换角色（轻量：不退出、不整页 reload） ---------- */
+BM.switchRole = function (selected, params) {
+  if (!selected || !BM.ROLES[selected]) return;
+  /* 演示通道（无 token）：重建本地 user，让 roleViews 按新角色重算导航 */
+  if (!BM.state.token) {
+    const r = BM.ROLES[selected];
+    BM.state.user = {
+      id: 0,
+      username: "demo:" + selected,
+      realName: r.title || r.name || selected,
+      org: null,
+      roles: [{ code: selected, name: r.name || selected, desc: r.desc || "", views: ["wb-home", "compile", "kanban", "rules"], scope: r.scope || "all" }],
+    };
+  }
+  /* 真实登录（有 token）：仅在已分配角色间切换，user.roles 集合保持不变，只改当前激活角色 */
+  BM.state.role = selected;
+  if (params) {
+    if (params.centerId) BM.state.centerId = params.centerId;
+    if (params.expenseType) BM.state.expenseType = params.expenseType;
+    if (params.scopeCompany) BM.state.scopeCompany = params.scopeCompany;
+  }
+  BM.saveState();
+  refreshRoleLabel();
+  refreshQuicknav();
+  BM.openView("wb-home");
+  BM.toast("已切换为 " + BM.curRole().name);
+};
 
 /* ---------- 进入系统 ---------- */
 BM.enterApp = function () {
@@ -118,20 +146,13 @@ BM.sendChat = async function (text) {
   BM.addUserMsg(text.trim());
   // 优先走后端 Copilot（受控动态 SQL + 回灌作答）；未启用 / 异常 → 降级本地确定性 engine.js
   try {
-    const resp = await fetch("/api/copilot/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + (BM.state.token || "") },
-      body: JSON.stringify({ question: text.trim() }),
-    });
-    if (resp.ok) {
-      const data = await resp.json();
-      if (data && data.aiEnabled && data.answer != null) {
-        const note = Array.isArray(data.evidence) && data.evidence.length
-          ? "（基于 " + data.evidence.length + " 条授权范围内的数据）"
-          : (data.source && data.source !== "ok" ? "（系统提示）" : "");
-        BM.addAiText(data.answer + note);
-        return;
-      }
+    const data = await BM.apiSend("/api/copilot/ask", "POST", { question: text.trim() });
+    if (data && data.aiEnabled && data.answer != null) {
+      const note = Array.isArray(data.evidence) && data.evidence.length
+        ? "（基于 " + data.evidence.length + " 条授权范围内的数据）"
+        : (data.source && data.source !== "ok" ? "（系统提示）" : "");
+      BM.addAiText(data.answer + note);
+      return;
     }
   } catch (e) { /* 网络异常 → 降级 */ }
   // 降级：本地确定性 engine.js
@@ -207,8 +228,7 @@ BM.authHeaders = function () {
 
 BM.loadNotifications = function () {
   if (!BM.state.loggedIn || !BM.state.token) return Promise.resolve({ items: [], unread: 0 });
-  return fetch("/api/notifications", { headers: BM.authHeaders() })
-    .then((res) => (res.ok ? res.json() : Promise.reject(new Error("notif"))))
+  return BM.apiGet("/api/notifications")
     .then((data) => {
       BM.NOTIF.items = data.items || [];
       BM.NOTIF.unread = data.unread || 0;
@@ -218,11 +238,8 @@ BM.loadNotifications = function () {
 };
 
 BM.markNotifRead = function (id) {
-  return fetch("/api/notifications/" + id + "/read", {
-    method: "POST",
-    headers: BM.authHeaders(),
-  })
-    .then((res) => (res.ok ? res.json() : null))
+  return BM.apiSend("/api/notifications/" + id + "/read", "POST")
+    .catch(() => null)
     .then((n) => {
       const it = BM.NOTIF.items.find((x) => x.id === id);
       if (it) it.read = true;
@@ -234,11 +251,8 @@ BM.markNotifRead = function (id) {
 };
 
 BM.markAllRead = function () {
-  return fetch("/api/notifications/read-all", {
-    method: "POST",
-    headers: BM.authHeaders(),
-  })
-    .then((res) => (res.ok ? res.json() : null))
+  return BM.apiSend("/api/notifications/read-all", "POST")
+    .catch(() => null)
     .then(() => {
       BM.NOTIF.items.forEach((x) => (x.read = true));
       BM.NOTIF.unread = 0;
@@ -352,6 +366,13 @@ function init() {
     });
   }
 
+  /* 顶部角色标签点击 → 打开角色切换器（轻量切换，不退出登录） */
+  const roleLabel = document.getElementById("roleLabel");
+  if (roleLabel) {
+    roleLabel.title = "点击切换角色";
+    roleLabel.addEventListener("click", () => BM.renderRoleSwitch());
+  }
+
   /* 登录成功后初始化 Copilot（按角色） */
   document.addEventListener("bm-logged-in", () => {
     BM.initCopilot();
@@ -371,7 +392,7 @@ function init() {
   if (ENABLE_DEMO_DEEPLINK && asRole && BM.ROLES[asRole]) {
     const dept = params.get("dept") || "admin";
     BM.login(asRole, dept);
-    /* 阶段一：真实角色参数化深链（兼容旧 boss/manager/staff/finance） */
+    /* 阶段一：真实角色参数化深链（centerOwner 选中心 / expense 选费用类型 / 法人层选公司） */
     if (asRole === "centerOwner") BM.state.centerId = params.get("center") || "hr";
     if (asRole === "expense") BM.state.expenseType = params.get("etype") || "canteen";
     if (asRole === "legalHead" || asRole === "adminHead" || asRole === "companyBudgeter") {
@@ -393,12 +414,12 @@ function init() {
 
   /* 会话校验：真实登录（有 token）时后台核对 /api/auth/me，过期则回登录页 */
   if (BM.state.loggedIn && BM.state.token) {
-    fetch("/api/auth/me", { headers: { Authorization: "Bearer " + BM.state.token } })
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error("401"))))
+    BM.apiGet("/api/auth/me")
       .then((me) => {
         if (me && me.username && BM.state.user) BM.state.user = me; /* 刷新最新用户信息 */
       })
-      .catch(() => {
+      .catch((e) => {
+        if (e && e.status === 401) return; /* 401 已由统一层 handleSessionExpired 处理（登出+回登录页+提示） */
         BM.logout();
         BM.renderLogin();
         BM.toast("会话已过期，请重新登录");

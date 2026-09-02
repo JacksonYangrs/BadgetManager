@@ -3,21 +3,12 @@
  * 对选定科目/公司，展示「公司申报值」vs「集团建议值（规则基线）」。
  * 重大差异生成争议项：业务方说明 → 补充证据 → 状态（待协商/已共识）。
  * 对应 V2 §5.2；同时验证 V1「预算碰撞与协商」假设（系统化协商价值）。
- * 仅 boss / finance 可见。
+ * 仅集团层（ceo / cooLead / cooAnalyst）可见。
  * ================================================================ */
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 function companyName(code) {
   const c = BM.COMPANIES.find((x) => x.code === code);

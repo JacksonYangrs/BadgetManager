@@ -42,31 +42,31 @@ function buildAuth(dbm, db) {
     next();
   }
 
-  /* 预算规则编辑 / 财务权限：管理员 / 财务 */
+  /* 预算规则编辑权限：管理员 / 总经办预算管理员 / 归口责任人 / 公司预算员 */
   function requireRuleEditor(req, res, next) {
-    if (!roleHas(req.user, ["admin", "finance"]))
-      return res.status(403).json({ error: "需要财务或管理员权限" });
+    if (!roleHas(req.user, ["admin", "cooAnalyst", "centerOwner", "companyBudgeter"]))
+      return res.status(403).json({ error: "需要规则编辑权限（管理员/总经办/归口责任人/公司预算员）" });
     next();
   }
 
-  /* 基础数据维护权限：管理员 / 财务 / 总经办 / 归口责任人（centerOwner） */
+  /* 基础数据维护权限：管理员 / 总经办 / 归口责任人（centerOwner） */
   function requireBaseDataEditor(req, res, next) {
-    if (!roleHas(req.user, ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner"]))
-      return res.status(403).json({ error: "需要基础数据维护权限（管理员/财务/总经办/归口责任人）" });
+    if (!roleHas(req.user, ["admin", "cooAnalyst", "cooLead", "centerOwner"]))
+      return res.status(403).json({ error: "需要基础数据维护权限（管理员/总经办/归口责任人）" });
     next();
   }
 
-  /* 预算工作人员（用户账户）维护权限：管理员 / 财务 / 总经办 / 归口责任人 / 总经理(boss,ceo) */
+  /* 预算工作人员（用户账户）维护权限：管理员 / 总经办 / 归口责任人 / 总经理(ceo) */
   function requireAccountsEditor(req, res, next) {
-    if (!roleHas(req.user, ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner", "boss", "ceo"]))
-      return res.status(403).json({ error: "需要预算工作人员管理权限（管理员/财务/总经办/归口责任人/总经理）" });
+    if (!roleHas(req.user, ["admin", "cooAnalyst", "cooLead", "centerOwner", "ceo"]))
+      return res.status(403).json({ error: "需要预算工作人员管理权限（管理员/总经办/归口责任人/总经理）" });
     next();
   }
 
-  /* 财务 / 总经办权限（政策生成等） */
-  function requireFinance(req,  res, next) {
-    if (!roleHas(req.user, ["admin", "finance", "cooLead", "cooAnalyst"]))
-      return res.status(403).json({ error: "需要财务 / 总经办权限" });
+  /* 政策生成权限（管理员 / 总经办） */
+  function requireFinance(req, res, next) {
+    if (!roleHas(req.user, ["admin", "cooAnalyst", "cooLead"]))
+      return res.status(403).json({ error: "需要管理员 / 总经办权限" });
     next();
   }
 
@@ -79,7 +79,7 @@ function buildAuth(dbm, db) {
  *   all / group → 全域（null）
  *   company     → 本人所属公司（向上找 level=company 的祖先【含自身】）及其全部下级
  *   center      → 本人归属的职能中心 managed_center_id 对应的所有组织
- *   dept / self → 本人所属组织 org_id
+ *   self        → 本人所属组织 org_id
  * 这是后端授权（verifier），前端 scopedData 仅作体验裁剪，不可替代本函数。
  * ================================================================ */
 function resolveAllowedOrgIds(dbm, db, user) {
@@ -102,7 +102,7 @@ function resolveAllowedOrgIds(dbm, db, user) {
       let mc = null;
       if (myId) { const row = db.prepare("SELECT managed_center_id FROM organization WHERE id = ?").get(myId); mc = row && row.managed_center_id; }
       nodes.forEach((n) => { if (n.managed_center_id === mc) allowed.add(n.id); });
-    } else { // dept / self
+    } else { // self
       if (myId) allowed.add(myId);
     }
   }

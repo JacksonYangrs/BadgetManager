@@ -25,16 +25,11 @@ const ROLE_SEEDS = [
   { code: "ceo",           name: "集团 CEO",       desc: "集团总额 · 压降目标 · 重大争议决策", views: ["wb-home", "compile", "kanban", "rules", "accounts", "basedata"], scope: "group" },
   { code: "cooLead",       name: "总经办负责人",   desc: "组织审核 · 牵头协商 · 推动压降下达", views: ["wb-home", "compile", "kanban", "rules", "accounts", "basedata"], scope: "group" },
   { code: "cooAnalyst",    name: "总经办预算管理员", desc: "预算汇总 · 对标分析 · 决算核查", views: ["wb-home", "compile", "kanban", "rules", "accounts", "basedata"], scope: "group" },
-  { code: "finance",       name: "财务经理",       desc: "预算总控 · 汇总 · 调整 · 决算", views: ["wb-home", "compile", "kanban", "rules", "accounts", "basedata"], scope: "all" },
-  { code: "buHead",        name: "事业部负责人",   desc: "事业部预算统筹 · 压降落实 · 经营线审核", views: ["wb-home", "compile", "kanban", "rules"], scope: "group" },
   { code: "legalHead",     name: "法人公司负责人", desc: "本公司预算统筹 · 审批", views: ["wb-home", "compile", "kanban", "rules"], scope: "company" },
-  { code: "adminHead",     name: "行政归口负责人", desc: "归口科目管理 · 压降落实", views: ["wb-home", "compile", "kanban", "rules"], scope: "center" },
+  { code: "adminHead",     name: "公司行政负责人", desc: "组织编制 · 解释差异 · 落实压降", views: ["wb-home", "compile", "kanban", "rules"], scope: "company" },
   { code: "companyBudgeter", name: "公司预算员",   desc: "本公司预算填报审核 · 汇总上报", views: ["wb-home", "compile", "kanban", "rules"], scope: "company" },
   { code: "centerOwner",   name: "职能中心归口责任人", desc: "归口科目跨公司统筹 · 编制审核", views: ["wb-home", "compile", "kanban", "rules", "accounts", "basedata"], scope: "center" },
-  { code: "manager",       name: "部门经理",       desc: "本部门编制 · 追踪 · 审批", views: ["wb-home", "compile", "kanban", "rules"], scope: "dept" },
   { code: "expense",       name: "基层费用责任岗", desc: "经济事项填报 · 月度分解 · AI 建议", views: ["wb-home", "compile", "kanban", "rules"], scope: "self" },
-  { code: "staff",         name: "员工",           desc: "负责采购项目 · 发起采购 / 报销", views: ["wb-home", "compile", "kanban", "rules"], scope: "self" },
-  { code: "boss",          name: "总经理",         desc: "全局决策 · 审批 · 决算（兼容旧角色）", views: ["wb-home", "compile", "kanban", "rules", "accounts", "basedata"], scope: "all" },
 ];
 
 /* 示例用户：username / 统一初始密码 Admin@2026（正式部署须改密） / 姓名 / 组织 code / 角色 code 列表
@@ -42,17 +37,17 @@ const ROLE_SEEDS = [
 
 const USER_SEEDS = [
   { username: "admin",     real_name: "系统管理员", org: "HQ",     roles: ["admin"] },
-  { username: "zhangmy",   real_name: "张明远",     org: "HQ",     roles: ["ceo", "boss"] },
+  { username: "zhangmy",   real_name: "张明远",     org: "HQ",     roles: ["ceo"] },
   { username: "xujing",    real_name: "徐静",       org: "COO-HQ", roles: ["cooLead"] },
-  { username: "lijing",    real_name: "李静",       org: "FIN-HQ", roles: ["finance", "cooAnalyst"] },
+  { username: "lijing",    real_name: "李静",       org: "FIN-HQ", roles: ["cooAnalyst", "centerOwner"] },
   { username: "zhoufang",  real_name: "周芳",       org: "ADM-HQ", roles: ["centerOwner"] },
-  { username: "sunyue",    real_name: "孙悦",       org: "BU-01",  roles: ["buHead"] },
+  { username: "sunyue",    real_name: "孙悦",       org: "BU-01",  roles: ["cooAnalyst"] },
   { username: "chenkai",   real_name: "陈凯",       org: "2020",   roles: ["adminHead"] },
   { username: "liuyang",   real_name: "刘洋",       org: "3050",   roles: ["companyBudgeter"] },
-  { username: "wangmin",   real_name: "王敏",       org: "2010-02", roles: ["manager"] },
+  { username: "wangmin",   real_name: "王敏",       org: "2010-02", roles: ["adminHead"] },
   { username: "zhaolei",   real_name: "赵磊",       org: "2010-03", roles: ["expense"] },
   { username: "duanwei",   real_name: "段伟",       org: "2020-03", roles: ["expense"] },
-  { username: "zhangwei",  real_name: "张伟",       org: "2010-01", roles: ["staff"] },
+  { username: "zhangwei",  real_name: "张伟",       org: "2010-01", roles: ["expense"] },
 ];
 
 const SEED_PASSWORD = "Admin@2026";
@@ -135,8 +130,8 @@ function initAuth(db) {
     ROLE_SEEDS.forEach((r) => ins.run(r.code, r.name, r.desc, JSON.stringify(r.views), r.scope));
   }
 
-  /* 基础数据视图迁移（幂等）：为 5 类基础数据维护角色补 basedata 视图（兼容已存在的库） */
-  ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner"].forEach((code) => {
+  /* 基础数据视图迁移（幂等）：为基础数据维护角色补 basedata 视图（兼容已存在的库） */
+  ["admin", "cooAnalyst", "cooLead", "centerOwner"].forEach((code) => {
     const row = db.prepare("SELECT views FROM role WHERE code = ?").get(code);
     if (row) {
       let arr = [];
@@ -149,8 +144,8 @@ function initAuth(db) {
     }
   });
 
-  /* 预算工作人员视图迁移（入口修复，幂等）：admin/财务/总经办/归口责任人/总经理(boss,ceo) 补 accounts 视图 */
-  ["admin", "finance", "cooLead", "cooAnalyst", "centerOwner", "boss", "ceo"].forEach((code) => {
+  /* 预算工作人员视图迁移（入口修复，幂等）：admin/总经办/归口责任人/总经理(ceo) 补 accounts 视图 */
+  ["admin", "cooAnalyst", "cooLead", "centerOwner", "ceo"].forEach((code) => {
     const row = db.prepare("SELECT views FROM role WHERE code = ?").get(code);
     if (row) {
       let arr = [];
@@ -196,14 +191,42 @@ function initAuth(db) {
 
   /* 用户组织归属由 scripts/import_excel_data.py 重映射，此处不再硬编码修正 */
 
-  /* 角色迁移（幂等）：孙悦 → 事业部负责人（buHead），移除旧 legalHead */
+  /* ================================================================
+   * 角色收敛迁移（2026-09-02，幂等）：删除 5 个 demo 冗余角色
+   *   boss / finance / staff / manager / buHead，
+   *   并把 5 个 seed 用户重映射到标准角色。重复启动无副作用。
+   * ================================================================ */
+  const OBSOLETE_ROLES = ["boss", "finance", "staff", "manager", "buHead"];
+  const ROLE_REMAP = {
+    zhangmy: ["ceo"],                      /* boss → ceo（已有 ceo，INSERT OR IGNORE 不重复） */
+    lijing: ["cooAnalyst", "centerOwner"], /* finance → cooAnalyst + centerOwner（财务中心归口） */
+    zhangwei: ["expense"],                 /* staff → expense */
+    wangmin: ["adminHead"],                /* manager → adminHead */
+    sunyue: ["cooAnalyst"],                /* buHead → cooAnalyst */
+  };
+
+  /* 1) 删除 user_role 中 5 个旧角色的关联记录（不动用户本身） */
+  {
+    const del = db.prepare("DELETE FROM user_role WHERE role_code = ?");
+    OBSOLETE_ROLES.forEach((rc) => del.run(rc));
+  }
+  /* sunyue 历史遗留清理：移除旧 legalHead 关联（历史迁移延续，幂等） */
   db.prepare("DELETE FROM user_role WHERE role_code = 'legalHead' AND user_id = (SELECT id FROM user WHERE username = 'sunyue')").run();
-  db.prepare("INSERT OR IGNORE INTO user_role (user_id, role_code) SELECT id, 'buHead' FROM user WHERE username = 'sunyue'").run();
+  /* 2) 按映射重插新角色（INSERT OR IGNORE，幂等避免重复关联） */
+  {
+    const ins = db.prepare("INSERT OR IGNORE INTO user_role (user_id, role_code) SELECT id, ? FROM user WHERE username = ?");
+    Object.entries(ROLE_REMAP).forEach(([un, roles]) => roles.forEach((rc) => ins.run(rc, un)));
+  }
+  /* 3) 删除 role 表中 5 个旧角色行 */
+  {
+    const del = db.prepare("DELETE FROM role WHERE code = ?");
+    OBSOLETE_ROLES.forEach((rc) => del.run(rc));
+  }
 
   /* 组织扩展迁移（D1）：加 type / managed_center_id 列 + 回填 type + 种子 11 管理中心 */
   organization.migrateOrgTypeAndCenters(db);
 
-  /* 修正历史 seed 用户组织归属（2026-08-25）：sunyue(buHead) 旧 org=BU-ADM 不存在，改挂真实 BU-01 */
+  /* 修正历史 seed 用户组织归属（2026-08-25）：sunyue 旧 org=BU-ADM 不存在，改挂真实 BU-01 */
   {
     const bu01 = db.prepare("SELECT id FROM organization WHERE code = 'BU-01'").get();
     const su = db.prepare("SELECT id, org_id FROM user WHERE username = 'sunyue'").get();
@@ -315,7 +338,7 @@ function updateUser(db, id, { realName, orgId, roleCodes, active, password }) {
 /* ================================================================
  * 消息推送模块（2026-08-24 D2：按角色 / 范围只推相关）
  *  - notification：广播（role_scope）+ 个人定向（user_id）两类
- *  - 可见性约束：基层角色（expense/staff）不可见 type ∈ {org, account, summary}
+ *  - 可见性约束：基层角色（expense）不可见 type ∈ {org, account, summary}
  * ================================================================ */
 
 module.exports = {

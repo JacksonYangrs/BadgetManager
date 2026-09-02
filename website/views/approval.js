@@ -4,16 +4,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const AI_CLS = { pass: "pass", reject: "reject", review: "review" };
 const AI_LABEL = { pass: "AI 初审：建议通过", reject: "AI 初审：建议驳回", review: "AI 初审：建议人工复核" };
@@ -42,8 +33,8 @@ function renderApproval(container) {
   const roleScopeNote = el("span", "hint-text");
   roleScopeNote.style.marginLeft = "auto";
   roleScopeNote.textContent =
-    BM.state.role === "boss" || BM.state.role === "finance" ? "范围：全集团"
-    : BM.state.role === "manager" ? "范围：本部门"
+    ["ceo", "cooLead", "cooAnalyst"].indexOf(BM.state.role) >= 0 ? "范围：全集团"
+    : BM.state.role === "adminHead" ? "范围：本公司"
     : "范围：我发起的申请";
   tabBar.appendChild(roleScopeNote);
   const tabBtns = {};
@@ -124,7 +115,7 @@ function renderApprovalCard(a) {
   }
 
   if (a.status === "pending") {
-    const canAct = BM.state.role === "boss" || BM.state.role === "finance" || BM.state.role === "manager";
+    const canAct = ["ceo", "cooAnalyst", "adminHead"].indexOf(BM.state.role) >= 0;
     if (canAct) {
       const actions = el("div", "appr-actions");
       const btnApprove = el("button", "btn btn-primary btn-sm", "终审通过");

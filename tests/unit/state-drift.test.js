@@ -29,6 +29,10 @@ function loadMobileStateSandbox() {
   };
   ctx.global = ctx;
   vm.createContext(ctx);
+  /* 先加载共享工具内核（提供 BM.money / BM.fmtMoney），再加载 mobile state.js，
+   * 与 desktop harness 的加载顺序一致（utils → state），避免删除重复定义后 BM.money 缺失。 */
+  const utilsCode = fs.readFileSync(path.resolve(__dirname, "../../website/core/utils.js"), "utf8");
+  vm.runInContext(utilsCode, ctx, { filename: "core/utils.js" });
   const code = fs.readFileSync(path.resolve(__dirname, "../../website/mobile/core/state.js"), "utf8");
   vm.runInContext(code, ctx, { filename: "mobile/core/state.js" });
   return ctx.window.BM;

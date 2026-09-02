@@ -7,16 +7,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 /* 编制流程状态机 */
 /* 流程状态（v0.12：按编制模式区分） */
@@ -247,13 +238,13 @@ function renderPlan(container) {
   const editor = el("div", "");
   const effectiveMode = ruleMode;
 
-  /* v0.5：自上而下 + 总经理/财务 → 自由语言归类 */
-  if (effectiveMode === "topdown" && (role === "boss" || role === "finance")) {
+  /* v0.5：自上而下 + 集团 CEO/总经办预算管理员 → 自由语言归类 */
+  if (effectiveMode === "topdown" && (role === "ceo" || role === "cooAnalyst")) {
     editor.appendChild(renderIntentParser(container));
   }
 
   const isDecompose = effectiveMode === "topdown";
-  const isSubmitter = role === "manager" || role === "staff";
+  const isSubmitter = role === "adminHead" || role === "expense";
   editor.appendChild(el("div", "section-title",
     isDecompose
       ? (isSubmitter ? "预算分解（按项目 · 物料 · 受上级额度约束）" : "预算分解（按部门）")
@@ -271,8 +262,8 @@ function renderPlan(container) {
   }
   page.appendChild(editor);
 
-  /* v0.6：客户规则引擎（仅集团编制角色 boss / finance） */
-  if (role === "boss" || role === "finance") {
+  /* v0.6：客户规则引擎（仅集团编制角色 ceo / cooAnalyst） */
+  if (role === "ceo" || role === "cooAnalyst") {
     page.appendChild(renderClientRuleEngine(container));
   }
 
@@ -280,7 +271,7 @@ function renderPlan(container) {
   const canEdit = BM.state.plan.status === "draft" || BM.state.plan.status === "rejected";
   const actions = el("div", "plan-actions");
   if (isSubmitter && canEdit) {
-    const submit = el("button", "btn btn-primary", "提交预算 → 财务汇总");
+    const submit = el("button", "btn btn-primary", "提交预算 → 预算管理员汇总");
     submit.addEventListener("click", () => {
       const check = checkDecomposeTotal();
       if (!check.ok) {
@@ -289,21 +280,21 @@ function renderPlan(container) {
       }
       BM.planSubmit();
       BM.openView("plan");
-      BM.toast("预算已提交，等待财务汇总");
+      BM.toast("预算已提交，等待预算管理员汇总");
     });
     actions.appendChild(submit);
     actions.appendChild(el("span", "hint-text", "提交时自动审查：分解加总须 ≤ 上级额度"));
   }
-  if (role === "finance" && BM.state.plan.status === "submitted") {
-    const submit = el("button", "btn btn-primary", "财务汇总确认 → 提交总经理审批");
+  if (role === "companyBudgeter" && BM.state.plan.status === "submitted") {
+    const submit = el("button", "btn btn-primary", "汇总校验确认 → 提交集团审批");
     submit.addEventListener("click", () => {
       BM.planSubmit();
       BM.openView("plan");
-      BM.toast("财务已汇总，已提交总经理审批");
+      BM.toast("已汇总校验，已提交集团审批");
     });
     actions.appendChild(submit);
   }
-  if (role === "boss" && BM.state.plan.status === "finance_approved") {
+  if (role === "ceo" && BM.state.plan.status === "finance_approved") {
     const approve = el("button", "btn btn-accent", "批准预算编制");
     approve.addEventListener("click", () => {
       BM.planApprove();
@@ -319,7 +310,7 @@ function renderPlan(container) {
     actions.appendChild(approve);
     actions.appendChild(reject);
   }
-  if (canEdit && role !== "staff") {
+  if (canEdit && role !== "expense") {
     actions.appendChild(el("span", "hint-text", "AI 已按 1-9 月历史执行年化预填建议额度，可直接修改"));
   }
   page.appendChild(actions);
@@ -594,7 +585,7 @@ function renderTopdown(container) {
     total += rows[d.id];
   });
 
-  const canEdit = BM.state.role !== "staff" && (p.status === "draft" || p.status === "rejected");
+  const canEdit = BM.state.role !== "expense" && (p.status === "draft" || p.status === "rejected");
 
   BM.DEPTS.forEach((d) => {
     const sugg = BM.buildTopDownSuggestion(p.totalBudget)[d.id];
@@ -639,7 +630,7 @@ function renderTopdown(container) {
 /* 上级额度：部门经理 = 本部门分配额度；员工 = 本人负责项目额度 */
 function getDecomposeScope() {
   const role = BM.state.role;
-  if (role === "manager") {
+  if (role === "adminHead") {
     const myDeptId = BM.state.deptId;
     const dept = BM.DEPTS.find((d) => d.id === myDeptId) || {};
     /* 上级给本部门的额度：优先 plan.rows[deptId]，否则用 AI 建议 */
@@ -647,8 +638,8 @@ function getDecomposeScope() {
     const projects = BM.PROJECTS.filter((p) => p.deptId === myDeptId);
     return { label: `本部门（${dept.name}）额度`, quota, projects, ownerType: "部门" };
   }
-  /* staff */
-  const projects = BM.PROJECTS.filter((p) => p.owner === "张伟" && p.ownerRole === "staff");
+  /* expense */
+  const projects = BM.PROJECTS.filter((p) => p.owner === "张伟" && p.ownerRole === "expense");
   const quota = projects.reduce((a, p) => a + p.budget, 0);
   return { label: "本人（张伟）负责项目额度", quota, projects, ownerType: "个人" };
 }
@@ -769,19 +760,19 @@ function renderDecomposeView(container) {
 function renderBottomup(container) {
   const role = BM.state.role;
   const wrap = el("div", "");
-  const canEdit = role === "manager" || role === "staff" || role === "boss" || role === "finance";
+  const canEdit = role === "adminHead" || role === "expense" || role === "ceo" || role === "cooAnalyst";
 
-  /* 部门经理：按本部门项目 → 物料填报（看不到其他部门） */
-  if (role === "manager") {
+  /* 公司行政负责人：按本部门项目 → 物料填报（看不到其他部门） */
+  if (role === "adminHead") {
     return renderManagerBottomup(wrap);
   }
 
-  /* 员工：按本人负责的项目 → 物料填报（v0.9） */
-  if (role === "staff") {
+  /* 基层费用责任岗：按本人负责的项目 → 物料填报（v0.9） */
+  if (role === "expense") {
     return renderStaffBottomup(wrap);
   }
 
-  /* 总经理/财务：保留部门下拉 + 按部门科目填报 */
+  /* 集团 CEO/总经办预算管理员：保留部门下拉 + 按部门科目填报 */
   let depts = BM.DEPTS;
 
   const selRow = el("div", "filter-bar");
@@ -988,7 +979,7 @@ function renderManagerBottomup(wrap) {
     wrap.appendChild(el("div", "empty", `<div class="empty-ico">🗂</div>本部门暂无项目，点击下方按钮新增`));
   }
 
-  const ctx = { deptId: myDeptId, owner: dept.head, ownerRole: "manager" };
+  const ctx = { deptId: myDeptId, owner: dept.head, ownerRole: "adminHead" };
   projects.forEach((p) => {
     buildAddablePlanCard(wrap, p, ctx);
   });
@@ -998,7 +989,7 @@ function renderManagerBottomup(wrap) {
 
 /* ---------- 员工填报：本人负责项目 → 物料（v0.11：头部 ＋ 可新增） ---------- */
 function renderStaffBottomup(wrap) {
-  const myProjects = BM.PROJECTS.filter((p) => p.owner === "张伟" && p.ownerRole === "staff");
+  const myProjects = BM.PROJECTS.filter((p) => p.owner === "张伟" && p.ownerRole === "expense");
 
   const info = el("div", "plan-statusbar");
   info.innerHTML = `<span class="badge badge-info">员工：张伟（IT 部）</span>
@@ -1010,7 +1001,7 @@ function renderStaffBottomup(wrap) {
     wrap.appendChild(el("div", "empty", `<div class="empty-ico">🗂</div>您暂未负责项目`));
   }
 
-  const ctx = { deptId: "it", owner: "张伟", ownerRole: "staff" };
+  const ctx = { deptId: "it", owner: "张伟", ownerRole: "expense" };
   myProjects.forEach((p) => {
     buildAddablePlanCard(wrap, p, ctx);
   });

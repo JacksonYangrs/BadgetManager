@@ -94,19 +94,6 @@
   background: var(--c-info-bg);
 }
 
-.role-card.boss .rc-ico {
-  background: #efe8fb;
-}
-.role-card.manager .rc-ico {
-  background: var(--c-ok-bg);
-}
-.role-card.staff .rc-ico {
-  background: #e8f1fb;
-}
-.role-card.finance .rc-ico {
-  background: #fbf3e0;
-}
-
 .role-card .rc-name {
   font-size: 15px;
   font-weight: 600;

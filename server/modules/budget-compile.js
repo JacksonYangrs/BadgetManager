@@ -86,6 +86,52 @@ function summaryByCat(db, orgCodes, months) {
   });
 }
 
+/* ================================================================
+ * 工作台首页总览（T6b · 2026-09-02）：按组织范围聚合真实预算 + 执行
+ * orgIds = null 表示全域（group/all）；数组表示受限范围（resolveAllowedOrgIds 产出）。
+ * months = 当期已执行月份（默认 1-12）。
+ * 返回 { totalBudget, totalExec, remain, execRate, units, topOverspent }，
+ *   execRate = 累计执行 / 全年预算（执行进度）；topOverspent = 超预算科目 TOP5（exec > amount 按超出额降序）。
+ * ================================================================ */
+function workbenchOverview(db, orgIds, months) {
+  const ms = (months && months.length) ? months : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const msPh = ms.map(() => "?").join(",");
+  let budgetWhere = "";
+  let execWhere = "WHERE ";
+  const params = [];
+  if (orgIds && orgIds.length) {
+    const ph = orgIds.map(() => "?").join(",");
+    budgetWhere = `WHERE org_id IN (${ph})`;
+    execWhere = `WHERE org_id IN (${ph}) AND `;
+    params.push(...orgIds);
+  }
+  const b = db.prepare(
+    `SELECT COALESCE(SUM(amount),0) AS amount, COALESCE(SUM(last_year),0) AS lastYear, COUNT(*) AS units FROM unit_budget ${budgetWhere}`
+  ).get(...params);
+  const ex = db.prepare(
+    `SELECT COALESCE(SUM(amount),0) AS amt FROM budget_execution ${execWhere}month IN (${msPh})`
+  ).get(...params, ...ms);
+  const totalBudget = b.amount || 0;
+  const totalExec = ex.amt || 0;
+  const remain = totalBudget - totalExec;
+  const execRate = totalBudget ? Math.round((totalExec / totalBudget) * 1000) / 10 : 0;
+  /* 超预算 TOP：按 cat 聚合 exec vs amount，exec > amount 的按超出额降序取前 5 */
+  const topParams = params.concat(ms);
+  const rows = db.prepare(
+    `SELECT ub.cat,
+       COALESCE(SUM(ub.amount),0) AS amount,
+       COALESCE((SELECT SUM(be.amount) FROM budget_execution be WHERE be.org_id = ub.org_id AND be.cat = ub.cat AND be.month IN (${msPh})),0) AS exec
+     FROM unit_budget ub ${budgetWhere}
+     GROUP BY ub.cat`
+  ).all(...topParams);
+  const topOverspent = rows
+    .map((r) => ({ cat: r.cat, amount: r.amount, exec: r.exec, over: r.exec - r.amount }))
+    .filter((r) => r.over > 0)
+    .sort((a, b) => b.over - a.over)
+    .slice(0, 5);
+  return { totalBudget, totalExec, remain, execRate, units: b.units || 0, topOverspent };
+}
+
 function updateUnitBudgetReduction(db, id, { reduceRatio, reduceAmount, note }) {
   const row = db.prepare("SELECT * FROM unit_budget WHERE id = ?").get(id);
   if (!row) return null;
@@ -115,4 +161,5 @@ module.exports = {
   summaryByCat,
   ubRowToEvent,
   updateUnitBudgetReduction,
+  workbenchOverview,
 };

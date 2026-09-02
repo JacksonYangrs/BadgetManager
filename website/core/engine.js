@@ -81,7 +81,7 @@ function replyProjects(t) {
     return `• ${p.name}（${info.deptName} · ${info.catName}）：额度 ${BM.money(p.budget)} · 已用 ${BM.money(p.used)} · ${remainTxt} · 执行率 ${p.execRate}%`;
   });
   const role = BM.state.role;
-  const head = role === "staff" ? "您负责的项目预算情况：" : role === "manager" ? "本部门项目预算情况：" : "全局项目预算情况：";
+  const head = role === "expense" ? "您负责的项目预算情况：" : role === "adminHead" ? "本公司项目预算情况：" : "全局项目预算情况：";
   return { type: "text", text: head + "\n" + lines.join("\n") };
 }
 

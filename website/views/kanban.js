@@ -8,15 +8,6 @@
  * ================================================================ */
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 /* 看板真实数据：按当前组织范围拉 unit_budget 汇总（替代原 mock CATEGORIES） */
 function kanbanItemSource() {

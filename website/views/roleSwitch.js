@@ -1,6 +1,6 @@
 /* ================================================================
  * roleSwitch.js — 顶部快速角色切换器（不退出、不整页 reload）
- * 列出 BM.ROLES 全部 12 个角色，按角色条件显示中心/费用类型/公司下拉，
+ * 列出 BM.ROLES 全部 9 个角色，按角色条件显示中心/费用类型/公司下拉，
  * 选中「切换」后由 app.js 的 BM.switchRole 完成轻量切换。
  * 复用登录页角色卡样式（.role-card / .login-roles）。
  * ================================================================ */
@@ -56,7 +56,7 @@ function renderPanel() {
   /* 主体 */
   const body = rsEl("div", "modal-body");
 
-  let selected = BM.state.role || "boss";
+  let selected = BM.state.role || "ceo";
 
   /* 参数行（按角色显示） */
   function makeRow(label, opts, valueKey) {
@@ -70,13 +70,11 @@ function renderPanel() {
     body.appendChild(row);
     return s;
   }
-  const deptSel = makeRow("选择所属部门", BM.DEPTS, "deptId");
   const centerSel = makeRow("选择职能中心", BM.FUNCTIONAL_CENTERS, "centerId"); // 11 个职能中心
   const expenseSel = makeRow("选择费用类型", BM.EXPENSE_TYPES, "expenseType"); // 7 类基层费用
   const companySel = makeRow("选择法人公司", BM.COMPANIES.map((c) => ({ id: c.code, name: c.name })), "scopeCompany");
 
   function showParamsFor(rid) {
-    deptSel.parentNode.style.display = rid === "manager" ? "flex" : "none";
     centerSel.parentNode.style.display = rid === "centerOwner" ? "flex" : "none";
     expenseSel.parentNode.style.display = rid === "expense" ? "flex" : "none";
     companySel.parentNode.style.display =
@@ -128,7 +126,6 @@ function renderPanel() {
       centerId: centerSel.value,
       expenseType: expenseSel.value,
       scopeCompany: companySel.value,
-      deptId: deptSel.value,
     };
     close();
     if (BM.switchRole) BM.switchRole(selected, params);

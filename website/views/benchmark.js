@@ -2,21 +2,12 @@
  * benchmark.js — 横向对标视角（v0.6 · P1）
  * 选定科目，按各子公司排列预算，自动计算集团均值/红线，
  * 标红偏离超过阈值的单位（对应客户文件2 汇总表横向排列，系统自动标异）。
- * 仅 boss / finance 可见。
+ * 仅集团层（ceo / cooLead / cooAnalyst）可见。
  * ================================================================ */
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 /* 偏离阈值：与集团均值偏差 > 10% 即标红 */
 const BENCH_THRESHOLD = 0.1;

@@ -168,21 +168,15 @@ function openEditor(u) {
       payload.password = pwdInput.value;
     }
     const req = isNew
-      ? fetch("/api/users", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (BM.state.token || "") }, body: JSON.stringify(payload) })
-      : fetch("/api/users/" + u.id, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (BM.state.token || "") }, body: JSON.stringify(payload) });
-    req.then((res) => res.json().then((d) => ({ ok: res.ok, d })))
-      .then(({ ok, d }) => {
-        if (!ok) {
-          err.textContent = d.error || "保存失败";
-          err.style.display = "block";
-          return;
-        }
-        modalRoot.innerHTML = "";
-        BM.toast(isNew ? "✅ 账户已创建：" + d.username : "✅ 账户已更新");
-        load();
-      })
-      .catch(() => {
-        err.textContent = "保存失败（请确认后端服务已启动）";
+      ? BM.apiSend("/api/users", "POST", payload)
+      : BM.apiSend("/api/users/" + u.id, "PUT", payload);
+    req.then((d) => {
+      modalRoot.innerHTML = "";
+      BM.toast(isNew ? "✅ 账户已创建：" + d.username : "✅ 账户已更新");
+      load();
+    })
+      .catch((d) => {
+        err.textContent = (d && d.error) ? d.error : "保存失败（请确认后端服务已启动）";
         err.style.display = "block";
       });
   });

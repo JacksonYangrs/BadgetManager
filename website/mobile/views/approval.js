@@ -5,16 +5,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 const AI_CLS = { pass: "pass", reject: "reject", review: "review" };
 const AI_LABEL = { pass: "AI 初审：建议通过", reject: "AI 初审：建议驳回", review: "AI 初审：建议人工复核" };

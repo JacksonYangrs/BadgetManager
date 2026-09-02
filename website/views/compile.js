@@ -12,16 +12,7 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 /* 取某科目的方法计算上下文（mock 派生，确定性） */
 function methodContext(r) {
@@ -58,8 +49,7 @@ BM.initEventsApi = function () {
   if (_apiChecked) return;
   _apiChecked = true;
   if (typeof fetch !== "function") return;
-  fetch("/api/events")
-    .then((res) => (res.ok ? res.json() : Promise.reject(new Error("api not ready"))))
+  BM.apiGet("/api/events")
     .then((list) => {
       BM.eventsData = Array.isArray(list) ? list : [];
       BM.apiMode = true;
@@ -97,10 +87,7 @@ function buildMockList() {
 function persistAmount(r, amt) {
   const ctrlMethod = r.method || BM.CTRL_METHOD_ASSIGN[r.cat] || "history";
   if (BM.apiMode && r.id != null && Number.isFinite(Number(r.id))) {
-    return fetch("/api/events/" + r.id + "/amount", {
-      method: "PUT", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: amt }),
-    }).catch(() => {});
+    return BM.apiSend("/api/events/" + r.id + "/amount", "PUT", { amount: amt }).catch(() => {});
   }
   BM.compileSaveSubject(r.cat, { method: ctrlMethod, amount: amt, monthly: BM.calc.decomposeMonthly(amt), reason: "" });
   return Promise.resolve();
@@ -398,8 +385,7 @@ function renderCompile(container) {
       return;
     }
     if (typeof fetch !== "function") { fallback(); return; }
-    fetch("/api/subjects", { headers: BM.authHeaders() })
-      .then((r) => (r.ok ? r.json() : []))
+    BM.apiGet("/api/subjects")
       .then((subjects) => {
         const acctName = {};
         (subjects || []).forEach((s) => { if (s.code) acctName[s.code] = s.name || "—"; });
@@ -461,8 +447,8 @@ function renderCompile(container) {
     }
     /* 先存草稿，再进入提交流 */
     saveBtn.click();
-    if (role === "manager") { BM.planSubmit(); BM.toast("✅ 已提交，等待财务汇总"); }
-    else if (role === "finance") { BM.planSubmit(); BM.toast("✅ 已提交，等待总经理审批"); }
+    if (role === "adminHead") { BM.planSubmit(); BM.toast("✅ 已提交，等待公司预算管理员汇总"); }
+    else if (role === "companyBudgeter") { BM.planSubmit(); BM.toast("✅ 已提交，等待集团审批"); }
     else { BM.toast("✅ 编制已提交（待汇总）"); }
     BM.openView("compile");
   });

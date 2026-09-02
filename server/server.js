@@ -17,6 +17,7 @@ const dbm = require("./db");
 const buildImportModule = require("./modules/expense-import");
 const buildPolicyRules = require("./policy_rules");
 const { buildAuth } = require("./middleware/auth");
+const { asyncHandler, errorMiddleware } = require("./middleware/error");
 const aiGateway = require("./modules/ai-gateway");
 
 /* markitdown（default venv 已装）解析政策文档为文本；优先用环境变量，回退到本机默认值，最后回退 python3 */
@@ -112,7 +113,7 @@ app.post("/api/rule-versions/:id/publish", auth, requireRuleEditor, (req, res) =
   res.json(r);
 });
 
-app.post("/api/rule-versions/:id/extract", auth, requireRuleEditor, async (req, res) => {
+app.post("/api/rule-versions/:id/extract", auth, requireRuleEditor, asyncHandler(async (req, res) => {
   const text = (req.body || {}).text || "";
   try {
     const proposals = await dbm.extractRuleProposals(db, text);
@@ -121,9 +122,9 @@ app.post("/api/rule-versions/:id/extract", auth, requireRuleEditor, async (req, 
     // 双保险：任何意外都返回空草案，保证页面不崩溃（前端提示手动录入）
     res.status(500).json({ proposals: [], error: "提取失败，请重试或手动录入" });
   }
-});
+}));
 
-/* ---------- AI 配置（模块三 · admin/finance） ---------- */
+/* ---------- AI 配置（模块三 · 规则编辑角色） ---------- */
 app.get("/api/ai-config", auth, requireRuleEditor, (req, res) => {
   res.json(dbm.getAiConfig(db));
 });
@@ -133,7 +134,7 @@ app.put("/api/ai-config", auth, requireRuleEditor, (req, res) => {
   res.json(r);
 });
 
-app.post("/api/ai-config/test", auth, requireRuleEditor, async (req, res) => {
+app.post("/api/ai-config/test", auth, requireRuleEditor, asyncHandler(async (req, res) => {
   const body = req.body || {};
   /* 优先用本次提交的凭据；未填 key 则回退到已保存配置 */
   let creds = { provider: body.provider, apiKey: body.apiKey, model: body.model, baseUrl: body.baseUrl };
@@ -157,11 +158,11 @@ app.post("/api/ai-config/test", auth, requireRuleEditor, async (req, res) => {
   } catch (e) {
     res.json({ ok: false, error: e && e.message ? e.message : String(e) });
   }
-});
+}));
 
 /* ---------- Copilot 智能问答（模块二 · 受控动态 SQL） ---------- */
 const { CopilotReject } = require("./modules/copilot-retrieval");
-app.post("/api/copilot/ask", auth, async (req, res) => {
+app.post("/api/copilot/ask", auth, asyncHandler(async (req, res) => {
   const { question } = req.body || {};
   if (!question || !String(question).trim()) return res.status(400).json({ error: "缺少问题" });
   const creds = dbm.getActiveCredentials(db);
@@ -190,7 +191,7 @@ app.post("/api/copilot/ask", auth, async (req, res) => {
     }
     res.json({ aiEnabled: true, answer: "抱歉，暂时无法回答该问题，请稍后重试或联系管理员。", evidence: [], source: "fallback", reason: msg });
   }
-});
+}));
 
 /* 上传并解析政策文件：前端以 base64 JSON 传 {filename, content}，避开 multer 依赖；
  * 写 runtime/uploads 临时文件 → 调 markitdown 转文本 → 返回 {text}；图片类拦截提示（OCR 后续补） */
@@ -411,6 +412,16 @@ app.get("/api/unit-summary", auth, (req, res) => {
   res.json(dbm.summaryByCat(db, orgList, ms));
 });
 
+/* 工作台首页总览（T6b）：按当前用户数据范围聚合真实预算+执行（unit_budget + budget_execution）。
+ * months 可选（1-12，逗号分隔）；数据范围由 resolveAllowedOrgIds 决定（null=全域）。 */
+app.get("/api/workbench-overview", auth, (req, res) => {
+  const months = req.query.months
+    ? String(req.query.months).split(",").map((s) => parseInt(s, 10)).filter((n) => n >= 1 && n <= 12)
+    : null;
+  const allowed = resolveAllowedOrgIds(dbm, db, req.user);
+  res.json(dbm.workbenchOverview(db, allowed, months));
+});
+
 /* 压降处理 + 注释（原因分析，保存到数据库） */
 app.put("/api/unit-budgets/:id/reduction", auth, requireBaseDataEditor, (req, res) => {
   const { reduceRatio, reduceAmount, note } = req.body || {};
@@ -452,6 +463,9 @@ app.put("/api/executions", auth, requireBaseDataEditor, (req, res) => {
 /* ---------- 独立模块：费控导入（M8）/ 预算政策生成 ---------- */
 buildImportModule(dbm).attach(app, db);
 buildPolicyRules(dbm).attach(app, db);
+
+/* ---------- 全局错误兜底（必须置于所有路由之后，兜住漏网 async 错误） ---------- */
+app.use(errorMiddleware);
 
 /* ---------- 静态前端 ---------- */
 app.use(express.static(WEB_ROOT));

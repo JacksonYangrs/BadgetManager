@@ -9,21 +9,8 @@
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
-function fmtMoney(n) {
-  const v = Number(n) || 0;
-  return "¥" + v.toLocaleString("zh-CN");
-}
 
 const METHOD_LABELS = {
   manageStd: "管控标准",
@@ -105,9 +92,9 @@ function renderEventsTab(body, canEdit) {
   if (canEdit) {
     const add = el("button", "btn btn-primary", "＋ 新增经济事项");
     add.addEventListener("click", () => {
-      Promise.all([fetch("/api/events", { headers: BM.authHeaders() }).then((r) => r.json()),
-                   fetch("/api/subjects", { headers: BM.authHeaders() }).then((r) => r.json())])
-        .then(([events, subjects]) => openEventModal(null, subjects, events, body));
+      Promise.all([BM.apiGet("/api/events"), BM.apiGet("/api/subjects")])
+        .then(([events, subjects]) => openEventModal(null, subjects, events, body))
+        .catch(() => BM.toast("加载失败，请稍后重试"));
     });
     toolbar.appendChild(add);
   }
@@ -121,8 +108,8 @@ function renderEventsTab(body, canEdit) {
   body.appendChild(wrap);
 
   Promise.all([
-    fetch("/api/events", { headers: BM.authHeaders() }).then((r) => (r.ok ? r.json() : [])),
-    fetch("/api/subjects", { headers: BM.authHeaders() }).then((r) => (r.ok ? r.json() : [])),
+    BM.apiGet("/api/events"),
+    BM.apiGet("/api/subjects"),
   ]).then(([events, subjects]) => {
     const subMap = {};
     subjects.forEach((s) => (subMap[s.id] = s));
@@ -148,8 +135,7 @@ function renderEventsTab(body, canEdit) {
         edit.addEventListener("click", () => openEventModal(ev, subjects, events, body));
         const del = el("button", "btn btn-ghost btn-sm bd-del", "删除");
         del.addEventListener("click", () => confirmDelete("经济事项", ev.cat, () => {
-          fetch("/api/events/" + ev.id, { method: "DELETE", headers: BM.authHeaders() })
-            .then((r) => (r.ok ? r.json() : r.json().then((d) => Promise.reject(d))))
+          BM.apiSend("/api/events/" + ev.id, "DELETE")
             .then(() => { BM.toast("✅ 已删除经济事项"); renderEventsTab(body, canEdit); })
             .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "删除失败")));
         }));
@@ -182,8 +168,7 @@ function renderSubjectsTab(body, canEdit) {
   </tr></thead><tbody><tr><td colspan="5" class="bd-empty">加载中…</td></tr></tbody></table>`;
   body.appendChild(wrap);
 
-  fetch("/api/subjects", { headers: BM.authHeaders() })
-    .then((r) => (r.ok ? r.json() : []))
+  BM.apiGet("/api/subjects")
     .then((subjects) => {
       toolbar.querySelector(".bd-count").textContent = `共 ${subjects.length} 个会计科目`;
       const tbody = wrap.querySelector("tbody");
@@ -206,8 +191,7 @@ function renderSubjectsTab(body, canEdit) {
           edit.addEventListener("click", () => openSubjectModal(s, body));
           const del = el("button", "btn btn-ghost btn-sm bd-del", "删除");
           del.addEventListener("click", () => confirmDelete("会计科目", s.code, () => {
-            fetch("/api/subjects/" + s.id, { method: "DELETE", headers: BM.authHeaders() })
-              .then((r) => (r.ok ? r.json() : r.json().then((d) => Promise.reject(d))))
+            BM.apiSend("/api/subjects/" + s.id, "DELETE")
               .then(() => { BM.toast("✅ 已删除科目"); renderSubjectsTab(body, canEdit); })
               .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "删除失败")));
           }));
@@ -283,8 +267,7 @@ function openSubjectModal(subject, reloadBody) {
     if (!payload.code) { BM.toast("⛔ 科目编码不能为空"); return; }
     const url = isEdit ? "/api/subjects/" + s.id : "/api/subjects";
     const method = isEdit ? "PUT" : "POST";
-    fetch(url, { method, headers: BM.authHeaders(), body: JSON.stringify(payload) })
-      .then((r) => (r.ok ? r.json() : r.json().then((d) => Promise.reject(d))))
+    BM.apiSend(url, method, payload)
       .then(() => { m.close(); BM.toast(isEdit ? "✅ 已保存" : "✅ 已创建科目"); renderSubjectsTab(reloadBody, true); })
       .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "保存失败")));
   });
@@ -318,8 +301,7 @@ function openEventModal(event, subjects, events, reloadBody) {
     if (!payload.cat) { BM.toast("⛔ 经济事项名称不能为空"); return; }
     const url = isEdit ? "/api/events/" + e.id : "/api/events";
     const method = isEdit ? "PUT" : "POST";
-    fetch(url, { method, headers: BM.authHeaders(), body: JSON.stringify(payload) })
-      .then((r) => (r.ok ? r.json() : r.json().then((d) => Promise.reject(d))))
+    BM.apiSend(url, method, payload)
       .then(() => { m.close(); BM.toast(isEdit ? "✅ 已保存" : "✅ 已创建经济事项"); renderEventsTab(reloadBody, true); })
       .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "保存失败")));
   });
@@ -343,8 +325,7 @@ function renderOrgTab(body, canEditOrg) {
   const wrap = el("div", "bd-orgchart");
   wrap.innerHTML = `<div class="hint-text">组织架构加载中…</div>`;
   body.appendChild(wrap);
-  fetch("/api/orgs/tree", { headers: BM.authHeaders() })
-    .then((r) => (r.ok ? r.json() : []))
+  BM.apiGet("/api/orgs/tree")
     .then((tree) => {
       wrap.innerHTML = "";
       if (!Array.isArray(tree) || !tree.length) { wrap.innerHTML = `<div class="hint-text">未获取到组织数据</div>`; return; }
@@ -447,8 +428,7 @@ function openOrgModal(node, tree, reloadBody, canEditOrg, forcedParentId) {
       payload.code = code;
     }
     const url = isEdit ? "/api/orgs/" + node.id : "/api/orgs";
-    fetch(url, { method: isEdit ? "PUT" : "POST", headers: BM.authHeaders(), body: JSON.stringify(payload) })
-      .then((r) => (r.ok ? r.json() : r.json().then((d) => Promise.reject(d))))
+    BM.apiSend(url, isEdit ? "PUT" : "POST", payload)
       .then(() => { m.close(); BM.toast(isEdit ? "✅ 已保存" : "✅ 已创建组织"); renderOrgTab(reloadBody, canEditOrg); })
       .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "保存失败")));
   }
@@ -458,8 +438,7 @@ function openOrgModal(node, tree, reloadBody, canEditOrg, forcedParentId) {
     m.body.querySelector("#o_child").addEventListener("click", () => { m.close(); openOrgModal(null, tree, reloadBody, canEditOrg, node.id); });
     m.body.querySelector("#o_del").addEventListener("click", () => {
       confirmDelete("组织架构", node.name, () => {
-        fetch("/api/orgs/" + node.id, { method: "DELETE", headers: BM.authHeaders() })
-          .then((r) => (r.ok ? r.json() : r.json().then((d) => Promise.reject(d))))
+        BM.apiSend("/api/orgs/" + node.id, "DELETE")
           .then(() => { m.close(); BM.toast("✅ 已删除组织"); renderOrgTab(reloadBody, canEditOrg); })
           .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "删除失败")));
       });

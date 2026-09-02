@@ -276,10 +276,7 @@ BM.renderMonthlySplit = function (container) {
     rebalanceTail();
     const out = curAmounts.slice();
     if (BM.apiMode && st.id != null && Number.isFinite(Number(st.id))) {
-      fetch("/api/events/" + st.id + "/monthly", {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ monthly: out }),
-      }).then((res) => res.json()).then(() => {
+      BM.apiSend("/api/events/" + st.id + "/monthly", "PUT", { monthly: out }).then(() => {
         BM.toast("✅ 月度拆解已保存到数据库：" + cat); BM.openView("compile");
       }).catch(() => BM.toast("保存失败：后端不可用"));
       return;

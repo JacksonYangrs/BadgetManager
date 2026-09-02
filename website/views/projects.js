@@ -1,21 +1,12 @@
 /* ================================================================
  * projects.js — 采购项目列表（v0.3）
- * 按角色数据范围：员工=我负责 / 经理=本部门 / 全局=全部
+ * 按角色数据范围：基层=我负责 / 法人层=本公司 / 集团层=全部
  * 每个项目卡片展示预算约束（额度/已用/冻结/剩余/执行率）
  * ================================================================ */
 
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
 
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 function renderProjects(container) {
   container.innerHTML = "";
@@ -59,7 +50,7 @@ function renderProjBody(container, role) {
   container.appendChild(kpi);
 
   /* 项目卡片 */
-  container.appendChild(el("div", "section-title", role === "staff" ? "我负责的项目" : "项目列表"));
+  container.appendChild(el("div", "section-title", role === "expense" ? "我负责的项目" : "项目列表"));
   const grid = el("div", "proj-grid");
   projects.forEach((p) => {
     grid.appendChild(renderProjectCard(p, role));
@@ -96,7 +87,7 @@ function renderProjectCard(p, role) {
 
   /* 行动按钮（按角色） */
   const actions = el("div", "pc-actions");
-  if (role === "staff" && p.owner === "张伟") {
+  if (role === "expense" && p.owner === "张伟") {
     const btn = el("button", "btn btn-primary btn-sm", "发起采购申请");
     btn.addEventListener("click", () => {
       const amount = 30000;
@@ -113,7 +104,7 @@ function renderProjectCard(p, role) {
     });
     actions.appendChild(btn);
   }
-  if (role === "finance") {
+  if (role === "cooAnalyst") {
     const btn = el("button", "btn btn-outline btn-sm", "预算调整");
     btn.addEventListener("click", () => {
       BM.openView("adjust");

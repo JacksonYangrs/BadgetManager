@@ -7,15 +7,6 @@
  * ================================================================ */
 var BM = window.BM || {};
 
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html !== undefined) e.innerHTML = html;
-  return e;
-}
-function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 /* 只读 8 列经济事项表（与基层编制表一致） */
 function renderUnitTable(container, list) {
@@ -81,8 +72,7 @@ BM.renderUnitInbox = function (container) {
   selBox.appendChild(sumBtn);
   page.appendChild(selBox);
 
-  fetch("/api/orgs", { headers: BM.authHeaders() })
-    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+  BM.apiGet("/api/orgs")
     .then(({ root, units }) => {
       box.innerHTML = "";
       if (!units || !units.length) { box.appendChild(el("div", "empty", "暂无下级单位（组织结构未配置）")); return; }
@@ -107,8 +97,7 @@ BM.renderUnitInbox = function (container) {
             detail.style.display = "block";
             if (!tbWrap.children.length) {
               tbWrap.appendChild(el("div", "hint-text", "加载该单位预算…"));
-              fetch("/api/unit-budgets?org=" + u.code, { headers: BM.authHeaders() })
-                .then((r) => r.json())
+              BM.apiGet("/api/unit-budgets?org=" + u.code)
                 .then((list) => renderUnitTable(tbWrap, list))
                 .catch(() => (tbWrap.innerHTML = '<div class="hint-text">加载失败</div>'));
             }

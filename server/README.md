@@ -59,7 +59,7 @@ NODE_PATH=<node_workspace>/node_modules node --experimental-sqlite server.js
 
 - **组织架构**：organization 三级树（集团 HQ → 二级公司 → 三级部门）
 - **用户账户**：user 表 + scrypt 密码哈希 + 会话表（token 持久化）
-- **角色系统**：role 表（13 角色 + 视图白名单 views + 数据范围 scope）+ user_role 多对多
+- **角色系统**：role 表（9 角色 + 视图白名单 views + 数据范围 scope）+ user_role 多对多
 - **认证**：Bearer token 鉴权中间件 + requireAdmin 权限中间件
 
 ### API 速查（模块三新增）
@@ -79,7 +79,7 @@ NODE_PATH=<node_workspace>/node_modules node --experimental-sqlite server.js
 
 | 表 | 关键字段 | 说明 |
 |----|----------|------|
-| `role` | code PK / name / desc / views JSON / scope | 13 角色（含 admin/ceo/cooLead/cooAnalyst/finance/legalHead/adminHead/companyBudgeter/centerOwner/expense/manager/staff/boss） |
+| `role` | code PK / name / desc / views JSON / scope | 9 角色（admin/ceo/cooLead/cooAnalyst/legalHead/adminHead/companyBudgeter/centerOwner/expense） |
 | `user` | id / username UNIQUE / password（scrypt 哈希）/ real_name / org_id / active | 种子 12 用户，统一初始密码 `Admin@2026`（正式部署须改） |
 | `user_role` | user_id + role_code（联合主键） | 一人可多角色，切换器只列已分配角色 |
 | `session` | token PK / user_id / created_at / expires_at | 会话有效期 24h，DB 持久化（重启不失效） |
@@ -91,23 +91,23 @@ NODE_PATH=<node_workspace>/node_modules node --experimental-sqlite server.js
 | 账号 | 姓名 | 角色 | 组织 |
 |------|------|------|------|
 | admin | 系统管理员 | admin | HQ |
-| zhangmy | 张明远 | ceo + boss（总经理） | HQ |
+| zhangmy | 张明远 | ceo（集团 CEO） | HQ |
 | xujing | 徐静 | cooLead（总经办负责人） | 总经办 |
-| lijing | 李静 | finance + cooAnalyst（集团财务部·上级） | 集团财务部 |
+| lijing | 李静 | cooAnalyst + centerOwner（集团财务部·上级 / 财务中心归口） | 集团财务部 |
 | zhoufang | 周芳 | centerOwner（职能中心归口责任人） | 行政服务中心 |
 
 **事业部层**
 
 | 账号 | 姓名 | 角色 | 组织 |
 |------|------|------|------|
-| sunyue | 孙悦 | buHead（事业部负责人） | 行政服务事业部 |
+| sunyue | 孙悦 | cooAnalyst（总经办预算管理员） | 行政服务事业部 |
 
 **公司 / 部门层**
 
 | 账号 | 姓名 | 角色 | 组织 |
 |------|------|------|------|
-| wangmin | 王敏 | manager（一公司财务部·下级） | 一公司 · 财务部 |
-| chenkai | 陈凯 | adminHead（行政归口负责人） | 二公司 |
+| wangmin | 王敏 | adminHead（公司行政负责人·下级） | 一公司 · 财务部 |
+| chenkai | 陈凯 | adminHead（公司行政负责人） | 二公司 |
 | liuyang | 刘洋 | companyBudgeter（公司预算员） | 四公司 |
 
 **基层层**
@@ -116,7 +116,7 @@ NODE_PATH=<node_workspace>/node_modules node --experimental-sqlite server.js
 |------|------|------|------|
 | zhaolei | 赵磊 | expense（基层费用责任岗） | 一公司 · 后勤保障部 |
 | duanwei | 段伟 | expense（基层费用责任岗） | 二公司 · 后勤保障部 |
-| zhangwei | 张伟 | staff（员工） | 一公司 · 综合办公室 |
+| zhangwei | 张伟 | expense（基层费用责任岗） | 一公司 · 综合办公室 |
 
 ### 组织树（事业部管辖公司）
 

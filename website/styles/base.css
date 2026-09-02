@@ -139,6 +139,13 @@ body {
 .role-label {
   font-size: 12px;
   color: #a9b4d0;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.role-label:hover {
+  color: #ffffff;
+  text-decoration: underline;
 }
 
 .role-switch {
