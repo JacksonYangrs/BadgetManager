@@ -304,8 +304,9 @@ app.put("/api/events/:id/monthly", auth, requireBaseDataEditor, (req, res) => {
 /* ---------- 基础数据管理（B）：会计科目 + 经济事项 CRUD ---------- */
 /* 会计科目主数据 */
 app.get("/api/subjects", auth, (req, res) => {
-  const { center, method } = req.query;
-  res.json(dbm.listSubjects(db, { center: center || undefined, method: method || undefined }));
+  const { center, method, tree, level } = req.query;
+  if (tree === "1" || tree === "true") return res.json(dbm.buildSubjectTree(db));
+  res.json(dbm.listSubjects(db, { center: center || undefined, method: method || undefined, level: level || undefined }));
 });
 
 app.get("/api/subjects/:id", auth, (req, res) => {

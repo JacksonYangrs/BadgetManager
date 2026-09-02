@@ -1,0 +1,4915 @@
+{
+  "version": 1,
+  "source": [
+    "费控系统预算科目明细表(会计科目名称4级树)",
+    "1.预算逻辑(控制逻辑)"
+  ],
+  "subjects": [
+    {
+      "name": "人工",
+      "level": 1,
+      "path": "人工",
+      "cat": "人工",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 0,
+      "parentPath": null
+    },
+    {
+      "name": "员工辞退福利（裁剪冗员补偿款）",
+      "level": 2,
+      "path": "人工/员工辞退福利（裁剪冗员补偿款）",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 1,
+      "parentPath": "人工"
+    },
+    {
+      "name": "福利费用",
+      "level": 2,
+      "path": "人工/福利费用",
+      "cat": "人工",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 2,
+      "parentPath": "人工"
+    },
+    {
+      "name": "宿舍费用",
+      "level": 3,
+      "path": "人工/福利费用/宿舍费用",
+      "cat": "人工",
+      "center": "总办",
+      "controlLogic": "按实际填报，备注说明。（能源费用报给动力，统一预算）",
+      "sortNo": 3,
+      "parentPath": "人工/福利费用"
+    },
+    {
+      "name": "食堂费用",
+      "level": 3,
+      "path": "人工/福利费用/食堂费用",
+      "cat": "人工",
+      "center": "总办",
+      "controlLogic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。",
+      "sortNo": 4,
+      "parentPath": "人工/福利费用"
+    },
+    {
+      "name": "其他福利费",
+      "level": 3,
+      "path": "人工/福利费用/其他福利费",
+      "cat": "人工",
+      "center": "总办",
+      "controlLogic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。",
+      "sortNo": 5,
+      "parentPath": "人工/福利费用"
+    },
+    {
+      "name": "通勤车费",
+      "level": 3,
+      "path": "人工/福利费用/通勤车费",
+      "cat": "人工",
+      "center": "总办",
+      "controlLogic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。",
+      "sortNo": 6,
+      "parentPath": "人工/福利费用"
+    },
+    {
+      "name": "探亲交通费",
+      "level": 3,
+      "path": "人工/福利费用/探亲交通费",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 7,
+      "parentPath": "人工/福利费用"
+    },
+    {
+      "name": "丧葬慰问金",
+      "level": 3,
+      "path": "人工/福利费用/丧葬慰问金",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 8,
+      "parentPath": "人工/福利费用"
+    },
+    {
+      "name": "生活困难补助",
+      "level": 3,
+      "path": "人工/福利费用/生活困难补助",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 9,
+      "parentPath": "人工/福利费用"
+    },
+    {
+      "name": "生病住院、工伤慰问金",
+      "level": 3,
+      "path": "人工/福利费用/生病住院、工伤慰问金",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 10,
+      "parentPath": "人工/福利费用"
+    },
+    {
+      "name": "个人商业保险",
+      "level": 2,
+      "path": "人工/个人商业保险",
+      "cat": "人工",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 11,
+      "parentPath": "人工"
+    },
+    {
+      "name": "其他保险费",
+      "level": 3,
+      "path": "人工/个人商业保险/其他保险费",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 12,
+      "parentPath": "人工/个人商业保险"
+    },
+    {
+      "name": "部门活动经费",
+      "level": 2,
+      "path": "人工/部门活动经费",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 13,
+      "parentPath": "人工"
+    },
+    {
+      "name": "人事费",
+      "level": 2,
+      "path": "人工/人事费",
+      "cat": "人工",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 14,
+      "parentPath": "人工"
+    },
+    {
+      "name": "其他人事费",
+      "level": 3,
+      "path": "人工/人事费/其他人事费",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 15,
+      "parentPath": "人工/人事费"
+    },
+    {
+      "name": "中介服务费",
+      "level": 3,
+      "path": "人工/人事费/中介服务费",
+      "cat": "人工",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 16,
+      "parentPath": "人工/人事费"
+    },
+    {
+      "name": "普通中介费用",
+      "level": 4,
+      "path": "人工/人事费/中介服务费/普通中介费用",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 17,
+      "parentPath": "人工/人事费/中介服务费"
+    },
+    {
+      "name": "猎头公司费用",
+      "level": 4,
+      "path": "人工/人事费/中介服务费/猎头公司费用",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 18,
+      "parentPath": "人工/人事费/中介服务费"
+    },
+    {
+      "name": "招聘网站费用",
+      "level": 4,
+      "path": "人工/人事费/中介服务费/招聘网站费用",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 19,
+      "parentPath": "人工/人事费/中介服务费"
+    },
+    {
+      "name": "校企合作费用",
+      "level": 4,
+      "path": "人工/人事费/中介服务费/校企合作费用",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 20,
+      "parentPath": "人工/人事费/中介服务费"
+    },
+    {
+      "name": "职工教育经费",
+      "level": 2,
+      "path": "人工/职工教育经费",
+      "cat": "人工",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 21,
+      "parentPath": "人工"
+    },
+    {
+      "name": "学历提升",
+      "level": 3,
+      "path": "人工/职工教育经费/学历提升",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 22,
+      "parentPath": "人工/职工教育经费"
+    },
+    {
+      "name": "外部讲师",
+      "level": 3,
+      "path": "人工/职工教育经费/外部讲师",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 23,
+      "parentPath": "人工/职工教育经费"
+    },
+    {
+      "name": "其他",
+      "level": 3,
+      "path": "人工/职工教育经费/其他",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 24,
+      "parentPath": "人工/职工教育经费"
+    },
+    {
+      "name": "工会经费",
+      "level": 1,
+      "path": "工会经费",
+      "cat": "工会经费",
+      "center": "财务",
+      "controlLogic": "",
+      "sortNo": 25,
+      "parentPath": null
+    },
+    {
+      "name": "劳务费",
+      "level": 2,
+      "path": "人工/劳务费",
+      "cat": "人工",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 26,
+      "parentPath": "人工"
+    },
+    {
+      "name": "残保金",
+      "level": 1,
+      "path": "残保金",
+      "cat": "残保金",
+      "center": "人资",
+      "controlLogic": "",
+      "sortNo": 27,
+      "parentPath": null
+    },
+    {
+      "name": "办公运营费",
+      "level": 1,
+      "path": "办公运营费",
+      "cat": "办公运营费",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 28,
+      "parentPath": null
+    },
+    {
+      "name": "办公费",
+      "level": 2,
+      "path": "办公运营费/办公费",
+      "cat": "办公运营费",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 29,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "复印机",
+      "level": 3,
+      "path": "办公运营费/办公费/复印机",
+      "cat": "办公运营费",
+      "center": "IT",
+      "controlLogic": "",
+      "sortNo": 30,
+      "parentPath": "办公运营费/办公费"
+    },
+    {
+      "name": "订阅",
+      "level": 3,
+      "path": "办公运营费/办公费/订阅",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "①较2025年实际费用下降5%",
+      "sortNo": 31,
+      "parentPath": "办公运营费/办公费"
+    },
+    {
+      "name": "办公用品",
+      "level": 3,
+      "path": "办公运营费/办公费/办公用品",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "①较2025年实际费用下降5%",
+      "sortNo": 32,
+      "parentPath": "办公运营费/办公费"
+    },
+    {
+      "name": "办公家具",
+      "level": 3,
+      "path": "办公运营费/办公费/办公家具",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "①较2025年实际费用下降5%",
+      "sortNo": 33,
+      "parentPath": "办公运营费/办公费"
+    },
+    {
+      "name": "其他办公费",
+      "level": 3,
+      "path": "办公运营费/办公费/其他办公费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "①较2025年实际费用下降5%",
+      "sortNo": 34,
+      "parentPath": "办公运营费/办公费"
+    },
+    {
+      "name": "软件年费",
+      "level": 3,
+      "path": "办公运营费/办公费/软件年费",
+      "cat": "办公运营费",
+      "center": "IT",
+      "controlLogic": "",
+      "sortNo": 35,
+      "parentPath": "办公运营费/办公费"
+    },
+    {
+      "name": "IT",
+      "level": 3,
+      "path": "办公运营费/办公费/IT",
+      "cat": "办公运营费",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 36,
+      "parentPath": "办公运营费/办公费"
+    },
+    {
+      "name": "维护",
+      "level": 4,
+      "path": "办公运营费/办公费/IT/维护",
+      "cat": "办公运营费",
+      "center": "IT",
+      "controlLogic": "",
+      "sortNo": 37,
+      "parentPath": "办公运营费/办公费/IT"
+    },
+    {
+      "name": "配件",
+      "level": 4,
+      "path": "办公运营费/办公费/IT/配件",
+      "cat": "办公运营费",
+      "center": "IT",
+      "controlLogic": "",
+      "sortNo": 38,
+      "parentPath": "办公运营费/办公费/IT"
+    },
+    {
+      "name": "市内交通费",
+      "level": 2,
+      "path": "办公运营费/市内交通费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 39,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "差旅费",
+      "level": 2,
+      "path": "办公运营费/差旅费",
+      "cat": "办公运营费",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 40,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "机票费",
+      "level": 3,
+      "path": "办公运营费/差旅费/机票费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%",
+      "sortNo": 41,
+      "parentPath": "办公运营费/差旅费"
+    },
+    {
+      "name": "住宿费",
+      "level": 3,
+      "path": "办公运营费/差旅费/住宿费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%",
+      "sortNo": 42,
+      "parentPath": "办公运营费/差旅费"
+    },
+    {
+      "name": "交通费",
+      "level": 3,
+      "path": "办公运营费/差旅费/交通费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%",
+      "sortNo": 43,
+      "parentPath": "办公运营费/差旅费"
+    },
+    {
+      "name": "其他差旅费",
+      "level": 3,
+      "path": "办公运营费/差旅费/其他差旅费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%",
+      "sortNo": 44,
+      "parentPath": "办公运营费/差旅费"
+    },
+    {
+      "name": "汽车费用",
+      "level": 2,
+      "path": "办公运营费/汽车费用",
+      "cat": "办公运营费",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 45,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "租车",
+      "level": 3,
+      "path": "办公运营费/汽车费用/租车",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 46,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "燃料",
+      "level": 3,
+      "path": "办公运营费/汽车费用/燃料",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 47,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "维保",
+      "level": 3,
+      "path": "办公运营费/汽车费用/维保",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 48,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "路税&保险",
+      "level": 3,
+      "path": "办公运营费/汽车费用/路税&保险",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 49,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "里程津贴",
+      "level": 3,
+      "path": "办公运营费/汽车费用/里程津贴",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 50,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "过路过桥费",
+      "level": 3,
+      "path": "办公运营费/汽车费用/过路过桥费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 51,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "停车费",
+      "level": 3,
+      "path": "办公运营费/汽车费用/停车费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 52,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "年检费",
+      "level": 3,
+      "path": "办公运营费/汽车费用/年检费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 53,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "其他车辆费",
+      "level": 3,
+      "path": "办公运营费/汽车费用/其他车辆费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 54,
+      "parentPath": "办公运营费/汽车费用"
+    },
+    {
+      "name": "固定电话费",
+      "level": 2,
+      "path": "办公运营费/固定电话费",
+      "cat": "办公运营费",
+      "center": "IT",
+      "controlLogic": "",
+      "sortNo": 55,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "移动电话费",
+      "level": 2,
+      "path": "办公运营费/移动电话费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "2026年移动电话费=2025年月人均费用*2026年可报销人数\n2025年月人均费用=2025年报销金额/报销人数",
+      "sortNo": 56,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "业务招待费",
+      "level": 2,
+      "path": "办公运营费/业务招待费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "",
+      "sortNo": 57,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "网络费用",
+      "level": 2,
+      "path": "办公运营费/网络费用",
+      "cat": "办公运营费",
+      "center": "IT",
+      "controlLogic": "",
+      "sortNo": 58,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "邮寄费",
+      "level": 2,
+      "path": "办公运营费/邮寄费",
+      "cat": "办公运营费",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 59,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "环保及绿化费",
+      "level": 2,
+      "path": "办公运营费/环保及绿化费",
+      "cat": "办公运营费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 60,
+      "parentPath": "办公运营费"
+    },
+    {
+      "name": "外部服务",
+      "level": 1,
+      "path": "外部服务",
+      "cat": "外部服务",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 61,
+      "parentPath": null
+    },
+    {
+      "name": "租赁费",
+      "level": 2,
+      "path": "外部服务/租赁费",
+      "cat": "外部服务",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 62,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "机器租赁费",
+      "level": 3,
+      "path": "外部服务/租赁费/机器租赁费",
+      "cat": "外部服务",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 63,
+      "parentPath": "外部服务/租赁费"
+    },
+    {
+      "name": "围板箱租赁费",
+      "level": 3,
+      "path": "外部服务/租赁费/围板箱租赁费",
+      "cat": "外部服务",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 64,
+      "parentPath": "外部服务/租赁费"
+    },
+    {
+      "name": "房租及物业",
+      "level": 2,
+      "path": "外部服务/房租及物业",
+      "cat": "外部服务",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 65,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "房屋修理",
+      "level": 3,
+      "path": "外部服务/房租及物业/房屋修理",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 66,
+      "parentPath": "外部服务/房租及物业"
+    },
+    {
+      "name": "厂房租赁费",
+      "level": 3,
+      "path": "外部服务/房租及物业/厂房租赁费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 67,
+      "parentPath": "外部服务/房租及物业"
+    },
+    {
+      "name": "物业水电燃气费",
+      "level": 3,
+      "path": "外部服务/房租及物业/物业水电燃气费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 68,
+      "parentPath": "外部服务/房租及物业"
+    },
+    {
+      "name": "宿舍租赁费",
+      "level": 3,
+      "path": "外部服务/房租及物业/宿舍租赁费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 69,
+      "parentPath": "外部服务/房租及物业"
+    },
+    {
+      "name": "运输费用",
+      "level": 2,
+      "path": "外部服务/运输费用",
+      "cat": "外部服务",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 70,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "咨询审计费",
+      "level": 2,
+      "path": "外部服务/咨询审计费",
+      "cat": "外部服务",
+      "center": "财务",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 71,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "认证年检登记费",
+      "level": 2,
+      "path": "外部服务/认证年检登记费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 72,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "诉讼费",
+      "level": 2,
+      "path": "外部服务/诉讼费",
+      "cat": "外部服务",
+      "center": "技术中心",
+      "controlLogic": "",
+      "sortNo": 73,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "会务宣传费",
+      "level": 2,
+      "path": "外部服务/会务宣传费",
+      "cat": "外部服务",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 74,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "广告宣传费",
+      "level": 3,
+      "path": "外部服务/会务宣传费/广告宣传费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 75,
+      "parentPath": "外部服务/会务宣传费"
+    },
+    {
+      "name": "市场费用",
+      "level": 3,
+      "path": "外部服务/会务宣传费/市场费用",
+      "cat": "外部服务",
+      "center": "销售部",
+      "controlLogic": "",
+      "sortNo": 76,
+      "parentPath": "外部服务/会务宣传费"
+    },
+    {
+      "name": "会议费",
+      "level": 3,
+      "path": "外部服务/会务宣传费/会议费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 77,
+      "parentPath": "外部服务/会务宣传费"
+    },
+    {
+      "name": "年费",
+      "level": 3,
+      "path": "外部服务/会务宣传费/年费",
+      "cat": "外部服务",
+      "center": "技术中心",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 78,
+      "parentPath": "外部服务/会务宣传费"
+    },
+    {
+      "name": "技术开发费",
+      "level": 2,
+      "path": "外部服务/技术开发费",
+      "cat": "外部服务",
+      "center": "技术中心",
+      "controlLogic": "",
+      "sortNo": 79,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "技术服务费",
+      "level": 2,
+      "path": "外部服务/技术服务费",
+      "cat": "外部服务",
+      "center": "技术中心",
+      "controlLogic": "",
+      "sortNo": 80,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "测试检验费",
+      "level": 2,
+      "path": "外部服务/测试检验费",
+      "cat": "外部服务",
+      "center": "品管",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 81,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "测试维护费",
+      "level": 2,
+      "path": "外部服务/测试维护费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "按实际预算，需详细说明。",
+      "sortNo": 82,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "进口费用",
+      "level": 2,
+      "path": "外部服务/进口费用",
+      "cat": "外部服务",
+      "center": "采购",
+      "controlLogic": "",
+      "sortNo": 83,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "出口费用",
+      "level": 2,
+      "path": "外部服务/出口费用",
+      "cat": "外部服务",
+      "center": "生管/采购（关务）",
+      "controlLogic": "",
+      "sortNo": 84,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "修理费",
+      "level": 2,
+      "path": "外部服务/修理费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 85,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "工装治具维护修理",
+      "level": 2,
+      "path": "外部服务/工装治具维护修理",
+      "cat": "外部服务",
+      "center": "安瑞",
+      "controlLogic": "",
+      "sortNo": 86,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "加工费",
+      "level": 2,
+      "path": "外部服务/加工费",
+      "cat": "外部服务",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 87,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "设计费",
+      "level": 2,
+      "path": "外部服务/设计费",
+      "cat": "外部服务",
+      "center": "技术中心",
+      "controlLogic": "",
+      "sortNo": 88,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "委托外部研究开发费用",
+      "level": 2,
+      "path": "外部服务/委托外部研究开发费用",
+      "cat": "外部服务",
+      "center": "技术中心",
+      "controlLogic": "",
+      "sortNo": 89,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "仓储费",
+      "level": 2,
+      "path": "外部服务/仓储费",
+      "cat": "外部服务",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 90,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "清洁费",
+      "level": 2,
+      "path": "外部服务/清洁费",
+      "cat": "外部服务",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 91,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "水处理费",
+      "level": 2,
+      "path": "外部服务/水处理费",
+      "cat": "外部服务",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 92,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "代理服务",
+      "level": 2,
+      "path": "外部服务/代理服务",
+      "cat": "外部服务",
+      "center": "风控",
+      "controlLogic": "",
+      "sortNo": 93,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "销售佣金",
+      "level": 2,
+      "path": "外部服务/销售佣金",
+      "cat": "外部服务",
+      "center": "销售部",
+      "controlLogic": "",
+      "sortNo": 94,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "税费",
+      "level": 1,
+      "path": "税费",
+      "cat": "税费",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 95,
+      "parentPath": null
+    },
+    {
+      "name": "保险费",
+      "level": 2,
+      "path": "税费/保险费",
+      "cat": "税费",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 96,
+      "parentPath": "税费"
+    },
+    {
+      "name": "货运保险费",
+      "level": 2,
+      "path": "税费/货运保险费",
+      "cat": "税费",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 97,
+      "parentPath": "税费"
+    },
+    {
+      "name": "材料消耗",
+      "level": 1,
+      "path": "材料消耗",
+      "cat": "材料消耗",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 98,
+      "parentPath": null
+    },
+    {
+      "name": "物料消耗",
+      "level": 2,
+      "path": "材料消耗/物料消耗",
+      "cat": "材料消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 99,
+      "parentPath": "材料消耗"
+    },
+    {
+      "name": "包材",
+      "level": 3,
+      "path": "材料消耗/物料消耗/包材",
+      "cat": "材料消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 100,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "工检夹治具",
+      "level": 3,
+      "path": "材料消耗/物料消耗/工检夹治具",
+      "cat": "材料消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 101,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "维修物料",
+      "level": 3,
+      "path": "材料消耗/物料消耗/维修物料",
+      "cat": "材料消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 102,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "订制品",
+      "level": 3,
+      "path": "材料消耗/物料消耗/订制品",
+      "cat": "材料消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 103,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "备品备件",
+      "level": 3,
+      "path": "材料消耗/物料消耗/备品备件",
+      "cat": "材料消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 104,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "劳保用品",
+      "level": 3,
+      "path": "材料消耗/物料消耗/劳保用品",
+      "cat": "材料消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 105,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "样品费",
+      "level": 3,
+      "path": "材料消耗/物料消耗/样品费",
+      "cat": "材料消耗",
+      "center": "销售部",
+      "controlLogic": "",
+      "sortNo": 106,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "试验试制费",
+      "level": 3,
+      "path": "材料消耗/物料消耗/试验试制费",
+      "cat": "材料消耗",
+      "center": "安瑞",
+      "controlLogic": "",
+      "sortNo": 107,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "低值易耗品",
+      "level": 3,
+      "path": "材料消耗/物料消耗/低值易耗品",
+      "cat": "材料消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 108,
+      "parentPath": "材料消耗/物料消耗"
+    },
+    {
+      "name": "能源消耗",
+      "level": 1,
+      "path": "能源消耗",
+      "cat": "能源消耗",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 109,
+      "parentPath": null
+    },
+    {
+      "name": "电费",
+      "level": 2,
+      "path": "能源消耗/电费",
+      "cat": "能源消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 110,
+      "parentPath": "能源消耗"
+    },
+    {
+      "name": "油气",
+      "level": 2,
+      "path": "能源消耗/油气",
+      "cat": "能源消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 111,
+      "parentPath": "能源消耗"
+    },
+    {
+      "name": "水费",
+      "level": 2,
+      "path": "能源消耗/水费",
+      "cat": "能源消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 112,
+      "parentPath": "能源消耗"
+    },
+    {
+      "name": "蒸汽",
+      "level": 2,
+      "path": "能源消耗/蒸汽",
+      "cat": "能源消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 113,
+      "parentPath": "能源消耗"
+    },
+    {
+      "name": "天燃气",
+      "level": 2,
+      "path": "能源消耗/天燃气",
+      "cat": "能源消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 114,
+      "parentPath": "能源消耗"
+    },
+    {
+      "name": "采暖费",
+      "level": 2,
+      "path": "能源消耗/采暖费",
+      "cat": "能源消耗",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 115,
+      "parentPath": "能源消耗"
+    },
+    {
+      "name": "安全生产",
+      "level": 1,
+      "path": "安全生产",
+      "cat": "安全生产",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 116,
+      "parentPath": null
+    },
+    {
+      "name": "安全生产费",
+      "level": 2,
+      "path": "安全生产/安全生产费",
+      "cat": "安全生产",
+      "center": "总办",
+      "controlLogic": "按实际预算，需详细说明。",
+      "sortNo": 117,
+      "parentPath": "安全生产"
+    },
+    {
+      "name": "危险废弃物处置费(安徽气体专用）",
+      "level": 2,
+      "path": "外部服务/危险废弃物处置费(安徽气体专用）",
+      "cat": "外部服务",
+      "center": "安徽气体",
+      "controlLogic": "",
+      "sortNo": 118,
+      "parentPath": "外部服务"
+    },
+    {
+      "name": "其他费用",
+      "level": 1,
+      "path": "其他费用",
+      "cat": "其他费用",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 119,
+      "parentPath": null
+    },
+    {
+      "name": "产品质量保证",
+      "level": 2,
+      "path": "其他费用/产品质量保证",
+      "cat": "其他费用",
+      "center": "安瑞市场部",
+      "controlLogic": "",
+      "sortNo": 120,
+      "parentPath": "其他费用"
+    },
+    {
+      "name": "产品认证",
+      "level": 2,
+      "path": "其他费用/产品认证",
+      "cat": "其他费用",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 121,
+      "parentPath": "其他费用"
+    },
+    {
+      "name": "安全认证",
+      "level": 3,
+      "path": "其他费用/产品认证/安全认证",
+      "cat": "其他费用",
+      "center": "品管",
+      "controlLogic": "",
+      "sortNo": 122,
+      "parentPath": "其他费用/产品认证"
+    },
+    {
+      "name": "专利费",
+      "level": 2,
+      "path": "其他费用/专利费",
+      "cat": "其他费用",
+      "center": "技术中心",
+      "controlLogic": "",
+      "sortNo": 123,
+      "parentPath": "其他费用"
+    },
+    {
+      "name": "中标服务费",
+      "level": 2,
+      "path": "其他费用/中标服务费",
+      "cat": "其他费用",
+      "center": "销售部",
+      "controlLogic": "",
+      "sortNo": 124,
+      "parentPath": "其他费用"
+    },
+    {
+      "name": "专利前期申请费用",
+      "level": 2,
+      "path": "其他费用/专利前期申请费用",
+      "cat": "其他费用",
+      "center": "技术中心",
+      "controlLogic": "",
+      "sortNo": 125,
+      "parentPath": "其他费用"
+    },
+    {
+      "name": "证券费用",
+      "level": 2,
+      "path": "其他费用/证券费用",
+      "cat": "其他费用",
+      "center": "证券",
+      "controlLogic": "",
+      "sortNo": 126,
+      "parentPath": "其他费用"
+    },
+    {
+      "name": "其他",
+      "level": 1,
+      "path": "其他",
+      "cat": "其他",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 127,
+      "parentPath": null
+    },
+    {
+      "name": "其他",
+      "level": 2,
+      "path": "其他/其他",
+      "cat": "其他",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 128,
+      "parentPath": "其他"
+    },
+    {
+      "name": "员工持股受让回购股份过户费",
+      "level": 1,
+      "path": "员工持股受让回购股份过户费",
+      "cat": "员工持股受让回购股份过户费",
+      "center": "证券",
+      "controlLogic": "",
+      "sortNo": 129,
+      "parentPath": null
+    },
+    {
+      "name": "董事会会费",
+      "level": 1,
+      "path": "董事会会费",
+      "cat": "董事会会费",
+      "center": "证券",
+      "controlLogic": "",
+      "sortNo": 130,
+      "parentPath": null
+    },
+    {
+      "name": "搬迁费用",
+      "level": 1,
+      "path": "搬迁费用",
+      "cat": "搬迁费用",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 131,
+      "parentPath": null
+    },
+    {
+      "name": "财务费用",
+      "level": 1,
+      "path": "财务费用",
+      "cat": "财务费用",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 132,
+      "parentPath": null
+    },
+    {
+      "name": "利息支出",
+      "level": 2,
+      "path": "财务费用/利息支出",
+      "cat": "财务费用",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 133,
+      "parentPath": "财务费用"
+    },
+    {
+      "name": "贷款利息支出",
+      "level": 3,
+      "path": "财务费用/利息支出/贷款利息支出",
+      "cat": "财务费用",
+      "center": "财务",
+      "controlLogic": "",
+      "sortNo": 134,
+      "parentPath": "财务费用/利息支出"
+    },
+    {
+      "name": "贴现利息支出",
+      "level": 3,
+      "path": "财务费用/利息支出/贴现利息支出",
+      "cat": "财务费用",
+      "center": "财务",
+      "controlLogic": "",
+      "sortNo": 135,
+      "parentPath": "财务费用/利息支出"
+    },
+    {
+      "name": "拆借利息",
+      "level": 3,
+      "path": "财务费用/利息支出/拆借利息",
+      "cat": "财务费用",
+      "center": "财务",
+      "controlLogic": "",
+      "sortNo": 136,
+      "parentPath": "财务费用/利息支出"
+    },
+    {
+      "name": "手续费",
+      "level": 2,
+      "path": "财务费用/手续费",
+      "cat": "财务费用",
+      "center": "财务",
+      "controlLogic": "",
+      "sortNo": 137,
+      "parentPath": "财务费用"
+    },
+    {
+      "name": "主营业务成本",
+      "level": 1,
+      "path": "主营业务成本",
+      "cat": "主营业务成本",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 138,
+      "parentPath": null
+    },
+    {
+      "name": "履约成本",
+      "level": 2,
+      "path": "主营业务成本/履约成本",
+      "cat": "主营业务成本",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 139,
+      "parentPath": "主营业务成本"
+    },
+    {
+      "name": "运输费",
+      "level": 3,
+      "path": "主营业务成本/履约成本/运输费",
+      "cat": "主营业务成本",
+      "center": "战略",
+      "controlLogic": "",
+      "sortNo": 140,
+      "parentPath": "主营业务成本/履约成本"
+    },
+    {
+      "name": "保证金",
+      "level": 2,
+      "path": "主营业务成本/保证金",
+      "cat": "主营业务成本",
+      "center": "安瑞",
+      "controlLogic": "",
+      "sortNo": 141,
+      "parentPath": "主营业务成本"
+    },
+    {
+      "name": "营业税金及附加",
+      "level": 1,
+      "path": "营业税金及附加",
+      "cat": "营业税金及附加",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 142,
+      "parentPath": null
+    },
+    {
+      "name": "车船使用税",
+      "level": 2,
+      "path": "营业税金及附加/车船使用税",
+      "cat": "营业税金及附加",
+      "center": "总办",
+      "controlLogic": "较2025年实际费用下降5%",
+      "sortNo": 143,
+      "parentPath": "营业税金及附加"
+    },
+    {
+      "name": "营业外支出",
+      "level": 1,
+      "path": "营业外支出",
+      "cat": "营业外支出",
+      "center": null,
+      "controlLogic": "",
+      "sortNo": 144,
+      "parentPath": null
+    },
+    {
+      "name": "捐赠支出",
+      "level": 2,
+      "path": "营业外支出/捐赠支出",
+      "cat": "营业外支出",
+      "center": "总办",
+      "controlLogic": "按照实际费用预算",
+      "sortNo": 145,
+      "parentPath": "营业外支出"
+    }
+  ],
+  "events": [
+    {
+      "cat": "离职经济补偿金",
+      "acctCode": "6600010124",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "员工辞退福利（裁剪冗员补偿款）"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "竞业限制补偿金",
+      "acctCode": "6600010124",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "员工辞退福利（裁剪冗员补偿款）"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "宿舍福利-房租",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-能源费用",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-物业费",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-修理费",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-卫星电视费",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-宽带网络费用",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-奖励费用",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-家具家电",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-清洁费",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-员工制服",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-宿舍物资",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-搬迁劳务费",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "宿舍福利-其他费用",
+      "acctCode": "6600010201",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": "按实际填报，备注说明。（能源费用报给动力，统一预算）"
+    },
+    {
+      "cat": "食堂福利-食堂耗材",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-修理费",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-能源费用",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-清洁费",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-劳保用品",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-食堂物资费用",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-检测费用",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-员工制服",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "其他福利-福利社费用",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-外租档口结算",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "食堂福利-员工餐费",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-家具家电",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "食堂福利-其他费用",
+      "acctCode": "6600010202",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": "①、原则上月人均费用不高于2025年月人均费用。（月人均费用=当月食堂支出费用/当月在职总人数）。\n2025年食堂人均用餐成本（不含人工）大于7.5元/人/餐应做节约规划，在保证品类和质量不下降的情况下降低月人均费用至少5%（或达成2026年人均用餐成本指标7元/人/餐±3%.)\n②、2026年全股份“食堂人均用餐成本（不含人工）”指标：7元/人/餐±3%。"
+    },
+    {
+      "cat": "其他福利-员工体检费",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-职工医疗互助费用",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-集体活动福利",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-节日福利",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-文体设施费用",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-司机误餐费用(非出差）",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-评优奖金",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-茶叶费用",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-水果点心费用",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "其他福利-旺年会",
+      "acctCode": "6600010203",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "生日礼金",
+      "acctCode": "6600010203",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "员工关怀走访费用",
+      "acctCode": "6600010203",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "其他福利-质量活动（品管）",
+      "acctCode": "6600010203",
+      "center": "品管",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "交通补贴",
+      "acctCode": "6600010203",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "其他福利费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "其他福利-通勤车费",
+      "acctCode": "6600010204",
+      "center": "总办",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "通勤车费"
+      ],
+      "method": "",
+      "logic": "整体费用较2025年下降5%，上座率低于75%的线路重新评估优化调整（上座率=总乘坐人数/总座位数）。"
+    },
+    {
+      "cat": "探亲交通费",
+      "acctCode": "6600010205",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "探亲交通费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "丧葬慰问金",
+      "acctCode": "6600010206",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "丧葬慰问金"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "生活困难补助",
+      "acctCode": "6600010207",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "生活困难补助"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "生病住院/工伤慰问金",
+      "acctCode": "6600010208",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "生病住院、工伤慰问金"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "商业保险费",
+      "acctCode": "6600010306",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "个人商业保险",
+        "其他保险费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "部门活动经费",
+      "acctCode": "6600010500",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "部门活动经费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "招聘宣传费",
+      "acctCode": "6600010602",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "其他人事费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "招聘差旅费（含面试住宿费）",
+      "acctCode": "6600010602",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "其他人事费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "入职前竞调费用",
+      "acctCode": "6600010602",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "其他人事费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "离职后竞调费用",
+      "acctCode": "6600010602",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "其他人事费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "第三方服务费",
+      "acctCode": "6600010602",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "其他人事费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "人事费-普通中介费用-正式员工",
+      "acctCode": "6600010603",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "中介服务费",
+        "普通中介费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "人事费-普通中介费用-劳务派遣",
+      "acctCode": "6600010603",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "中介服务费",
+        "普通中介费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "人事费-猎头公司费用",
+      "acctCode": "6600010604",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "中介服务费",
+        "猎头公司费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "人事费-招聘网站费用",
+      "acctCode": "6600010605",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "中介服务费",
+        "招聘网站费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "人事费-校企合作费用",
+      "acctCode": "6600010606",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "人事费",
+        "中介服务费",
+        "校企合作费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "继续教育费",
+      "acctCode": "6600010607",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "职工教育经费",
+        "学历提升"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "外部讲师费",
+      "acctCode": "6600010608",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "职工教育经费",
+        "外部讲师"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "培训服务费",
+      "acctCode": "6600010609",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "职工教育经费",
+        "其他"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "培训设施费",
+      "acctCode": "6600010609",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "职工教育经费",
+        "其他"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "取证费",
+      "acctCode": "6600010609",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "职工教育经费",
+        "其他"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "其他培训费",
+      "acctCode": "6600010609",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "职工教育经费",
+        "其他"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "工会经费",
+      "acctCode": "6600010700",
+      "center": "财务",
+      "subjectPath": [
+        "工会经费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "劳务报酬",
+      "acctCode": "6600010800",
+      "center": "人资",
+      "subjectPath": [
+        "人工",
+        "劳务费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "残保金",
+      "acctCode": "6600010900",
+      "center": "人资",
+      "subjectPath": [
+        "残保金"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "办公费-复印机",
+      "acctCode": "6600020102",
+      "center": "IT",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "复印机"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "办公费-书报杂志订阅费",
+      "acctCode": "6600020104",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "订阅"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公用品-办公文具",
+      "acctCode": "6600020105",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "办公用品"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公用品-生活用纸",
+      "acctCode": "6600020105",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "办公用品"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公用品-饮用水",
+      "acctCode": "6600020105",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "办公用品"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公用品-其他办公用品",
+      "acctCode": "6600020105",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "办公用品"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公家具-小家具家电",
+      "acctCode": "6600020106",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "办公家具"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公费-办公耗材",
+      "acctCode": "6600020107",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "其他办公费"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公费-茶叶费用",
+      "acctCode": "6600020107",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "其他办公费"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公费-水果点心费用",
+      "acctCode": "6600020107",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "其他办公费"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公费-自主清洁",
+      "acctCode": "6600020107",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "其他办公费"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公费-洗衣房费用",
+      "acctCode": "6600020107",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "其他办公费"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公费-办公工作服",
+      "acctCode": "6600020107",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "其他办公费"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公费-修理费-自主维修",
+      "acctCode": "6600020107",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "其他办公费"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "办公费-其他费用",
+      "acctCode": "6600020107",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "其他办公费"
+      ],
+      "method": "",
+      "logic": "①较2025年实际费用下降5%"
+    },
+    {
+      "cat": "IT-软件订阅年费",
+      "acctCode": "6600020108",
+      "center": "IT",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "软件年费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "IT-软件维护",
+      "acctCode": "6600020113",
+      "center": "IT",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "IT",
+        "维护"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "IT-硬件维护",
+      "acctCode": "6600020113",
+      "center": "IT",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "IT",
+        "维护"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "IT-人力委外",
+      "acctCode": "6600020113",
+      "center": "IT",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "IT",
+        "维护"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "IT-配件",
+      "acctCode": "6600020114",
+      "center": "IT",
+      "subjectPath": [
+        "办公运营费",
+        "办公费",
+        "IT",
+        "配件"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "市内交通费",
+      "acctCode": "6600020200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "市内交通费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "差旅费-机票费",
+      "acctCode": "6600020301",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "机票费"
+      ],
+      "method": "",
+      "logic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%"
+    },
+    {
+      "cat": "差旅费-住宿费",
+      "acctCode": "6600020302",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "住宿费"
+      ],
+      "method": "",
+      "logic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%"
+    },
+    {
+      "cat": "差旅费-火车费用",
+      "acctCode": "6600020303",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "交通费"
+      ],
+      "method": "",
+      "logic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%"
+    },
+    {
+      "cat": "差旅费-长途汽车费用",
+      "acctCode": "6600020303",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "交通费"
+      ],
+      "method": "",
+      "logic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%"
+    },
+    {
+      "cat": "差旅费-市内交通费",
+      "acctCode": "6600020303",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "交通费"
+      ],
+      "method": "",
+      "logic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%"
+    },
+    {
+      "cat": "差旅费-商旅机票费",
+      "acctCode": "6600020301",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "机票费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "差旅费-商旅住宿费",
+      "acctCode": "6600020302",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "住宿费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "差旅费-商旅火车费用",
+      "acctCode": "6600020303",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "交通费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "差旅费-商旅长途汽车费用",
+      "acctCode": "6600020303",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "交通费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "差旅费-商旅市内交通费",
+      "acctCode": "6600020303",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "交通费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "差旅费-差旅补贴",
+      "acctCode": "6600020304",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "其他差旅费"
+      ],
+      "method": "",
+      "logic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%"
+    },
+    {
+      "cat": "差旅费-误餐补贴",
+      "acctCode": "6600020304",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "其他差旅费"
+      ],
+      "method": "",
+      "logic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%"
+    },
+    {
+      "cat": "差旅费-其他差旅费",
+      "acctCode": "6600020304",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "差旅费",
+        "其他差旅费"
+      ],
+      "method": "",
+      "logic": "1.有营收单位：25年营收比千分之4以下费用增长率不超过营收增长率的50%\n2.无营收单位：上年实际降10%"
+    },
+    {
+      "cat": "汽车费用-租车费",
+      "acctCode": "6600020401",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "租车"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "汽车费用-燃料费",
+      "acctCode": "6600020402",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "燃料"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "汽车费用-维保费",
+      "acctCode": "6600020403",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "维保"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "汽车费用-路税&保险",
+      "acctCode": "6600020404",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "路税&保险"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "汽车费用-里程津贴",
+      "acctCode": "6600020405",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "里程津贴"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "汽车费用-过路过桥费",
+      "acctCode": "6600020406",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "过路过桥费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "汽车费用-停车费",
+      "acctCode": "6600020407",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "停车费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "汽车费用-年检费",
+      "acctCode": "6600020408",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "年检费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "汽车费用-其他车辆费",
+      "acctCode": "6600020409",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "汽车费用",
+        "其他车辆费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "固定电话费",
+      "acctCode": "6600020500",
+      "center": "IT",
+      "subjectPath": [
+        "办公运营费",
+        "固定电话费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "移动电话费",
+      "acctCode": "6600020600",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "移动电话费"
+      ],
+      "method": "",
+      "logic": "2026年移动电话费=2025年月人均费用*2026年可报销人数\n2025年月人均费用=2025年报销金额/报销人数"
+    },
+    {
+      "cat": "业务招待-茶叶费用",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-酒水费用",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-餐饮费",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-商务礼品费",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-总经理费用",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-景区门票费用",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-非本公司员工产生的招待费用",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-代驾费用",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-水果点心费用",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-机场VIP通道费用",
+      "acctCode": "6600020700",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "业务招待-招聘招待费",
+      "acctCode": "6600020700",
+      "center": "人资",
+      "subjectPath": [
+        "办公运营费",
+        "业务招待费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "网络费用",
+      "acctCode": "6600020800",
+      "center": "IT",
+      "subjectPath": [
+        "办公运营费",
+        "网络费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "邮寄费",
+      "acctCode": "6600021000",
+      "center": "战略",
+      "subjectPath": [
+        "办公运营费",
+        "邮寄费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "环保费-排污费",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-环保施工费",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-环保评估、验收费",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-环保设施",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-环保应急物资",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-环境检测费用",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-清理费",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-固体废物处置",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-危险废物处置",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "环保费-其他环保费用",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "绿化费-厂区绿化费",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "户外绿化养护费用=户外管养面积*户外管养单价\n户外管养面积：按实际填报\n户外管养单价：不大于2025年最新合同单价，原则上，2025年户外管养单价在3元/㎡/年~3.5元/㎡/年的，至少下降5%；户外管养单价＞3.5元/㎡/年的至少下降10%；户外管养单价＜3元/㎡/年，由各子公司自行设定。"
+    },
+    {
+      "cat": "绿化费-其他绿化费",
+      "acctCode": "6600021200",
+      "center": "总办",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": "户外绿化养护费用=户外管养面积*户外管养单价\n户外管养面积：按实际填报\n户外管养单价：不大于2025年最新合同单价，原则上，2025年户外管养单价在3元/㎡/年~3.5元/㎡/年的，至少下降5%；户外管养单价＞3.5元/㎡/年的至少下降10%；户外管养单价＜3元/㎡/年，由各子公司自行设定。"
+    },
+    {
+      "cat": "租赁费-机器租赁费",
+      "acctCode": "6600030101",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "租赁费",
+        "机器租赁费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "租赁费-围板箱租赁费",
+      "acctCode": "6600030102",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "租赁费",
+        "围板箱租赁费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "租赁宿舍\\厂房费用-修理费",
+      "acctCode": "6600030203",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "房租及物业",
+        "房屋修理"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "租赁宿舍\\厂房费用-厂房租赁租金费用",
+      "acctCode": "6600030204",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "房租及物业",
+        "厂房租赁费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "租赁宿舍\\厂房费用-厂房租赁中介费用",
+      "acctCode": "6600030204",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "房租及物业",
+        "厂房租赁费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "租赁宿舍\\厂房费用-物业费",
+      "acctCode": "6600030205",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "房租及物业",
+        "物业水电燃气费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "租赁宿舍\\厂房费用-能源费用",
+      "acctCode": "6600030205",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "房租及物业",
+        "物业水电燃气费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "租赁宿舍\\厂房费用-宿舍租赁租金费用",
+      "acctCode": "6600030206",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "房租及物业",
+        "宿舍租赁费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "租赁宿舍\\厂房费用-宿舍租赁中介费用",
+      "acctCode": "6600030206",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "房租及物业",
+        "宿舍租赁费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "运输费用",
+      "acctCode": "6600030300",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "运输费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "咨询审计费-审计费用",
+      "acctCode": "6600030400",
+      "center": "财务",
+      "subjectPath": [
+        "外部服务",
+        "咨询审计费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "咨询审计费-尽调费用",
+      "acctCode": "6600030400",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "咨询审计费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "咨询审计费-项目管理咨询费用",
+      "acctCode": "6600030400",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "咨询审计费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "咨询审计费-法律顾问费用",
+      "acctCode": "6600030400",
+      "center": "风控",
+      "subjectPath": [
+        "外部服务",
+        "咨询审计费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "咨询审计费-政府项目专项审计",
+      "acctCode": "6600030400",
+      "center": "技术中心",
+      "subjectPath": [
+        "外部服务",
+        "咨询审计费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "咨询审计费-第三方专利报告",
+      "acctCode": "6600030400",
+      "center": "技术中心",
+      "subjectPath": [
+        "外部服务",
+        "咨询审计费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "咨询审计费-体系顾问费用",
+      "acctCode": "6600030400",
+      "center": "品管",
+      "subjectPath": [
+        "外部服务",
+        "咨询审计费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "咨询审计费-其他咨询审计费",
+      "acctCode": "6600030400",
+      "center": "风控",
+      "subjectPath": [
+        "外部服务",
+        "咨询审计费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "认证年检登记-执照认证年检费",
+      "acctCode": "6600030500",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "认证年检登记费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "认证年检登记-公众号认证费（新媒体平台年费）",
+      "acctCode": "6600030500",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "认证年检登记费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "认证年检登记-抵押登记费",
+      "acctCode": "6600030500",
+      "center": "销售部",
+      "subjectPath": [
+        "外部服务",
+        "认证年检登记费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "认证年检登记-体系认证费用",
+      "acctCode": "6600030500",
+      "center": "品管",
+      "subjectPath": [
+        "外部服务",
+        "认证年检登记费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "专利诉讼费",
+      "acctCode": "6600030600",
+      "center": "技术中心",
+      "subjectPath": [
+        "外部服务",
+        "诉讼费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "其他诉讼费",
+      "acctCode": "6600030600",
+      "center": "风控",
+      "subjectPath": [
+        "外部服务",
+        "诉讼费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "会务宣传费-企业文化宣传费（品牌建设宣传费）",
+      "acctCode": "6600030701",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "广告宣传费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "会务宣传费-市场费用",
+      "acctCode": "6600030702",
+      "center": "销售部",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "市场费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "会务宣传费-会议费",
+      "acctCode": "6600030703",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "会议费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "会务宣传费-行业协会年费",
+      "acctCode": "6600030743",
+      "center": "技术中心",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "年费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "会务宣传费-品牌建设会员年费（活动费）",
+      "acctCode": "6600030743",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "年费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "会务宣传费-品牌建设其他费用",
+      "acctCode": "6600030743",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "年费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "品牌建设费-物料制作费",
+      "acctCode": "6600030743",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "年费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "品牌建设费-宣传片制作费",
+      "acctCode": "6600030743",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "年费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "品牌建设费-内刊运营费",
+      "acctCode": "6600030743",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "年费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "品牌建设费-素材库年费",
+      "acctCode": "6600030743",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "会务宣传费",
+        "年费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "委外技术开发费（研发费用）",
+      "acctCode": "6600030800",
+      "center": "技术中心",
+      "subjectPath": [
+        "外部服务",
+        "技术开发费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "技术服务费",
+      "acctCode": "6600030900",
+      "center": "技术中心",
+      "subjectPath": [
+        "外部服务",
+        "技术服务费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "仪器检测费用",
+      "acctCode": "6600031100",
+      "center": "品管",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "产品检测费用-委托内部关联方",
+      "acctCode": "6600031100",
+      "center": "品管",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "产品检测费用-委托外部第三方",
+      "acctCode": "6600031100",
+      "center": "品管",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料检测费用",
+      "acctCode": "6600031100",
+      "center": "各工厂生产部门",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "有害物质检测费用",
+      "acctCode": "6600031100",
+      "center": "品管",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "水质检测费-自来水水质检测费",
+      "acctCode": "6600031100",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "动辅检测费",
+      "acctCode": "6600031100",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "黄金检测费",
+      "acctCode": "6600031100",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "压力管道检验费用",
+      "acctCode": "6600031100",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "测试检验费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "电梯测试维护费",
+      "acctCode": "6600031200",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "测试维护费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "进口费用",
+      "acctCode": "6600031300",
+      "center": "采购",
+      "subjectPath": [
+        "外部服务",
+        "进口费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "出口费用",
+      "acctCode": "6600031400",
+      "center": "生管/采购（关务）",
+      "subjectPath": [
+        "外部服务",
+        "出口费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "修理费-委外维修（总办）",
+      "acctCode": "6600031500",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "修理费-终端设备维修",
+      "acctCode": "6600031500",
+      "center": "IT",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "修理费-弱电维护",
+      "acctCode": "6600031500",
+      "center": "IT",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "修理费-动辅维修服务",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "修理费-委外服务",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "修理费-设备备件维修服务",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "修理费-零星工程（基建）",
+      "acctCode": "6600031500",
+      "center": "基建",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "工装治具维护修理",
+      "acctCode": "6600031501",
+      "center": "安瑞",
+      "subjectPath": [
+        "外部服务",
+        "工装治具维护修理"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "内部加工费（工序委外）",
+      "acctCode": "6600031600",
+      "center": "",
+      "subjectPath": [
+        "外部服务",
+        "加工费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "外部加工费（工序委外）",
+      "acctCode": "6600031600",
+      "center": "",
+      "subjectPath": [
+        "外部服务",
+        "加工费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "设计费",
+      "acctCode": "6600031800",
+      "center": "技术中心",
+      "subjectPath": [
+        "外部服务",
+        "设计费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "委托外部研究开发费用",
+      "acctCode": "6600032000",
+      "center": "技术中心",
+      "subjectPath": [
+        "外部服务",
+        "委托外部研究开发费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "产品仓储费",
+      "acctCode": "6600032100",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "仓储费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "清洁费-委外清洁",
+      "acctCode": "6600033001",
+      "center": "总办",
+      "subjectPath": [
+        "外部服务",
+        "清洁费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "厂区水处理费（循环水处理）",
+      "acctCode": "6600034100",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "水处理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "代理服务费",
+      "acctCode": "6600035100",
+      "center": "风控",
+      "subjectPath": [
+        "外部服务",
+        "代理服务"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "销售佣金",
+      "acctCode": "6600036100",
+      "center": "销售部",
+      "subjectPath": [
+        "外部服务",
+        "销售佣金"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "保险费",
+      "acctCode": "6600040200",
+      "center": "总办",
+      "subjectPath": [
+        "税费",
+        "保险费"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "货运保险费",
+      "acctCode": "6600040300",
+      "center": "战略",
+      "subjectPath": [
+        "税费",
+        "货运保险费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗",
+      "acctCode": "6600060100",
+      "center": "战略",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-包材",
+      "acctCode": "6600060101",
+      "center": "战略",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "包材"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-工检夹治具",
+      "acctCode": "6600060102",
+      "center": "战略",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "工检夹治具"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-维修物料",
+      "acctCode": "6600060121",
+      "center": "战略",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "维修物料"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-订制品",
+      "acctCode": "6600060122",
+      "center": "战略",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "订制品"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-备品备件",
+      "acctCode": "6600060300",
+      "center": "战略",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "备品备件"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-劳保用品",
+      "acctCode": "6600060400",
+      "center": "战略",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "劳保用品"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-样品费",
+      "acctCode": "6600060500",
+      "center": "销售部",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "样品费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-试验试制费",
+      "acctCode": "6600060600",
+      "center": "安瑞",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "试验试制费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "物料消耗-低值易耗品",
+      "acctCode": "6600060900",
+      "center": "战略",
+      "subjectPath": [
+        "材料消耗",
+        "物料消耗",
+        "低值易耗品"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "能源消耗-电费",
+      "acctCode": "6600060201",
+      "center": "战略",
+      "subjectPath": [
+        "能源消耗",
+        "电费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "能源消耗-油气",
+      "acctCode": "6600060202",
+      "center": "战略",
+      "subjectPath": [
+        "能源消耗",
+        "油气"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "能源消耗-水费",
+      "acctCode": "6600060203",
+      "center": "战略",
+      "subjectPath": [
+        "能源消耗",
+        "水费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "能源消耗-蒸汽",
+      "acctCode": "6600060204",
+      "center": "战略",
+      "subjectPath": [
+        "能源消耗",
+        "蒸汽"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "能源消耗-天燃气",
+      "acctCode": "6600060205",
+      "center": "战略",
+      "subjectPath": [
+        "能源消耗",
+        "天燃气"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "能源消耗-采暖费",
+      "acctCode": "6600060206",
+      "center": "战略",
+      "subjectPath": [
+        "能源消耗",
+        "采暖费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "安全生产费-安全耗材物资",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-安全教育培训费",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-安全体检费用",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-安全类办证费",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-安全评估费",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-马路人行道划线",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-安保制服费用",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-工伤费用",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-危化品管理费用",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-急救药品费用",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-特种设备检验费",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-防雷检验",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-消防验收",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-消防维保",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-检验检测费",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-气体侦测器",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-安责险",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-作业场所检测",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "安全生产费-其他安全生产费",
+      "acctCode": "6600070100",
+      "center": "总办",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": "按实际预算，需详细说明。"
+    },
+    {
+      "cat": "危险废弃物处置费(安徽气体专用）",
+      "acctCode": "6600070200",
+      "center": "安徽气体",
+      "subjectPath": [
+        "外部服务",
+        "危险废弃物处置费(安徽气体专用）"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "产品质量保证",
+      "acctCode": "6600100200",
+      "center": "安瑞市场部",
+      "subjectPath": [
+        "其他费用",
+        "产品质量保证"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "产品安全认证",
+      "acctCode": "6600100203",
+      "center": "品管",
+      "subjectPath": [
+        "其他费用",
+        "产品认证",
+        "安全认证"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "专利年费",
+      "acctCode": "6600100300",
+      "center": "技术中心",
+      "subjectPath": [
+        "其他费用",
+        "专利费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "其他专利费",
+      "acctCode": "6600100300",
+      "center": "技术中心",
+      "subjectPath": [
+        "其他费用",
+        "专利费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "中标服务费",
+      "acctCode": "6600100400",
+      "center": "销售部",
+      "subjectPath": [
+        "其他费用",
+        "中标服务费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "专利前期申请费用",
+      "acctCode": "6600100500",
+      "center": "技术中心",
+      "subjectPath": [
+        "其他费用",
+        "专利前期申请费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "信用披露费用",
+      "acctCode": "6600100600",
+      "center": "证券",
+      "subjectPath": [
+        "其他费用",
+        "证券费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "报社年费",
+      "acctCode": "6600100600",
+      "center": "证券",
+      "subjectPath": [
+        "其他费用",
+        "证券费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "其他证券费用",
+      "acctCode": "6600100600",
+      "center": "证券",
+      "subjectPath": [
+        "其他费用",
+        "证券费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "其他费用",
+      "acctCode": "6600109600",
+      "center": "总办",
+      "subjectPath": [
+        "其他",
+        "其他"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "员工持股受让回购股份过户费",
+      "acctCode": "6600201000",
+      "center": "证券",
+      "subjectPath": [
+        "员工持股受让回购股份过户费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "董事会会费",
+      "acctCode": "6600202000",
+      "center": "证券",
+      "subjectPath": [
+        "董事会会费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "搬迁费用",
+      "acctCode": "6600301000",
+      "center": "总办",
+      "subjectPath": [
+        "搬迁费用"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "贷款利息支出",
+      "acctCode": "6603010100",
+      "center": "财务",
+      "subjectPath": [
+        "财务费用",
+        "利息支出",
+        "贷款利息支出"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "贴现利息支出",
+      "acctCode": "6603010200",
+      "center": "财务",
+      "subjectPath": [
+        "财务费用",
+        "利息支出",
+        "贴现利息支出"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "拆借利息",
+      "acctCode": "6603010300",
+      "center": "财务",
+      "subjectPath": [
+        "财务费用",
+        "利息支出",
+        "拆借利息"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "财务费用-手续费",
+      "acctCode": "6603040100",
+      "center": "财务",
+      "subjectPath": [
+        "财务费用",
+        "手续费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "主营业务成本-履约成本-运输费（出口）",
+      "acctCode": "6401100000",
+      "center": "战略",
+      "subjectPath": [
+        "主营业务成本",
+        "履约成本",
+        "运输费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "主营业务成本-履约成本-运输费（内销）",
+      "acctCode": "6401100000",
+      "center": "战略",
+      "subjectPath": [
+        "主营业务成本",
+        "履约成本",
+        "运输费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "主营业务成本-履约保证金",
+      "acctCode": "6401070000",
+      "center": "安瑞",
+      "subjectPath": [
+        "主营业务成本",
+        "保证金"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "营业税金及附加-车船使用税",
+      "acctCode": "6405070000",
+      "center": "总办",
+      "subjectPath": [
+        "营业税金及附加",
+        "车船使用税"
+      ],
+      "method": "",
+      "logic": "较2025年实际费用下降5%"
+    },
+    {
+      "cat": "营业外支出-捐赠支出",
+      "acctCode": "6711050000",
+      "center": "总办",
+      "subjectPath": [
+        "营业外支出",
+        "捐赠支出"
+      ],
+      "method": "",
+      "logic": "按照实际费用预算"
+    },
+    {
+      "cat": "零星工程-气体管道一二次配工程",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-一二次配工程",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-动力工程",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-车间工程",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-生管工程",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-总办宿舍工程",
+      "acctCode": "6600010201",
+      "center": "战略",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "宿舍费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-总办食堂工程",
+      "acctCode": "6600010202",
+      "center": "战略",
+      "subjectPath": [
+        "人工",
+        "福利费用",
+        "食堂费用"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-总办环保工程",
+      "acctCode": "6600021200",
+      "center": "战略",
+      "subjectPath": [
+        "办公运营费",
+        "环保及绿化费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-总办安全生产工程",
+      "acctCode": "6600070100",
+      "center": "战略",
+      "subjectPath": [
+        "安全生产",
+        "安全生产费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-总办工程",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-IT工程",
+      "acctCode": "6600031500",
+      "center": "IT",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "零星工程-基建工程",
+      "acctCode": "6600031500",
+      "center": "基建",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "委外服务-拆装机费",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "设备维保-升级改造",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "设备维保-维修保养",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "设备维保-动力",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "泵类维保",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-马达",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-电源",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-射频",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "设备维修-PVD",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-磨具开槽",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-衬板喷砂熔射",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-电子电器类",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-冰水机",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-五金杂项",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-砂轮",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-工装类/切割刀类",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-石墨盘/铜盘/陶瓷盘",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "备件维修-针卡",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "自动化-升级改造",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "工时费用",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "大族维保费用",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "Bake炉年保",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "原子束曝光机年保",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "FIB年保",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    },
+    {
+      "cat": "其他年保",
+      "acctCode": "6600031500",
+      "center": "战略",
+      "subjectPath": [
+        "外部服务",
+        "修理费"
+      ],
+      "method": "",
+      "logic": ""
+    }
+  ]
+}

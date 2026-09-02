@@ -85,68 +85,143 @@ BM.renderBaseData = function (container, opts) {
   renderBody();
 };
 
+/* ---------- 4 级分类树渲染（E5，2026-09-02） ---------- */
+function flattenSubjectTree(tree) {
+  const out = [];
+  (function walk(ns) { (ns || []).forEach((n) => { out.push(n); walk(n.children || []); }); })(tree || []);
+  return out;
+}
+function subjectDescendantIds(tree, id) {
+  const flat = flattenSubjectTree(tree);
+  const node = flat.find((n) => n.id === id);
+  if (!node) return [];
+  return flattenSubjectTree(node.children || []).map((n) => n.id);
+}
+
+/* 渲染分类树（mode: "events" 叶子挂经济事项 | "subjects" 纯科目树） */
+function renderSubjectTree(container, tree, eventsBySubject, mode, canEdit, reloadBody) {
+  container.innerHTML = "";
+  if (!tree || !tree.length) {
+    container.innerHTML = `<div class="bd-empty">暂无分类数据</div>`;
+    return;
+  }
+
+  function buildEventRow(ev, depth) {
+    const row = el("div", "bd-event-row");
+    row.style.paddingLeft = (12 + depth * 22) + "px";
+    row.appendChild(el("span", "bd-event-name", esc(ev.cat)));
+    row.appendChild(el("span", "bd-event-center", esc(ev.center || "—")));
+    row.appendChild(el("span", "bd-event-method", esc(methodLabel(ev.method))));
+    if (ev.amount != null && ev.amount > 0) row.appendChild(el("span", "bd-event-amount", money(ev.amount)));
+    const ops = el("span", "bd-tree-ops");
+    if (canEdit) {
+      const edit = el("button", "btn btn-ghost btn-sm", "编辑");
+      edit.addEventListener("click", () => openEventModal(ev, reloadBody));
+      const del = el("button", "btn btn-ghost btn-sm bd-del", "删除");
+      del.addEventListener("click", () => confirmDelete("经济事项", ev.cat, () => {
+        BM.apiSend("/api/events/" + ev.id, "DELETE")
+          .then(() => { BM.toast("✅ 已删除经济事项"); reloadBody(); })
+          .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "删除失败")));
+      }));
+      ops.appendChild(edit); ops.appendChild(del);
+    }
+    row.appendChild(ops);
+    return row;
+  }
+
+  function buildNode(node, depth) {
+    const hasChildren = !!(node.children && node.children.length);
+    const isLeaf = !hasChildren;
+    const collapsed = hasChildren && depth >= 2; // 默认展开 L1，L2+ 折叠
+    const nodeDiv = el("div", "bd-tree-node" + (isLeaf ? " leaf" : "") + (collapsed ? " collapsed" : ""));
+    const row = el("div", "bd-tree-row");
+    row.style.paddingLeft = (8 + (depth - 1) * 22) + "px";
+
+    const toggle = el("span", "bd-tree-toggle", hasChildren ? (collapsed ? "▸" : "▾") : "");
+    function toggleNode() {
+      nodeDiv.classList.toggle("collapsed");
+      toggle.textContent = nodeDiv.classList.contains("collapsed") ? "▸" : "▾";
+    }
+    if (hasChildren) {
+      toggle.addEventListener("click", (e) => { e.stopPropagation(); toggleNode(); });
+      row.addEventListener("click", () => toggleNode());
+    }
+
+    row.appendChild(toggle);
+    if (mode === "subjects" && node.code) row.appendChild(el("span", "bd-tree-code", esc(node.code)));
+    row.appendChild(el("span", "bd-tree-name", esc(node.name)));
+    if (mode === "subjects") row.appendChild(el("span", "bd-tree-level", "L" + (node.level || depth)));
+    const ops = el("span", "bd-tree-ops");
+    if (canEdit) {
+      const addChild = el("button", "btn btn-ghost btn-sm", "＋子分类");
+      addChild.addEventListener("click", (e) => { e.stopPropagation(); openSubjectModal(null, reloadBody, { forcedParentId: node.id }); });
+      ops.appendChild(addChild);
+      if (mode === "subjects") {
+        const edit = el("button", "btn btn-ghost btn-sm", "编辑");
+        edit.addEventListener("click", (e) => { e.stopPropagation(); openSubjectModal(node, reloadBody); });
+        const del = el("button", "btn btn-ghost btn-sm bd-del", "删除");
+        del.addEventListener("click", (e) => { e.stopPropagation(); confirmDelete("会计科目", node.name, () => {
+          BM.apiSend("/api/subjects/" + node.id, "DELETE")
+            .then(() => { BM.toast("✅ 已删除科目"); reloadBody(); })
+            .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "删除失败")));
+        }); });
+        ops.appendChild(edit); ops.appendChild(del);
+      }
+      if (mode === "events") {
+        const addEvent = el("button", "btn btn-ghost btn-sm", "＋事项");
+        addEvent.addEventListener("click", (e) => { e.stopPropagation(); openEventModal(null, reloadBody, node.id); });
+        ops.appendChild(addEvent);
+      }
+    }
+    row.appendChild(ops);
+    nodeDiv.appendChild(row);
+
+    const childWrap = el("div", "bd-tree-children");
+    if (hasChildren) {
+      node.children.forEach((c) => childWrap.appendChild(buildNode(c, depth + 1)));
+    }
+    if (mode === "events") {
+      const evs = eventsBySubject[node.id] || [];
+      evs.forEach((ev) => childWrap.appendChild(buildEventRow(ev, depth)));
+    }
+    nodeDiv.appendChild(childWrap);
+    return nodeDiv;
+  }
+
+  const root = el("div", "bd-tree");
+  tree.forEach((n) => root.appendChild(buildNode(n, 1)));
+  container.appendChild(root);
+}
+
 /* ---------- 经济事项 Tab ---------- */
 function renderEventsTab(body, canEdit) {
   body.innerHTML = "";
   const toolbar = el("div", "bd-toolbar");
   if (canEdit) {
     const add = el("button", "btn btn-primary", "＋ 新增经济事项");
-    add.addEventListener("click", () => {
-      Promise.all([BM.apiGet("/api/events"), BM.apiGet("/api/subjects")])
-        .then(([events, subjects]) => openEventModal(null, subjects, events, body))
-        .catch(() => BM.toast("加载失败，请稍后重试"));
-    });
+    add.addEventListener("click", () => openEventModal(null, body));
     toolbar.appendChild(add);
   }
   toolbar.appendChild(el("div", "bd-count", "加载中…"));
   body.appendChild(toolbar);
 
-  const wrap = el("div", "tbl-wrap");
-  wrap.innerHTML = `<table class="bd-table"><thead><tr>
-    <th>经济事项</th><th>会计科目</th><th>归口中心</th><th>编制方法</th><th class="bd-op">操作</th>
-  </tr></thead><tbody><tr><td colspan="5" class="bd-empty">加载中…</td></tr></tbody></table>`;
+  const wrap = el("div", "bd-tree-wrap");
+  wrap.innerHTML = `<div class="bd-empty">加载中…</div>`;
   body.appendChild(wrap);
 
   Promise.all([
+    BM.apiGet("/api/subjects?tree=1"),
     BM.apiGet("/api/events"),
-    BM.apiGet("/api/subjects"),
-  ]).then(([events, subjects]) => {
-    const subMap = {};
-    subjects.forEach((s) => (subMap[s.id] = s));
-    toolbar.querySelector(".bd-count").textContent = `共 ${events.length} 条经济事项`;
-    const tbody = wrap.querySelector("tbody");
-    if (!events.length) {
-      tbody.innerHTML = `<tr><td colspan="5" class="bd-empty">暂无经济事项</td></tr>`;
-      return;
-    }
-    tbody.innerHTML = "";
+  ]).then(([tree, events]) => {
+    const evsBySub = {};
     events.forEach((ev) => {
-      const sub = ev.subjectId != null ? subMap[ev.subjectId] : null;
-      const acct = sub ? `${esc(sub.code)} · ${esc(sub.name)}` : (ev.acctCode ? esc(ev.acctCode) : "—");
-      const tr = el("tr");
-      tr.innerHTML = `<td>${esc(ev.cat)}</td>
-        <td>${acct}</td>
-        <td>${esc(ev.center || "—")}</td>
-        <td>${esc(methodLabel(ev.method))}</td>
-        <td class="bd-op"></td>`;
-      const op = tr.querySelector(".bd-op");
-      if (canEdit) {
-        const edit = el("button", "btn btn-ghost btn-sm", "编辑");
-        edit.addEventListener("click", () => openEventModal(ev, subjects, events, body));
-        const del = el("button", "btn btn-ghost btn-sm bd-del", "删除");
-        del.addEventListener("click", () => confirmDelete("经济事项", ev.cat, () => {
-          BM.apiSend("/api/events/" + ev.id, "DELETE")
-            .then(() => { BM.toast("✅ 已删除经济事项"); renderEventsTab(body, canEdit); })
-            .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "删除失败")));
-        }));
-        op.appendChild(edit); op.appendChild(del);
-      } else {
-        op.textContent = "—";
-      }
-      tbody.appendChild(tr);
+      if (ev.subjectId != null) (evsBySub[ev.subjectId] = evsBySub[ev.subjectId] || []).push(ev);
     });
+    const subCount = flattenSubjectTree(tree).length;
+    toolbar.querySelector(".bd-count").textContent = `共 ${subCount} 个分类 · ${events.length} 条经济事项`;
+    renderSubjectTree(wrap, tree, evsBySub, "events", canEdit, () => renderEventsTab(body, canEdit));
   }).catch(() => {
-    wrap.querySelector("tbody").innerHTML = `<tr><td colspan="5" class="bd-empty">⚠️ 加载失败</td></tr>`;
+    wrap.innerHTML = `<div class="bd-empty">⚠️ 加载失败</div>`;
   });
 }
 
@@ -162,48 +237,18 @@ function renderSubjectsTab(body, canEdit) {
   toolbar.appendChild(el("div", "bd-count", "加载中…"));
   body.appendChild(toolbar);
 
-  const wrap = el("div", "tbl-wrap");
-  wrap.innerHTML = `<table class="bd-table"><thead><tr>
-    <th>科目编码</th><th>科目名称</th><th>类别</th><th>归口中心</th><th>编制方法</th><th class="bd-op">操作</th>
-  </tr></thead><tbody><tr><td colspan="5" class="bd-empty">加载中…</td></tr></tbody></table>`;
+  const wrap = el("div", "bd-tree-wrap");
+  wrap.innerHTML = `<div class="bd-empty">加载中…</div>`;
   body.appendChild(wrap);
 
-  BM.apiGet("/api/subjects")
-    .then((subjects) => {
-      toolbar.querySelector(".bd-count").textContent = `共 ${subjects.length} 个会计科目`;
-      const tbody = wrap.querySelector("tbody");
-      if (!subjects.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="bd-empty">暂无会计科目</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = "";
-      subjects.forEach((s) => {
-        const tr = el("tr");
-        tr.innerHTML = `<td class="tbl-num">${esc(s.code)}</td>
-          <td>${esc(s.name)}</td>
-          <td>${esc(s.cat || "—")}</td>
-          <td>${esc(s.center || "—")}</td>
-          <td>${esc(methodLabel(s.method))}</td>
-          <td class="bd-op"></td>`;
-        const op = tr.querySelector(".bd-op");
-        if (canEdit) {
-          const edit = el("button", "btn btn-ghost btn-sm", "编辑");
-          edit.addEventListener("click", () => openSubjectModal(s, body));
-          const del = el("button", "btn btn-ghost btn-sm bd-del", "删除");
-          del.addEventListener("click", () => confirmDelete("会计科目", s.code, () => {
-            BM.apiSend("/api/subjects/" + s.id, "DELETE")
-              .then(() => { BM.toast("✅ 已删除科目"); renderSubjectsTab(body, canEdit); })
-              .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "删除失败")));
-          }));
-          op.appendChild(edit); op.appendChild(del);
-        } else {
-          op.textContent = "—";
-        }
-        tbody.appendChild(tr);
-      });
+  BM.apiGet("/api/subjects?tree=1")
+    .then((tree) => {
+      const subCount = flattenSubjectTree(tree).length;
+      toolbar.querySelector(".bd-count").textContent = `共 ${subCount} 个会计科目`;
+      renderSubjectTree(wrap, tree, {}, "subjects", canEdit, () => renderSubjectsTab(body, canEdit));
     })
     .catch(() => {
-      wrap.querySelector("tbody").innerHTML = `<tr><td colspan="5" class="bd-empty">⚠️ 加载失败</td></tr>`;
+      wrap.innerHTML = `<div class="bd-empty">⚠️ 加载失败</div>`;
     });
 }
 
@@ -236,14 +281,35 @@ function confirmDelete(kind, name, onYes) {
   m.body.querySelector("#bdYes").addEventListener("click", () => { m.close(); onYes(); });
 }
 
-/* ---------- 会计科目 表单 ---------- */
-function openSubjectModal(subject, reloadBody) {
+/* ---------- 会计科目 表单（级联父级，E5） ---------- */
+function openSubjectModal(subject, reloadBody, opts) {
+  opts = opts || {};
   const isEdit = !!subject;
   const m = openModal(isEdit ? "编辑会计科目" : "新增会计科目");
+  m.body.innerHTML = `<div class="bd-empty">加载科目树…</div>`;
+  BM.apiGet("/api/subjects?tree=1")
+    .then((tree) => fillSubjectModal(m, subject, tree, reloadBody, opts.forcedParentId))
+    .catch(() => { m.body.innerHTML = `<div class="bd-empty">⚠️ 加载失败</div>`; });
+}
+
+function fillSubjectModal(m, subject, tree, reloadBody, forcedParentId) {
+  const isEdit = !!subject;
   const s = subject || {};
+  const flat = flattenSubjectTree(tree);
+  /* 父级下拉：编辑时排除自身及后代（防环）；新增子级时默认父级=当前节点 */
+  const exclude = isEdit ? new Set([s.id].concat(subjectDescendantIds(tree, s.id))) : new Set();
+  const parentOpts = `<option value="">（无上级 / 根节点）</option>` + flat
+    .filter((o) => !exclude.has(o.id))
+    .map((o) => `<option value="${o.id}" ${isEdit && s.parentId != null && s.parentId === o.id ? "selected" : ""}>${esc(o.path || o.name)}</option>`)
+    .join("");
+  const defaultParent = isEdit
+    ? (s.parentId != null ? String(s.parentId) : "")
+    : (forcedParentId != null ? String(forcedParentId) : "");
   m.body.innerHTML = `
     <div class="bd-field"><label>科目编码 *</label><input class="bd-input" id="f_code" value="${esc(s.code || "")}" placeholder="如 6602.12"></div>
     <div class="bd-field"><label>科目名称</label><input class="bd-input" id="f_name" value="${esc(s.name || "")}"></div>
+    <div class="bd-field"><label>隶属上级（级联）</label><select class="bd-input" id="f_parent">${parentOpts}</select>
+      <div class="bd-hint">ⓘ 选择上级后，级别与完整路径由系统自动推导。</div></div>
     <div class="bd-field"><label>类别</label><input class="bd-input" id="f_cat" value="${esc(s.cat || "")}" placeholder="如 外部服务"></div>
     <div class="bd-field"><label>归口中心</label><input class="bd-input" id="f_center" value="${esc(s.center || "")}"></div>
     <div class="bd-field"><label>编制方法</label>${methodSelect(s.method)}
@@ -254,11 +320,15 @@ function openSubjectModal(subject, reloadBody) {
       <button class="btn btn-ghost" id="f_cancel">取消</button>
       <button class="btn btn-primary" id="f_save">${isEdit ? "保存" : "创建"}</button>
     </div>`;
+  const pSel = m.body.querySelector("#f_parent");
+  if (pSel && defaultParent !== "") pSel.value = defaultParent;
   m.body.querySelector("#f_cancel").addEventListener("click", m.close);
   m.body.querySelector("#f_save").addEventListener("click", () => {
+    const pv = m.body.querySelector("#f_parent").value;
     const payload = {
       code: m.body.querySelector("#f_code").value.trim(),
       name: m.body.querySelector("#f_name").value.trim(),
+      parentId: pv === "" ? null : Number(pv),
       cat: m.body.querySelector("#f_cat").value.trim(),
       center: m.body.querySelector("#f_center").value.trim(),
       method: m.body.querySelector("#bd_method").value,
@@ -266,22 +336,38 @@ function openSubjectModal(subject, reloadBody) {
     };
     if (!payload.code) { BM.toast("⛔ 科目编码不能为空"); return; }
     const url = isEdit ? "/api/subjects/" + s.id : "/api/subjects";
-    const method = isEdit ? "PUT" : "POST";
-    BM.apiSend(url, method, payload)
+    const httpMethod = isEdit ? "PUT" : "POST";
+    BM.apiSend(url, httpMethod, payload)
       .then(() => { m.close(); BM.toast(isEdit ? "✅ 已保存" : "✅ 已创建科目"); renderSubjectsTab(reloadBody, true); })
       .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "保存失败")));
   });
 }
 
-/* ---------- 经济事项 表单 ---------- */
-function openEventModal(event, subjects, events, reloadBody) {
+/* ---------- 经济事项 表单（叶子级联，E5） ---------- */
+function openEventModal(event, reloadBody, forcedSubjectId) {
   const isEdit = !!event;
   const m = openModal(isEdit ? "编辑经济事项" : "新增经济事项");
+  m.body.innerHTML = `<div class="bd-empty">加载科目树…</div>`;
+  BM.apiGet("/api/subjects?tree=1")
+    .then((tree) => fillEventModal(m, event, tree, reloadBody, forcedSubjectId))
+    .catch(() => { m.body.innerHTML = `<div class="bd-empty">⚠️ 加载失败</div>`; });
+}
+
+function fillEventModal(m, event, tree, reloadBody, forcedSubjectId) {
+  const isEdit = !!event;
   const e = event || {};
-  const subOpts = `<option value="">（未关联）</option>` + subjects.map((s) => `<option value="${s.id}" ${s.id === e.subjectId ? "selected" : ""}>${esc(s.code)} · ${esc(s.name)}</option>`).join("");
+  const preselect = isEdit ? e.subjectId : (forcedSubjectId != null ? forcedSubjectId : "");
+  /* 级联下拉：所有科目节点（含中间节点）均可挂载，optgroup 按 L1 分组，显示完整 path */
+  const groups = (tree || []).map((l1) =>
+    `<optgroup label="${esc(l1.path || l1.name)}">` +
+    flattenSubjectTree([l1]).map((n) =>
+      `<option value="${n.id}" ${n.id === preselect ? "selected" : ""}>${esc(n.path || n.name)}</option>`).join("") +
+    `</optgroup>`).join("");
+  const subOpts = `<option value="">（未关联）</option>` + groups;
   m.body.innerHTML = `
     <div class="bd-field"><label>经济事项名称 *</label><input class="bd-input" id="e_cat" value="${esc(e.cat || "")}" placeholder="如 食堂费用"></div>
-    <div class="bd-field"><label>关联会计科目</label><select class="bd-input" id="e_sub">${subOpts}</select></div>
+    <div class="bd-field"><label>关联会计科目（级联）</label><select class="bd-input" id="e_sub">${subOpts}</select>
+      <div class="bd-hint">ⓘ 列出所有科目节点（含中间节点），显示完整路径。</div></div>
     <div class="bd-field"><label>归口中心</label><input class="bd-input" id="e_center" value="${esc(e.center || "")}"></div>
     <div class="bd-field"><label>编制方法</label>${methodSelect(e.method)}</div>
     <div class="bd-hint">ⓘ 预算类金额（本年预算、上年预算、上年决算等）属业务数据，不在基础数据中维护，由编制 / 填报阶段另行生成。</div>
@@ -300,8 +386,8 @@ function openEventModal(event, subjects, events, reloadBody) {
     };
     if (!payload.cat) { BM.toast("⛔ 经济事项名称不能为空"); return; }
     const url = isEdit ? "/api/events/" + e.id : "/api/events";
-    const method = isEdit ? "PUT" : "POST";
-    BM.apiSend(url, method, payload)
+    const httpMethod = isEdit ? "PUT" : "POST";
+    BM.apiSend(url, httpMethod, payload)
       .then(() => { m.close(); BM.toast(isEdit ? "✅ 已保存" : "✅ 已创建经济事项"); renderEventsTab(reloadBody, true); })
       .catch((d) => BM.toast("⛔ " + (d && d.error ? d.error : "保存失败")));
   });

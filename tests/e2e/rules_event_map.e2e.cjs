@@ -125,7 +125,7 @@ async function login(page, username, password) {
 
   console.log("RESULT", JSON.stringify(res, null, 0));
   ok(!res.err, "无运行时错误" + (res.err ? " => " + res.err : ""));
-  ok(/预算规则管理/.test(res.title || ""), "页面标题含「预算规则管理」=> " + (res.title || ""));
+  ok(/预算规划/.test(res.title || ""), "页面标题含「预算规划」=> " + (res.title || ""));
   ok(res.scopeCards > 0, "Tab1 规则卡渲染 " + res.scopeCards + " 张");
   ok(res.explain, "Tab1 点卡显示解释区");
   ok(res.flow > 0, "Tab1 财务流程规则 " + res.flow + " 项");
@@ -133,13 +133,13 @@ async function login(page, username, password) {
   ok(res.activeDelDisabled, "Tab2 active 行删除按钮已禁用（守卫）");
   ok(res.evtMap, "Tab3 .evt-map 渲染");
   ok(res.evtCards > 0, "Tab3 左侧规则卡 " + res.evtCards + " 张");
-  ok(res.checks === 60, "Tab3 科目勾选 " + res.checks + "（预期 60）");
+  ok(res.checks === 206, "Tab3 科目勾选 " + res.checks + "（预期 206）");
   ok(res.evtVerSel, "Tab3 版本切换器（.evt-ver-sel）存在");
   ok(res.evtVerOpts >= 1, "Tab3 版本切换器含 " + (res.evtVerOpts || 0) + " 个版本选项");
   ok(res.evtToolbar, "Tab3 工具栏（.evt-toolbar）渲染");
   ok(res.evtToolbarSave, "Tab3 工具栏内含保存按钮（.btn-accent）");
   ok(/v20\d{2}/.test(res.evtRvTitle || ""), "Tab3 头卡 .rv-title 显示版本号 => " + (res.evtRvTitle || ""));
-  ok(res.evtCurInfo, "Tab3 右侧当前规则信息面板（.evt-cur-info）渲染");
+  ok(!res.evtCurInfo, "Tab3 右侧当前规则信息面板（.evt-cur-info）已移除（新布局不渲染）");
   ok(res.evtFirstCardHasBadge, "Tab3 规则卡显示弹性分类徽章（.sc-badge）");
   ok(res.evtFirstCardKeyIsName, "Tab3 规则卡显示规则名（非代码）=> " + (res.evtFirstCardKey || ""));
   ok(res.savedNonEmpty >= 1 && res.savedSample[0] >= 2, "Tab3 保存持久化（按 active 版本往返）=> " + JSON.stringify(res.savedSample));

@@ -64,7 +64,7 @@ async function navTo(page, label) {
   }, { timeout: 8000 });
   const evCount = await page.$eval(".bd-count", (e) => e.textContent.trim());
   const evLoadFail = await page.$eval(".bd-body", (e) => e.textContent.includes("加载失败"));
-  const evRows = await page.$$eval(".bd-table tbody tr", (els) => els.length);
+  const evRows = await page.$$eval(".bd-event-row", (els) => els.length);
   ok(!evLoadFail, `经济事项列表加载成功（无「加载失败」），${evCount}，行数 ${evRows}`);
   ok(evRows > 0, "经济事项列表有数据");
 
@@ -74,21 +74,27 @@ async function navTo(page, label) {
   await page.waitForSelector("#e_cat", { timeout: 5000 });
   ok(true, "「＋ 新增经济事项」弹窗打开（/api/events+/api/subjects 已加载）");
   await page.fill("#e_cat", evName);
+  // 4 级树：未选科目的事件 subjectId=null 不会挂在任何节点下，须选一个科目节点使其出现在树中
+  await page.evaluate(() => {
+    const sel = document.querySelector("#e_sub");
+    const first = Array.from(sel.options).find((o) => o.value !== "");
+    if (first) sel.value = first.value;
+  });
   await page.click("#e_save");
   await page.waitForFunction((nm) =>
-    Array.from(document.querySelectorAll(".bd-table tbody tr td:first-child")).some((t) => t.textContent.trim() === nm),
+    Array.from(document.querySelectorAll(".bd-event-row .bd-event-name")).some((t) => t.textContent.trim() === nm),
     evName, { timeout: 8000 });
   ok(true, `新建经济事项「${evName}」列表已出现`);
   // 删除
   await page.evaluate((nm) => {
-    const row = Array.from(document.querySelectorAll(".bd-table tbody tr"))
-      .find((r) => r.querySelector("td") && r.querySelector("td").textContent.trim() === nm);
+    const row = Array.from(document.querySelectorAll(".bd-event-row"))
+      .find((r) => { const n = r.querySelector(".bd-event-name"); return n && n.textContent.trim() === nm; });
     if (row) row.querySelector(".bd-del").click();
   }, evName);
   await page.waitForSelector("#bdYes", { timeout: 5000 });
   await page.click("#bdYes");
   await page.waitForFunction((nm) =>
-    !Array.from(document.querySelectorAll(".bd-table tbody tr td:first-child")).some((t) => t.textContent.trim() === nm),
+    !Array.from(document.querySelectorAll(".bd-event-row .bd-event-name")).some((t) => t.textContent.trim() === nm),
     evName, { timeout: 8000 });
   ok(true, "测试经济事项已删除（还原）");
 
@@ -99,9 +105,9 @@ async function navTo(page, label) {
     return c && /科目/.test(c.textContent);
   }, { timeout: 8000 });
   const subLoadFail = await page.$eval(".bd-body", (e) => e.textContent.includes("加载失败"));
-  const subRows = await page.$$eval(".bd-table tbody tr", (els) => els.length);
+  const subRows = await page.$$eval(".bd-tree-node", (els) => els.length);
   ok(!subLoadFail, "会计科目列表加载成功");
-  ok(subRows > 0, `会计科目列表有数据（${subRows} 行）`);
+  ok(subRows > 0, `会计科目树加载（${subRows} 个节点）`);
 
   const subCode = "9" + Date.now().toString().slice(-8);
   const subName = "回归测试科目" + Date.now().toString().slice(-4);
@@ -111,18 +117,18 @@ async function navTo(page, label) {
   await page.fill("#f_name", subName);
   await page.click("#f_save");
   await page.waitForFunction((nm) =>
-    Array.from(document.querySelectorAll(".bd-table tbody tr td:nth-child(2)")).some((t) => t.textContent.trim() === nm),
+    Array.from(document.querySelectorAll(".bd-tree-name")).some((t) => t.textContent.trim() === nm),
     subName, { timeout: 8000 });
-  ok(true, `新建科目「${subCode}/${subName}」列表已出现`);
+  ok(true, `新建科目「${subCode}/${subName}」树中已出现`);
   await page.evaluate((nm) => {
-    const row = Array.from(document.querySelectorAll(".bd-table tbody tr"))
-      .find((r) => r.querySelector("td:nth-child(2)") && r.querySelector("td:nth-child(2)").textContent.trim() === nm);
-    if (row) row.querySelector(".bd-del").click();
+    const node = Array.from(document.querySelectorAll(".bd-tree-node"))
+      .find((r) => { const n = r.querySelector(".bd-tree-name"); return n && n.textContent.trim() === nm; });
+    if (node) node.querySelector(".bd-del").click();
   }, subName);
   await page.waitForSelector("#bdYes", { timeout: 5000 });
   await page.click("#bdYes");
   await page.waitForFunction((nm) =>
-    !Array.from(document.querySelectorAll(".bd-table tbody tr td:nth-child(2)")).some((t) => t.textContent.trim() === nm),
+    !Array.from(document.querySelectorAll(".bd-tree-name")).some((t) => t.textContent.trim() === nm),
     subName, { timeout: 8000 });
   ok(true, "测试科目已删除（还原）");
 

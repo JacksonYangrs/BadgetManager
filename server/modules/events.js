@@ -3,6 +3,11 @@ const { decomposeMonthly } = require("../pure-calc");
 const { aiSuggestion } = require("./ai-budget-decision");
 const { getSubject } = require("./subjects");
 const { compileBaseline } = require("./rules");
+const fs = require("fs");
+const path = require("path");
+
+/* 与 subjects.seedSubjectTree 共用同一份 seed（叶子经济事项段） */
+const SUBJECT_SEED_FILE = path.join(__dirname, "..", "seeds", "subject-tree.json");
 
 const SEEDS = [
   { cat: "总办办公费", acct_code: "6602.11", type: "down5",   last_budget: 1320000, last_year: 1200000, method: "manageStd" },
@@ -125,6 +130,38 @@ function deleteEvent(db, id) {
   return { ok: true, id };
 }
 
+/* 幂等 seed：叶子经济事项（最细费用类型）写入 economic_event，subject_id 挂到 4 级树叶子节点。
+ * 可重复执行不重复插入（cat 唯一）。须在 subjects.seedSubjectTree 之后调用（依赖树节点 id）。 */
+function seedEventLeaves(db) {
+  let data;
+  try {
+    data = JSON.parse(fs.readFileSync(SUBJECT_SEED_FILE, "utf-8"));
+  } catch (e) {
+    return { error: "seed 文件缺失或非法: " + SUBJECT_SEED_FILE };
+  }
+  const events = data.events || [];
+  if (!events.length) return { error: "seed events 为空" };
+
+  const findSub = db.prepare("SELECT id FROM account_subject WHERE code = ?");
+  const ins = db.prepare(
+    "INSERT OR IGNORE INTO economic_event (cat, acct_code, center, amount, monthly, last_budget, last_year, method, ai, sort_no, subject_id) VALUES (?, ?, ?, 0, ?, NULL, NULL, ?, NULL, ?, ?)"
+  );
+  let inserted = 0;
+  let unmounted = 0;
+  events.forEach((e, i) => {
+    const pathKey = Array.isArray(e.subjectPath) ? e.subjectPath.join("/") : e.subjectPath;
+    const sub = findSub.get(pathKey);
+    if (!sub) { unmounted++; return; }
+    const r = ins.run(
+      e.cat, e.acctCode || null, e.center || null,
+      JSON.stringify(decomposeMonthly(0)),
+      e.method || null, i, sub.id
+    );
+    if (r.changes) inserted++;
+  });
+  return { ok: true, events: events.length, inserted, unmounted };
+}
+
 /* 种子：首次初始化时把样例经济事项写入（RULE_FACTORS 此时尚未加载，走硬编码因子口径） */
 function seedEvents(db) {
   const count = db.prepare("SELECT COUNT(*) AS c FROM economic_event").get().c;
@@ -146,6 +183,7 @@ module.exports = {
   getEvent,
   listEvents,
   rowToEvent,
+  seedEventLeaves,
   seedEvents,
   updateAmount,
   updateEvent,

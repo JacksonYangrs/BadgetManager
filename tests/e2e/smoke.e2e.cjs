@@ -11,11 +11,14 @@ const puppeteer = (() => { try { return require("puppeteer"); } catch { return n
 const http = require("http");
 const { spawn } = require("child_process");
 const path = require("path");
+const os = require("os");
+const fs = require("fs");
 
 const PORT = Number(process.env.E2E_PORT || 8401);
 const BASE = process.env.E2E_BASE || "http://127.0.0.1:" + PORT;
 const NODE = process.execPath;
 const SERVER = path.resolve(__dirname, "../../server/server.js");
+const DB_FILE = path.join(os.tmpdir(), "smoke-e2e-" + Date.now() + ".db");
 
 function get(p) {
   return new Promise((res, rej) => {
@@ -33,9 +36,9 @@ function get(p) {
     process.exit(0);
   }
 
-  /* 自启后端 */
+  /* 自启后端（独立 DB_FILE，避免 SQLITE_BUSY / 污染开发库） */
   const child = spawn(NODE, ["--experimental-sqlite", SERVER], {
-    env: Object.assign({}, process.env, { PORT: String(PORT) }),
+    env: Object.assign({}, process.env, { PORT: String(PORT), DB_FILE }),
     stdio: ["ignore", "ignore", "ignore"],
   });
   let healthy = false;
@@ -83,15 +86,19 @@ function get(p) {
       assert.ok(views.includes("basedata"), "缺少 basedata（P2a 修复未完成）");
     });
 
-    /* B) 前端分解 ≡ 后端 API 月度分布（实时跨端合同，写后还原） */
+    /* B) 前端分解 ≡ 后端 API 月度分布（实时跨端合同，写后还原；裸 fetch 补认证 token） */
     const cmp = await page.evaluate(async () => {
       const amount = 9876543;
       const fe = BM.calc.decomposeMonthly(amount);
-      const list = await fetch("/api/events").then((r) => r.json());
+      const token = BM.state.token;
+      const h = { Authorization: "Bearer " + token };
+      const list = await fetch("/api/events", { headers: h }).then((r) => r.json());
+      if (!Array.isArray(list) || !list[0]) throw new Error("events 列表为空或无数据");
       const id = list[0].id, orig = list[0].amount;
-      await fetch("/api/events/" + id + "/amount", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount }) });
-      const after = await fetch("/api/events/" + id).then((r) => r.json());
-      await fetch("/api/events/" + id + "/amount", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ amount: orig }) });
+      const putH = Object.assign({ "Content-Type": "application/json" }, h);
+      await fetch("/api/events/" + id + "/amount", { method: "PUT", headers: putH, body: JSON.stringify({ amount }) });
+      const after = await fetch("/api/events/" + id, { headers: h }).then((r) => r.json());
+      await fetch("/api/events/" + id + "/amount", { method: "PUT", headers: putH, body: JSON.stringify({ amount: orig }) });
       return { fe, be: after.monthly, sum: after.monthly.reduce((a, b) => a + b, 0) };
     });
     await check("前端 decomposeMonthly ≡ 后端 API 月度分布", () => {
@@ -106,6 +113,7 @@ function get(p) {
   } finally {
     if (browser) await browser.close();
     try { child.kill("SIGKILL"); } catch {}
+    try { fs.unlinkSync(DB_FILE); } catch (_) {}
   }
 
   console.log("\nE2E 关键路径：" + passed + " 通过 / " + failed + " 失败");

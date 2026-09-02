@@ -75,12 +75,18 @@ function init() {
       sort_no INTEGER
     );
   `);
+  try { db.exec("ALTER TABLE account_subject ADD COLUMN level INTEGER"); } catch (e) {}
+  try { db.exec("ALTER TABLE account_subject ADD COLUMN path TEXT"); } catch (e) {}
 
   /* 经济事项种子（RULE_FACTORS 此时尚未加载，走硬编码因子口径） */
   events.seedEvents(db);
 
-  /* 会计科目主数据迁移 + 回填 subject_id */
+  /* 会计科目主数据迁移 + 回填 subject_id（含旧平铺科目 level/path 补齐） */
   subjects.migrateSubjects(db);
+
+  /* 4 级分类树 seed（account_subject 建 parent_id/level/path）+ 叶子经济事项挂载（economic_event.subject_id 挂叶子） */
+  subjects.seedSubjectTree(db);
+  events.seedEventLeaves(db);
 
   /* 预算规则版本化（D4）+ 加载 active 因子（驱动基线计算） */
   rules.migrateRuleVersions(db);

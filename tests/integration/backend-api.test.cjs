@@ -88,6 +88,43 @@ function waitHealth(tries) {
       assert.strictEqual(r.status, 200);
       assert.ok(Array.isArray(r.body));
     });
+    /* ---------- 4 级分类树回归：/api/subjects?tree=1 + 平铺 level/path + events subjectId ---------- */
+    await check("GET /api/subjects?tree=1 → 200 树结构（含 children 嵌套）", async () => {
+      const r = await req("GET", "/api/subjects?tree=1", token ? { authorization: "Bearer " + token } : {});
+      assert.strictEqual(r.status, 200);
+      assert.ok(Array.isArray(r.body), "tree 应为数组");
+      assert.ok(r.body.length > 0, "树根非空");
+      assert.ok(r.body.some((n) => Array.isArray(n.children) && n.children.length > 0), "至少一个根节点含 children 嵌套");
+      const flat = [];
+      (function walk(ns) { ns.forEach((n) => { flat.push(n); walk(n.children || []); }); })(r.body);
+      assert.ok(flat.length > 0, "扁平化节点数 > 0");
+      assert.ok(flat.filter((n) => !(n.children && n.children.length)).length > 0, "存在叶子节点");
+    });
+
+    await check("GET /api/subjects 平铺 → 含 level/path/parentId（向后兼容，无 children 嵌套）", async () => {
+      const r = await req("GET", "/api/subjects", token ? { authorization: "Bearer " + token } : {});
+      assert.strictEqual(r.status, 200);
+      assert.ok(Array.isArray(r.body) && r.body.length > 0);
+      const s = r.body[0];
+      for (const k of ["id", "code", "name", "cat", "center", "method", "controlLogic", "parentId", "sortNo"]) {
+        assert.ok(k in s, "平铺旧字段缺失: " + k);
+      }
+      assert.ok("level" in s, "平铺应含 level");
+      assert.ok("path" in s, "平铺应含 path");
+      assert.ok(!("children" in s), "平铺不应嵌套 children");
+      for (const lv of new Set(r.body.map((x) => x.level))) {
+        assert.ok([1, 2, 3, 4].includes(lv), "非法 level " + lv);
+      }
+    });
+
+    await check("GET /api/events 平铺 → 含 subjectId（叶子挂载不破坏）", async () => {
+      const r = await req("GET", "/api/events", token ? { authorization: "Bearer " + token } : {});
+      assert.strictEqual(r.status, 200);
+      assert.ok(Array.isArray(r.body) && r.body.length > 0);
+      assert.ok("subjectId" in r.body[0], "event 应含 subjectId");
+      assert.ok(r.body.filter((e) => e.subjectId != null).length >= 300, "挂载 subjectId 的事件应 >= 300");
+    });
+
     await check("GET /api/roles → 9 个标准角色，无旧角色", async () => {
       const r = await req("GET", "/api/roles", token ? { authorization: "Bearer " + token } : {});
       assert.strictEqual(r.status, 200);
