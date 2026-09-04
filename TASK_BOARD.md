@@ -60,6 +60,6 @@
 
 1. **O1**：2 家公司 BU 推断纠偏（2170/2160 错归 BU-09 光通讯）。
 2. **O2**：预算执行数据录入 UI（`PUT /api/executions` 后端已有，前端表单待补）。
-3. **测试卫生遗留**：`tests/e2e/p02_fetch_convergence_regression.e2e.cjs:72` 新增经济事项后不清理且连开发库（共享 8300），会污染开发库留 `subject_id=null` 残留；应改为独立 DB_FILE + 用例后清理。
+3. ~~测试卫生遗留~~ ✅ **已修复（v1.5.2）**：`p02_fetch_convergence_regression.e2e.cjs` 原连开发库（共享 8300）跑写操作会污染真实数据 + 潜在 SQLITE_BUSY；已改为自启独立后端（端口 8403 + 独立临时 DB_FILE，模式同 role-convergence），35/0 全绿，开发库零污染。
 
 **⚠️ 系统性隐患（建议后续排期）**：各视图是经典 `<script>`（非 module），顶层 `function` 声明会污染全局，`index.html` 后加载的文件覆盖先加载的同名函数。本次 `renderEventsTab` 冲突已用 IIFE 修掉；`el`/`esc`/`companyName` 等同名是逻辑一致的副本（无害）。但同类地雷仍可能在其他视图间出现——建议统一把视图文件改为 IIFE 包裹或 ES Module，从根上消除全局污染。

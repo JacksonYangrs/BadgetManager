@@ -6,7 +6,18 @@
  * 写操作均「新建→验证→删除/停用」还原。
  * ================================================================ */
 const { chromium } = require("/Users/yangjackson/.workbuddy/binaries/node/workspace/node_modules/playwright");
-const BASE = "http://localhost:8300";
+const http = require("http");
+const { spawn } = require("child_process");
+const path = require("path");
+const os = require("os");
+
+/* 独立临时库 + 自启后端：避免连开发库（8300）跑写操作污染真实数据 + SQLITE_BUSY。
+ * 模式同 tests/e2e/role-convergence.e2e.cjs（2026-09-04 修复测试卫生）。 */
+const PORT = Number(process.env.E2E_PORT || 8403);
+const BASE = process.env.E2E_BASE || "http://127.0.0.1:" + PORT;
+const NODE = process.execPath;
+const SERVER = path.resolve(__dirname, "../../server/server.js");
+const DB_FILE = process.env.E2E_DB_FILE || path.join(os.tmpdir(), "badget-p02-e2e-" + Date.now() + ".db");
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -36,7 +47,30 @@ async function navTo(page, label) {
 }
 
 /* ================================================================ */
+let child = null;
 (async () => {
+  /* 自启后端（独立临时 DB），健康检查，结束统一回收 */
+  child = spawn(NODE, ["--experimental-sqlite", SERVER], {
+    env: Object.assign({}, process.env, { PORT: String(PORT), DB_FILE }),
+    stdio: ["ignore", "ignore", "ignore"],
+  });
+  let healthy = false;
+  for (let i = 0; i < 60; i++) {
+    try {
+      await new Promise((res, rej) => {
+        const r = http.get(BASE + "/api/health", (x) => { x.resume(); x.on("end", res); });
+        r.on("error", rej);
+      });
+      healthy = true; break;
+    } catch (e) {}
+    await new Promise((r) => setTimeout(r, 300));
+  }
+  if (!healthy) {
+    console.log("⚠️  SKIP E2E：独立后端启动失败（DB_FILE=" + DB_FILE + "）");
+    try { child.kill("SIGKILL"); } catch {}
+    process.exit(0);
+  }
+
   const browser = await chromium.launch({ headless: true });
 
   /* ---------- 桌面主页面 ---------- */
@@ -326,8 +360,15 @@ async function navTo(page, label) {
 
   await page.screenshot({ path: "output/e2e/p02_regression.png", fullPage: false }).catch(() => {});
   await browser.close();
+  try { child.kill("SIGKILL"); } catch {}
+  try { require("fs").unlinkSync(DB_FILE); } catch {}
 
   console.log("\n=== 结果：" + pass + " 通过 / " + fail + " 失败 ===");
   if (fails.length) console.log("失败项：\n" + fails.map((f, i) => "  " + (i + 1) + ". " + f).join("\n"));
   process.exit(fail === 0 ? 0 : 1);
-})().catch((e) => { console.log("FATAL", e.message); process.exit(2); });
+})().catch((e) => {
+  try { if (child) child.kill("SIGKILL"); } catch {}
+  try { require("fs").unlinkSync(DB_FILE); } catch {}
+  console.log("FATAL", e.message);
+  process.exit(2);
+});
