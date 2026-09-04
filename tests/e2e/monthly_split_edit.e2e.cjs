@@ -14,7 +14,7 @@ function ok(c, m) { if (c) { pass++; console.log("  ✓ " + m); } else { fail++;
   await page.fill(".login-form input[type=password]", "Admin@2026");
   await page.click(".login-submit");
   await page.waitForSelector("#quicknav", { timeout: 8000 });
-  await page.click("#quicknav .qn-btn:has-text(\"新预算编制\")");
+  await page.click("#quicknav .qn-btn:has-text(\"预算编制\")");
   await page.waitForSelector(".cmp-apply", { timeout: 8000 });
 
   // 进第一个事项的月度分解

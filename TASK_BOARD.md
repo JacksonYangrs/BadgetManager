@@ -65,8 +65,9 @@
 
 **⚠️ 系统性隐患（已于 v1.5.3 闭环）**：各视图是经典 `<script>`（非 module），顶层 `function` 声明会污染全局，`index.html` 后加载的文件覆盖先加载的同名函数。本次 `renderEventsTab` 冲突已用 IIFE 修掉。**2026-09-04 已按方案 A 把 3 个上帝文件（data/state/plan）拆分 + dashboard IIFE 隔离，从根上消除全局污染**（见 M19）。剩余：`app.js` 及部分小视图仍是顶层裸函数，可后续随 ES Module 迁移一并收编。
 
-**🔧 4 个陈旧 E2E（2026-09-04 发现，非拆分引入，属 08-23/24 导航收敛遗留，待修）**：
-1. `compile_dynamic_advice.e2e.cjs` — stale 导航选择器「新预算编制」→ 现为「预算编制」。
-2. `kanban_restructure.e2e.cjs` — stale 导航「预算看板」→ 现为「预算跟踪」。
-3. `rules_grouping.e2e.cjs` — 注入 token 后未设 `BM.state.loggedIn=true`，`openView('rules')` 提前返回，`.rule-group` 永不出现。
-4. `create_next_rule.e2e.cjs` — stale 标题断言「预算规则管理」→ 现为「预算规划」（18 通过 / 1 失败）。
+**🔧 陈旧 E2E 清理（v1.5.4 已修导航标签/标题/登录流；3 个仍残留更深陈旧，待后续专项）**：
+- ✅ 已修（v1.5.4）：`compile_dynamic_advice` / `monthly_split_edit`（stale 导航「新预算编制」→「预算编制」）；`kanban_restructure`（「预算看板」→「预算跟踪」）；`create_next_rule`（stale 标题「预算规则管理」→「预算规划」）；`rules_grouping`（改走登录表单 + `renderRules` 直调，弃用失效的 token 注入）。
+- ⏳ 仍残留（更深陈旧，非导航标签，属 08-23/24 + 09-02 特性变更，需专项核对当前正确断言）：
+  1. `compile_dynamic_advice` — 断言已移除的「⚖️ 上级平衡预览」按钮（compile.js 现 0 处）。
+  2. `kanban_restructure` — 断言已移除的 `buHead` 角色（14 角色收敛后无此角色，需改断言到现行角色）。
+  3. `monthly_split_edit` — 拖拽分隔线 / 手动调整金额断言（1 月金额恒 0，疑似 Playwright 拖拽模拟 + 数据初始化问题）。

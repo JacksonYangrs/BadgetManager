@@ -151,7 +151,7 @@ async function login(page, username, password) {
 
   console.log("RESULT", JSON.stringify(res, null, 0));
   ok(!res.err, "无运行时错误" + (res.err ? " => " + res.err : ""));
-  ok(/预算规则管理/.test(res.title || ""), "页面标题含「预算规则管理」=> " + (res.title || ""));
+  ok(/预算规划/.test(res.title || ""), "页面标题含「预算规划」=> " + (res.title || ""));
   ok(res.tab4, "Tab4 渲染（创建明年新规则）");
   ok(/2027/.test(res.targetYear || ""), "Tab4 目标年度显示 2027 => " + (res.targetYear || ""));
   ok(res.cnEx > 0 && /canteen|食堂/.test(res.cnExText), "② 抽取建议含 canteen（食堂）=> " + res.cnEx + " 条");

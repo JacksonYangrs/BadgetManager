@@ -13,7 +13,7 @@ function ok(c, m) { if (c) { pass++; console.log("  ✓ " + m); } else { fail++;
   await page.fill(".login-form input[type=password]", "Admin@2026");
   await page.click(".login-submit");
   await page.waitForSelector("#quicknav", { timeout: 8000 });
-  await page.click("#quicknav .qn-btn:has-text(\"预算看板\")");
+  await page.click("#quicknav .qn-btn:has-text(\"预算跟踪\")");
   await page.waitForSelector(".kb-box", { timeout: 8000 });
   await page.waitForTimeout(900); // 等组织树 + 首屏真实数据异步加载
 
@@ -90,7 +90,7 @@ function ok(c, m) { if (c) { pass++; console.log("  ✓ " + m); } else { fail++;
   await page.fill(".login-form input[type=password]", "Admin@2026");
   await page.click(".login-submit");
   await page.waitForSelector("#quicknav", { timeout: 8000 });
-  await page.click("#quicknav .qn-btn:has-text(\"预算看板\")");
+  await page.click("#quicknav .qn-btn:has-text(\"预算跟踪\")");
   await page.waitForSelector(".kb-box", { timeout: 8000 });
   await page.waitForTimeout(1000);
   const scopeTxt = await page.$eval(".kb-scope-text", (e) => e.textContent);

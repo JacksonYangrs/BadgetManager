@@ -20,20 +20,15 @@ function check(name, cond, detail) {
   const pageErrors = [];
   page.on("pageerror", (e) => pageErrors.push(String(e)));
 
-  await page.goto(BASE + "/?as=admin", { waitUntil: "networkidle" });
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  await page.waitForSelector(".login-form input[type=text]", { timeout: 8000 });
+  await page.fill(".login-form input[type=text]", "admin");
+  await page.fill(".login-form input[type=password]", "Admin@2026");
+  await page.click(".login-submit");
+  await page.waitForSelector("div.workbench", { timeout: 8000 });
 
-  // 登录 admin，注入 token（renderRules 内 fetch 规则需鉴权）
-  await page.evaluate(async () => {
-    const r = await fetch("/api/auth/login", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: "admin", password: "Admin@2026" }),
-    });
-    const d = await r.json();
-    BM.state.token = d.token; BM.state.role = "admin";
-  });
-
-  // 打开预算规则视图（设 currentView='rules'，SPA 不再覆盖）
-  await page.evaluate(() => BM.openView("rules"));
+  // 打开预算规则视图（renderRules 内 fetch 规则需鉴权，登录后 token 已就绪）
+  await page.evaluate(() => BM.renderRules(document.getElementById("viewPanel")));
   await page.waitForSelector(".rule-group", { timeout: 8000 });
 
   const out = await page.evaluate(() => {

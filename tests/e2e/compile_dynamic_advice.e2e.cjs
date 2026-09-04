@@ -26,7 +26,7 @@ async function login(page, username, password) {
   console.log("【登录 + 进编制页】");
   await login(page, "admin", "Admin@2026");
   await page.waitForSelector("#quicknav", { timeout: 8000 });
-  await page.click("#quicknav .qn-btn:has-text(\"新预算编制\")");
+  await page.click("#quicknav .qn-btn:has-text(\"预算编制\")");
   await page.waitForSelector(".cmp-apply", { timeout: 8000 });
   ok(true, "编制页已加载，8 列填报表可见");
 
