@@ -169,7 +169,6 @@ BM.NAV_LABELS = {
   /* details 已移除（v0.6） */
   approval: "审批中心",
   decisions: "决策中心",
-  plan: "预算编制",
   track: "预算追踪",
   final: "决算",
   adjust: "预算调整",

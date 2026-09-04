@@ -11,7 +11,6 @@ const VIEWS = {
   details: BM.renderDetails,
   approval: BM.renderApproval,
   decisions: BM.renderDecisions,
-  plan: BM.renderPlan,
   track: BM.renderTrack,
   final: BM.renderFinal,
   projects: BM.renderProjects,
