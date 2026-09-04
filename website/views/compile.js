@@ -89,7 +89,8 @@ function persistAmount(r, amt) {
   if (BM.apiMode && r.id != null && Number.isFinite(Number(r.id))) {
     return BM.apiSend("/api/events/" + r.id + "/amount", "PUT", { amount: amt }).catch(() => {});
   }
-  BM.compileSaveSubject(r.cat, { method: ctrlMethod, amount: amt, monthly: BM.calc.decomposeMonthly(amt), reason: "" });
+  const existing = (BM.compileLoadDraft().items || {})[r.cat];
+  BM.compileSaveSubject(r.cat, { method: ctrlMethod, amount: amt, monthly: BM.calc.decomposeMonthly(amt), reason: (existing && existing.reason) || "" });
   return Promise.resolve();
 }
 
@@ -157,6 +158,7 @@ function renderCompile(container) {
       <th style="text-align:right">本年度预算值</th>
       <th style="text-align:right">上年预算</th><th style="text-align:right">上年决算</th><th>偏差</th>
       <th class="ai-suggest-th">AI 建议</th>
+      <th>编制理由</th>
       <th>月度拆分</th>
     </tr></thead>`;
     tbody = el("tbody");
@@ -165,7 +167,8 @@ function renderCompile(container) {
       const ctrlCtx = methodContext(r);
       ctrlCtx.method = ctrlMethod;
       const baseline = BM.calc.compileByMethod(ctrlCtx).amount;
-      const curAmount = r.amount != null ? r.amount : baseline;
+      const isAuto = ctrlMethod === "perCapita" || ctrlMethod === "volume"; /* RK4：规则自动分解类（松哥拍板=人均标准+业务量） */
+      const curAmount = isAuto ? baseline : (r.amount != null ? r.amount : baseline);
       const savedMonthly = r.monthly && r.monthly.length === 12 ? r.monthly : null;
 
       const tr = el("tr");
@@ -187,8 +190,19 @@ function renderCompile(container) {
       applySlider.max = String(maxAmt);
       applySlider.step = "10000";
       applySlider.value = curAmount;
+      if (isAuto) {
+        /* RK4：规则自动分解类（人均标准/业务量）——系统按规则算好预算，锁定手填 */
+        applyInput.disabled = true;
+        applySlider.disabled = true;
+        applyWrap.classList.add("cmp-auto");
+      }
       applyWrap.appendChild(applySlider);
       applyWrap.appendChild(applyInput);
+      if (isAuto) {
+        const autoNote = BM.calc.compileByMethod(ctrlCtx).note || "规则自动分解";
+        applyWrap.appendChild(el("div", "cmp-auto-badge", "⚙ 自动分解"));
+        applyWrap.appendChild(el("div", "cmp-auto-note", esc(autoNote)));
+      }
       applyTd.appendChild(applyWrap);
       tr.appendChild(applyTd);
 
@@ -246,6 +260,17 @@ function renderCompile(container) {
         aiTd.appendChild(adviceBtn);
       }
       tr.appendChild(aiTd);
+      /* 编制理由列（REQ-003）：行内可编辑，落既有 items[cat].reason（compile.js 已预留字段，无需改数据模型） */
+      const reasonTd = el("td", "cmp-reason-td");
+      const reasonInput = el("textarea", "cmp-reason-input");
+      reasonInput.rows = 1;
+      reasonInput.placeholder = "填写编制理由（与 AI 建议并列参考）";
+      reasonInput.value = (((draft.items || {})[r.cat]) && draft.items[r.cat].reason) || "";
+      reasonInput.addEventListener("input", () => {
+        BM.compileSaveSubject(r.cat, { method: ctrlMethod, amount: curAmount, reason: reasonInput.value.trim() });
+      });
+      reasonTd.appendChild(reasonInput);
+      tr.appendChild(reasonTd);
       tr.appendChild(monthTd);
 
       /* 独立弹层：遮罩 + 居中卡片（默认隐藏，点击 💡 打开） */
@@ -431,8 +456,10 @@ function renderCompile(container) {
       if (!apply) return;
       const amt = parseInt(apply.value, 10) || 0;
       const ctrl = BM.CTRL_METHOD_ASSIGN[cat] || "history"; /* 预算控制方法由上级定义，随行记录但不可改 */
+      const reasonEl = row.querySelector(".cmp-reason-input");
+      const reason = reasonEl ? reasonEl.value.trim() : "";
       const saved = (draft.monthly && draft.monthly[cat]) || null;
-      items[cat] = { amount: amt, reason: "", method: ctrl };
+      items[cat] = { amount: amt, reason: reason, method: ctrl };
       monthly[cat] = saved && saved.length === 12 ? saved.slice() : BM.calc.decomposeMonthly(amt);
       method[cat] = ctrl;
     });

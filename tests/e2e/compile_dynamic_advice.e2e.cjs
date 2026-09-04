@@ -55,15 +55,9 @@ async function login(page, username, password) {
   await page.evaluate(() => document.querySelectorAll(".advice-overlay").forEach((o) => (o.style.display = "none")));
   await page.waitForTimeout(200);
 
-  console.log("【C】⚖️ 上级平衡预览");
-  await page.click("button:has-text(\"⚖️ 上级平衡预览\")");
-  await page.waitForTimeout(400);
-  const balPanel = await page.$(".cmp-balance");
-  ok(!!balPanel, "平衡预览面板已展开");
-  const balText = balPanel ? await balPanel.innerText() : "";
-  ok(/弹性分类|平衡建议|偏高项/.test(balText), "面板含 弹性分类 / 平衡建议 / 偏高项");
-  ok(/刚性|半刚性|弹性|项目型/.test(balText), "含弹性类型分类标签");
-  await page.screenshot({ path: "output/e2e/compile_balance.png" });
+  console.log("【C】⚖️ 上级平衡预览（已移除）");
+  const balBtn = await page.$("button:has-text(\"⚖️ 上级平衡预览\")");
+  ok(!balBtn, "「⚖️ 上级平衡预览」按钮已移除（编制页收敛为两视角，松哥定稿）");
 
   await browser.close();
   console.log("\n=== 结果: " + pass + " 通过 / " + fail + " 失败 ===");

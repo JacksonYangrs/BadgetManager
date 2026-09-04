@@ -61,7 +61,13 @@ async function login(page, username, password) {
       await sleep(400);
       out.evtMap = !!document.querySelector(".evt-map");
       out.evtCards = document.querySelectorAll(".evt-cards .scope-card").length;
-      out.checks = document.querySelectorAll(".evt-list input[type=checkbox]").length;
+      out.checks = document.querySelectorAll(".evt-tree input[type=checkbox]").length;
+
+      // RK1 断言：绑定视角切换器 + 树形经济事项
+      out.evtModeSel = !!document.querySelector(".evt-mode-sel");
+      out.evtModeBtns = document.querySelectorAll(".evt-mode-btn").length;
+      out.evtTree = !!document.querySelector(".evt-tree");
+      out.evtTreeNodeCount = document.querySelectorAll(".evt-tree-node").length;
 
       // 版本切换器断言
       out.evtVerSel = !!document.querySelector(".evt-ver-sel");
@@ -84,7 +90,7 @@ async function login(page, username, password) {
 
       // 持久化：清空 → 勾选 → 保存 → GET 确认（按 active 版本往返）
       await fetch(`/api/rule-versions/${activeId}/event-map`, { method: "PUT", headers: { Authorization: "Bearer " + tok, "Content-Type": "application/json" }, body: "[]" });
-      const c0 = document.querySelectorAll(".evt-list input[type=checkbox]");
+      const c0 = document.querySelectorAll(".evt-tree input[type=checkbox]");
       if (c0[0]) c0[0].click();
       if (c0[1]) c0[1].click();
       const saveBtn = document.querySelector(".evt-toolbar .btn-accent");
@@ -106,6 +112,26 @@ async function login(page, username, password) {
           await sleep(400);
           out.verSwitchOk = (document.querySelector('[data-pane="events"] .rv-title') || {}).innerText.includes(otherOpt.textContent.split(" ")[0]);
         }
+      }
+
+      // RK1 模式②：切「事项 → 规则卡」，验证左右反转 + 反向勾选
+      const evBtn = Array.from(document.querySelectorAll(".evt-mode-btn")).find((b) => b.dataset.mode === "event");
+      if (evBtn) {
+        evBtn.click();
+        await sleep(300);
+        const panels = Array.from(document.querySelectorAll(".evt-map > .evt-panel"));
+        out.modeEventFirst = panels.length >= 2 && /经济事项/.test((panels[0].querySelector(".evt-panel-title") || {}).textContent || "");
+        out.evtCardChecks = document.querySelectorAll(".evt-card-check").length;
+        const firstRow = document.querySelector(".evt-tree-row");
+        if (firstRow) {
+          firstRow.click();
+          await sleep(200);
+          out.modeEventRowSelected = !!document.querySelector(".evt-tree-row.selected");
+          out.modeEventCounter = (document.querySelector(".evt-counter") || {}).textContent || "";
+        }
+        const cdBtn = Array.from(document.querySelectorAll(".evt-mode-btn")).find((b) => b.dataset.mode === "card");
+        if (cdBtn) cdBtn.click();
+        await sleep(200);
       }
 
       // 版本历史「查看」展开
@@ -134,6 +160,14 @@ async function login(page, username, password) {
   ok(res.evtMap, "Tab3 .evt-map 渲染");
   ok(res.evtCards > 0, "Tab3 左侧规则卡 " + res.evtCards + " 张");
   ok(res.checks === 146, "Tab3 科目勾选 " + res.checks + "（预期 146）");
+  ok(res.evtModeSel, "Tab3 绑定视角切换器（.evt-mode-sel）存在");
+  ok(res.evtModeBtns === 2, "Tab3 视角切换器含 2 个模式按钮 => " + res.evtModeBtns);
+  ok(res.evtTree, "Tab3 树形经济事项（.evt-tree）渲染");
+  ok(res.evtTreeNodeCount === 146, "Tab3 树形节点数 " + res.evtTreeNodeCount + "（预期 146）");
+  ok(res.modeEventFirst, "Tab3 模式②左侧为经济事项树（左右反转）");
+  ok(res.evtCardChecks > 0, "Tab3 模式②规则卡带勾选（.evt-card-check）" + res.evtCardChecks + " 个");
+  ok(res.modeEventRowSelected, "Tab3 模式②点击事项节点后高亮选中");
+  ok(/绑定/.test(res.modeEventCounter || ""), "Tab3 模式②计数显示绑定数 => " + res.modeEventCounter);
   ok(res.evtVerSel, "Tab3 版本切换器（.evt-ver-sel）存在");
   ok(res.evtVerOpts >= 1, "Tab3 版本切换器含 " + (res.evtVerOpts || 0) + " 个版本选项");
   ok(res.evtToolbar, "Tab3 工具栏（.evt-toolbar）渲染");

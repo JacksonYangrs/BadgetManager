@@ -1060,8 +1060,8 @@
 .se-row { display: flex; gap: 10px; padding: 4px 0; font-size: 13px; }
 .se-k { color: var(--c-text-2); flex: 0 0 72px; }
 .se-v { font-weight: 600; }
-/* ---------- 预算规则 · 适用经济事项（横版规则卡 + 注释框 + 经济事项，2026-08-26） ---------- */
-.evt-map { display: flex; flex-direction: column; gap: 16px; }
+/* ---------- 预算规则 · 适用经济事项（横版规则卡 + 注释框 + 经济事项，2026-08-26；RK1 改双栏可切换，2026-09-04） ---------- */
+.evt-map { display: flex; flex-direction: row; gap: 16px; align-items: flex-start; }
 .evt-cards {
   display: flex; flex-direction: row; gap: 12px;
   overflow-x: auto; overflow-y: hidden;
@@ -1102,6 +1102,48 @@
 .evt-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px; max-height: 420px; overflow: auto; padding: 4px; border: 1px solid var(--c-border); border-radius: 10px; background: var(--c-surface-2); }
 .evt-check { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 3px; cursor: pointer; }
 .evt-check input { accent-color: var(--c-accent); }
+
+/* ---------- RK1 · 绑定视角切换器 + 双栏 + 树形经济事项（2026-09-04） ---------- */
+.evt-mode-sel { display: inline-flex; border: 1px solid var(--c-border); border-radius: 8px; overflow: hidden; }
+.evt-mode-btn {
+  padding: 6px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  background: var(--c-surface); color: var(--c-text-2); border: none;
+}
+.evt-mode-btn + .evt-mode-btn { border-left: 1px solid var(--c-border); }
+.evt-mode-btn.active { background: var(--c-primary); color: #fff; }
+.evt-panel { min-width: 0; }
+.evt-cards-panel { flex: 0 0 240px; }
+.evt-tree-panel { flex: 1 1 auto; }
+.evt-panel-title { font-size: 13px; font-weight: 700; color: var(--c-text-2); margin-bottom: 8px; }
+/* 规则卡竖排（RK1 双栏内） */
+.evt-cards-col { flex-direction: column; overflow: visible; padding: 0; margin: 0; gap: 8px; }
+.evt-cards-col .scope-card { flex: none; min-width: 0; max-width: none; width: 100%; padding: 10px 12px; }
+.evt-cards-col .scope-card.bound { border-color: var(--c-primary); box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15); }
+.evt-card-check { margin-right: 8px; accent-color: var(--c-primary); }
+/* 树形经济事项 */
+.evt-tree {
+  max-height: 460px; overflow: auto;
+  border: 1px solid var(--c-border); border-radius: 10px;
+  background: var(--c-surface-2); padding: 6px;
+}
+.evt-tree-node.collapsed > .evt-tree-children { display: none; }
+.evt-tree-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 6px; border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+.evt-tree-row:hover { background: var(--c-surface); }
+.evt-tree-row.selected { background: rgba(0, 60, 180, 0.08); }
+.evt-tree-toggle { width: 14px; text-align: center; color: var(--c-text-3); flex: 0 0 auto; font-size: 11px; }
+.evt-tree-check { flex: 0 0 auto; accent-color: var(--c-primary); }
+.evt-tree-name { flex: 1 1 auto; color: var(--c-text); line-height: 1.4; }
+.evt-tree-level {
+  font-size: 10px; color: var(--c-text-3); background: var(--c-surface);
+  border: 1px solid var(--c-border); border-radius: 4px; padding: 0 4px; margin-left: 6px;
+}
+@media (max-width: 860px) {
+  .evt-map { flex-direction: column; }
+  .evt-cards-panel { flex: 1 1 auto; width: 100%; }
+}
 
 /* ---------- 预算规则 · 适用经济事项 对照表（松哥 2026-08-24） ---------- */
 .evt-ver-bar {
@@ -1312,6 +1354,39 @@
   .kb-agg-box { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .kb-card-nums { gap: 10px; }
 }
+
+/* ---------- 预算跟踪 · 预算排行榜（RK2 · REQ-002） ---------- */
+.kb-rank {
+  border: 1px solid var(--c-border, #e5e7eb);
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: var(--c-surface, #fff);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+.kb-rank-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.kb-rank-title { font-size: 15px; font-weight: 700; color: var(--c-text, #111); }
+.kb-rank-sub { font-size: 12px; color: var(--c-muted, #6b7280); }
+.kb-rank-chart { display: flex; align-items: flex-end; gap: 14px; height: 150px; }
+.kb-rank-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
+.kb-rank-barwrap { width: 100%; max-width: 46px; height: 104px; display: flex; align-items: flex-end; }
+.kb-rank-bar { width: 100%; border-radius: 5px 5px 0 0; min-height: 6px; transition: height 0.2s; }
+.kb-rank-bar.danger { background: #d64545; }
+.kb-rank-bar.warn { background: #f59e0b; }
+.kb-rank-bar.near { background: #facc15; }
+.kb-rank-pct { font-size: 11px; font-weight: 700; margin-top: 5px; font-variant-numeric: tabular-nums; }
+.kb-rank-pct.danger { color: #d64545; }
+.kb-rank-pct.warn { color: #b76e00; }
+.kb-rank-pct.near { color: #a16207; }
+.kb-rank-name {
+  margin-top: 2px; font-size: 11px; color: var(--c-muted, #6b7280);
+  max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center;
+}
+.kb-rank-legend { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+.kb-lg { font-size: 11px; padding: 2px 10px; border-radius: 999px; font-weight: 600; color: #fff; }
+.kb-lg.lg-danger { background: #d64545; }
+.kb-lg.lg-warn { background: #f59e0b; }
+.kb-lg.lg-near { background: #facc15; color: #713f12; }
+.kb-rank-empty { padding: 8px 2px; font-size: 12.5px; color: var(--c-muted, #6b7280); }
 
 /* ---------- 预算规则 · Tab4 创建明年新规则（2026-08-25） ---------- */
 .create-next-head { margin: 8px 0 4px; padding: 10px 14px; border-radius: 10px; background: var(--c-surface-2); font-size: 13px; color: var(--c-text-2); }

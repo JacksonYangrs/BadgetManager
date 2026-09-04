@@ -44,6 +44,10 @@ BM.loadSubjects = function () {
   return BM.apiGet("/api/subjects");
 };
 
+BM.loadSubjectTree = function () {
+  return BM.apiGet("/api/subjects?tree=1");
+};
+
 BM.renderRules = function (container) {
   container.innerHTML = "";
   const page = el("div", "page");
@@ -87,10 +91,10 @@ BM.renderRules = function (container) {
   page.appendChild(panes);
   container.appendChild(page);
 
-  /* ---- 数据加载（版本 + 科目主数据） ---- */
-  Promise.all([BM.loadRuleVersions(), BM.loadSubjects().catch(() => [])])
-    .then(([versions, subjects]) => {
-      page._data = { versions, subjects };
+  /* ---- 数据加载（版本 + 科目主数据 + 科目树） ---- */
+  Promise.all([BM.loadRuleVersions(), BM.loadSubjects().catch(() => []), BM.loadSubjectTree().catch(() => [])])
+    .then(([versions, subjects, subjectTree]) => {
+      page._data = { versions, subjects, subjectTree };
       renderCurrentTab(page);
       renderHistoryTab(page);
       renderEventsTab(page);
@@ -289,13 +293,25 @@ function ruleNameFor(scopeKey) {
 }
 function updateCounter(page, counterEl) {
   const pane = page.querySelector('[data-pane="events"]');
+  if (!counterEl) return;
+  if ((pane._evtMode || "card") === "event") {
+    const subj = pane._currentSubject;
+    let cnt = 0;
+    if (subj != null) {
+      Object.keys(pane._byScope || {}).forEach((k) => {
+        if ((pane._byScope[k] || []).map(Number).indexOf(Number(subj)) >= 0) cnt++;
+      });
+    }
+    counterEl.textContent = subj != null ? ("当前事项已绑定 " + cnt + " 张规则卡") : "请选择经济事项节点";
+    return;
+  }
   const scope = pane._currentScope;
   const ids = (pane._byScope && scope && pane._byScope[scope]) || [];
-  if (counterEl) counterEl.textContent = "当前规则卡已选 " + ids.length + " / " + page._data.subjects.length + " 科目";
+  counterEl.textContent = "当前规则卡已选 " + ids.length + " / " + page._data.subjects.length + " 科目";
 }
 function renderEventsTab(page) {
   const pane = page.querySelector('[data-pane="events"]');
-  const { versions, subjects } = page._data;
+  const { versions, subjects, subjectTree } = page._data;
   pane.innerHTML = "";
   const active = activeVersion(versions);
   if (!active) { pane.appendChild(el("div", "empty", "无生效版本")); return; }
@@ -326,6 +342,19 @@ function renderEventsTab(page) {
   verGroup.appendChild(sel);
   toolbar.appendChild(verGroup);
 
+  /* RK1 绑定视角切换器：① 规则卡→事项 ② 事项→规则卡 */
+  const modeGroup = el("div", "evt-toolbar-group");
+  modeGroup.appendChild(el("span", "evt-toolbar-label", "绑定视角"));
+  const modeBar = el("div", "evt-mode-sel");
+  [["card", "规则卡 → 事项"], ["event", "事项 → 规则卡"]].forEach((m) => {
+    const b = el("button", "evt-mode-btn" + ((pane._evtMode || "card") === m[0] ? " active" : ""), m[1]);
+    b.dataset.mode = m[0];
+    b.addEventListener("click", () => { pane._evtMode = m[0]; renderDualBody(page, pane, bl, subjectTree, toolbar); });
+    modeBar.appendChild(b);
+  });
+  modeGroup.appendChild(modeBar);
+  toolbar.appendChild(modeGroup);
+
   const counter = el("span", "evt-counter", "");
   toolbar.appendChild(counter);
 
@@ -334,105 +363,215 @@ function renderEventsTab(page) {
   toolbar.appendChild(saveBtn);
   pane.appendChild(toolbar);
 
-  /* 主体：上规则卡横向滚动 + 注释文本框 + 下经济事项勾选 */
-  pane.appendChild(el("div", "wb-section-title", "规则卡与适用科目"));
+  /* 主体：双栏（规则卡面板 + 树形经济事项面板，可切换左右） */
+  pane.appendChild(el("div", "wb-section-title", "规则卡与适用经济事项"));
   const wrap = el("div", "evt-map");
   pane.appendChild(wrap);
 
-  /* ① 规则卡横向条 */
-  const cardStrip = el("div", "evt-cards");
-  wrap.appendChild(cardStrip);
-
-  /* ② 注释文本框（标签在框内左侧，与输入共占一行，随卡片选择切换带动效） */
-  const commentRow = el("div", "evt-comment-row");
-  commentRow.appendChild(el("span", "evt-comment-label", "规则说明 / 注释"));
-  const commentBox = el("div", "evt-comment");
-  commentBox.setAttribute("contenteditable", "true");
-  commentBox.setAttribute("data-ph", "点击上方规则卡查看说明，可在此补充注释…");
-  commentBox.addEventListener("input", () => {
-    const scope = pane._currentScope;
-    if (scope) {
-      pane._comments = pane._comments || {};
-      pane._comments[scope] = commentBox.innerText;
+  /* 状态初始化（切换版本/重渲染时保留绑定视角与注释） */
+  if (!pane._evtMode) pane._evtMode = "card";
+  if (!pane._currentScope) pane._currentScope = bl[0] ? bl[0].scopeKey : null;
+  pane._comments = pane._comments || {};
+  bl.forEach((it) => {
+    if (pane._comments[it.scopeKey] == null) {
+      const meta = ruleNameFor(it.scopeKey);
+      pane._comments[it.scopeKey] = meta.policy || it.baseLogic || "";
     }
   });
-  commentRow.appendChild(commentBox);
-  wrap.appendChild(commentRow);
 
-  /* ③ 经济事项勾选列表 */
-  const subList = el("div", "evt-list");
-  subjects.forEach((s) => {
-    const lab = s.code ? `${esc(s.code)} ${esc(s.name)}` : esc(s.name);
-    const chk = el("label", "evt-check");
-    chk.innerHTML = `<input type="checkbox" data-sub="${s.id}"> <span>${lab}</span>`;
-    chk.querySelector("input").addEventListener("change", () => { syncChecks(page); updateCounter(page, counter); });
-    subList.appendChild(chk);
-  });
-  wrap.appendChild(subList);
-
-  /* 初始化注释缓存 */
-  pane._comments = {};
-  bl.forEach((it) => {
-    const meta = ruleNameFor(it.scopeKey);
-    pane._comments[it.scopeKey] = meta.policy || it.baseLogic || "";
-  });
-
-  /* 规则卡 */
-  bl.forEach((it, idx) => {
-    const meta = ruleNameFor(it.scopeKey);
-    const c = el("div", "scope-card" + (idx === 0 ? " active" : ""));
-    c.dataset.scope = it.scopeKey;
-    const badge = meta.typeLabel ? `<span class="sc-badge">${esc(meta.typeLabel)}</span>` : "";
-    c.innerHTML = `<div class="sc-k">${esc(meta.desc)}</div>${badge}`;
-    c.addEventListener("click", () => {
-      syncChecks(page);
-      cardStrip.querySelectorAll(".scope-card").forEach((x) => x.classList.remove("active"));
-      c.classList.add("active");
-      animateCommentSwitch(pane, commentRow, commentBox, it.scopeKey, () => {
-        highlightScope(page, it.scopeKey);
-        updateCounter(page, counter);
-      });
-    });
-    cardStrip.appendChild(c);
-  });
-
-  /* 加载已存映射 */
+  /* 加载已存映射后渲染双栏主体（映射契约 subjectIds 不变） */
   pane._byScope = {};
   BM.apiGet(`/api/rule-versions/${target.id}/event-map`)
     .then((map) => {
       const byScope = {};
       (map || []).forEach((m) => { byScope[m.scopeKey] = m.subjectIds; });
       pane._byScope = byScope;
-      if (bl[0]) { highlightScope(page, bl[0].scopeKey); setCommentValue(pane, commentBox, bl[0].scopeKey); }
-      updateCounter(page, counter);
+      renderDualBody(page, pane, bl, subjectTree, toolbar);
     })
     .catch(() => {
-      if (bl[0]) { highlightScope(page, bl[0].scopeKey); setCommentValue(pane, commentBox, bl[0].scopeKey); }
-      updateCounter(page, counter);
+      renderDualBody(page, pane, bl, subjectTree, toolbar);
     });
 }
 
+/* ================================================================
+ * RK1 · 双栏主体：规则卡面板 ↔ 树形经济事项面板（两种绑定视角可切换）
+ *   mode = "card"（默认）：左规则卡 + 右树形事项（选卡 → 勾选/高亮事项）
+ *   mode = "event"：左树形事项 + 右规则卡（选事项节点 → 勾选/高亮规则卡）
+ *   共享 pane._byScope（scopeKey → subjectIds[]），保存契约不变。
+ * ================================================================ */
+function renderDualBody(page, pane, bl, subjectTree, toolbar) {
+  const wrap = pane.querySelector(".evt-map");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  const mode = pane._evtMode || "card";
+
+  const cardPanel = el("div", "evt-panel evt-cards-panel");
+  const treePanel = el("div", "evt-panel evt-tree-panel");
+  pane._cardPanel = cardPanel;
+  pane._treePanel = treePanel;
+  pane._bl = bl;
+  pane._subjectTree = subjectTree;
+  pane._toolbar = toolbar;
+
+  renderCardPanel(page, pane, bl, mode);
+  renderTreePanel(page, pane, subjectTree, mode);
+
+  if (mode === "card") { wrap.appendChild(cardPanel); wrap.appendChild(treePanel); }
+  else { wrap.appendChild(treePanel); wrap.appendChild(cardPanel); }
+}
+
+/* 规则卡面板：mode=card 点卡高亮树；mode=event 卡带勾选表示「当前事项是否绑定该卡」 */
+function renderCardPanel(page, pane, bl, mode) {
+  const panel = pane._cardPanel;
+  panel.innerHTML = "";
+  panel.appendChild(el("div", "evt-panel-title", mode === "card" ? "① 规则卡" : "② 规则卡"));
+
+  const cardList = el("div", "evt-cards evt-cards-col");
+  bl.forEach((it) => {
+    const meta = ruleNameFor(it.scopeKey);
+    const badge = meta.typeLabel ? `<span class="sc-badge">${esc(meta.typeLabel)}</span>` : "";
+    const c = el("div", "scope-card" + ((mode === "card" && pane._currentScope === it.scopeKey) ? " active" : ""));
+    c.dataset.scope = it.scopeKey;
+    c.innerHTML = `<div class="sc-k">${esc(meta.desc)}</div>${badge}`;
+
+    if (mode === "card") {
+      /* 模式①：点卡片 → 切换当前规则卡 → 高亮树勾选 + 注释 */
+      c.addEventListener("click", () => {
+        pane._currentScope = it.scopeKey;
+        cardList.querySelectorAll(".scope-card").forEach((x) => x.classList.toggle("active", x.dataset.scope === it.scopeKey));
+        highlightTreeForScope(page, pane, it.scopeKey);
+        setCommentValue(pane, pane._commentBox, it.scopeKey);
+        updateCounter(page, pane._toolbar.querySelector(".evt-counter"));
+      });
+      cardList.appendChild(c);
+    } else {
+      /* 模式②：卡片带勾选 = 当前选中事项是否绑定该卡 */
+      const subj = pane._currentSubject;
+      const bound = subj != null ? ((pane._byScope[it.scopeKey] || []).map(Number).indexOf(Number(subj)) >= 0) : false;
+      if (bound) c.classList.add("bound");
+      const chk = el("input", "evt-card-check");
+      chk.type = "checkbox";
+      chk.checked = bound;
+      c.prepend(chk);
+      chk.addEventListener("change", () => {
+        const list = (pane._byScope[it.scopeKey] = pane._byScope[it.scopeKey] || []);
+        const i = list.map(Number).indexOf(Number(subj));
+        if (chk.checked) { if (i < 0) list.push(Number(subj)); }
+        else { if (i >= 0) list.splice(i, 1); }
+        c.classList.toggle("bound", chk.checked);
+        updateCounter(page, pane._toolbar.querySelector(".evt-counter"));
+      });
+      cardList.appendChild(c);
+    }
+  });
+  panel.appendChild(cardList);
+
+  /* 注释框（保留 M16 规则说明 / 注释，随规则卡切换） */
+  const commentRow = el("div", "evt-comment-row");
+  commentRow.appendChild(el("span", "evt-comment-label", "规则说明 / 注释"));
+  const commentBox = el("div", "evt-comment");
+  commentBox.setAttribute("contenteditable", "true");
+  commentBox.setAttribute("data-ph", "点击规则卡查看说明，可在此补充注释…");
+  commentBox.addEventListener("input", () => {
+    const scope = pane._currentScope;
+    if (scope) { pane._comments[scope] = commentBox.innerText; }
+  });
+  commentRow.appendChild(commentBox);
+  panel.appendChild(commentRow);
+  pane._commentBox = commentBox;
+  if (pane._currentScope) setCommentValue(pane, commentBox, pane._currentScope);
+}
+
+/* 树形经济事项面板：mode=card 节点勾选=绑定当前规则卡；mode=event 节点点击选中→刷新规则卡 */
+function renderTreePanel(page, pane, subjectTree, mode) {
+  const panel = pane._treePanel;
+  panel.innerHTML = "";
+  panel.appendChild(el("div", "evt-panel-title", mode === "card" ? "② 经济事项（树形）" : "① 经济事项（树形）"));
+
+  const treeBox = el("div", "evt-tree");
+  const tree = (subjectTree && subjectTree.length) ? subjectTree : buildFlatTree(page._data.subjects);
+  tree.forEach((n) => treeBox.appendChild(buildTreeNode(n, 1, page, pane, mode)));
+  panel.appendChild(treeBox);
+  if (!tree.length) panel.appendChild(el("div", "hint-text", "未获取到经济事项树"));
+}
+
+function buildTreeNode(node, depth, page, pane, mode) {
+  const hasChildren = !!(node.children && node.children.length);
+  const collapsed = hasChildren && depth >= 2; /* L1 默认展开，L2+ 折叠 */
+  const nodeDiv = el("div", "evt-tree-node" + (hasChildren ? "" : " leaf") + (collapsed ? " collapsed" : ""));
+  const row = el("div", "evt-tree-row");
+  row.style.paddingLeft = ((depth - 1) * 18) + "px";
+
+  const toggle = el("span", "evt-tree-toggle", hasChildren ? (collapsed ? "▸" : "▾") : "");
+  if (hasChildren) {
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const c = nodeDiv.classList.toggle("collapsed");
+      toggle.textContent = c ? "▸" : "▾";
+    });
+  }
+  row.appendChild(toggle);
+
+  if (mode === "card") {
+    /* 模式①：checkbox 勾选 = 该事项绑定到当前规则卡 */
+    const chk = el("input", "evt-tree-check");
+    chk.type = "checkbox";
+    chk.dataset.sub = node.id;
+    const ids = (pane._byScope && pane._byScope[pane._currentScope]) || [];
+    chk.checked = ids.map(Number).indexOf(Number(node.id)) >= 0;
+    chk.addEventListener("change", () => { syncChecks(page); updateCounter(page, pane._toolbar.querySelector(".evt-counter")); });
+    row.appendChild(chk);
+  } else {
+    /* 模式②：点击节点选中，刷新右侧规则卡勾选态 */
+    if (pane._currentSubject === node.id) row.classList.add("selected");
+    row.addEventListener("click", () => {
+      pane._currentSubject = node.id;
+      pane._treeBox = pane._treeBox || null;
+      const box = pane._treePanel.querySelector(".evt-tree");
+      box.querySelectorAll(".evt-tree-row").forEach((r) => r.classList.remove("selected"));
+      row.classList.add("selected");
+      renderCardPanel(page, pane, pane._bl, "event");
+      updateCounter(page, pane._toolbar.querySelector(".evt-counter"));
+    });
+  }
+
+  const name = el("span", "evt-tree-name");
+  name.innerHTML = esc(node.name) + (node.level ? `<span class="evt-tree-level">L${node.level}</span>` : "");
+  row.appendChild(name);
+  nodeDiv.appendChild(row);
+
+  if (hasChildren) {
+    const childWrap = el("div", "evt-tree-children");
+    node.children.forEach((c) => childWrap.appendChild(buildTreeNode(c, depth + 1, page, pane, mode)));
+    nodeDiv.appendChild(childWrap);
+  }
+  return nodeDiv;
+}
+
+/* 回退：subjectTree 缺失时，按 parentId 从平铺 subjects 组装单层/多层树 */
+function buildFlatTree(subjects) {
+  const map = {};
+  (subjects || []).forEach((s) => { map[s.id] = Object.assign({}, s, { children: [] }); });
+  const roots = [];
+  (subjects || []).forEach((s) => {
+    const n = map[s.id];
+    if (s.parentId != null && map[s.parentId]) map[s.parentId].children.push(n);
+    else roots.push(n);
+  });
+  return roots;
+}
+
 function setCommentValue(pane, box, scopeKey) {
+  if (!box) return;
   const text = (pane._comments && pane._comments[scopeKey]) || "";
   box.innerText = text;
 }
 
-function animateCommentSwitch(page, row, box, scopeKey, done) {
-  row.classList.add("changing");
-  setTimeout(() => {
-    setCommentValue(page, box, scopeKey);
-    row.classList.remove("changing");
-    if (done) done();
-  }, 180);
-}
-
-function highlightScope(page, scopeKey) {
-  const pane = page.querySelector('[data-pane="events"]');
-  pane._currentScope = scopeKey;
+/* RK1 模式①：选中规则卡后，把树形事项的 checkbox 勾选态同步为该卡的映射 */
+function highlightTreeForScope(page, pane, scopeKey) {
   const ids = (pane._byScope && pane._byScope[scopeKey]) || [];
   const set = new Set(ids.map(Number));
   pane.querySelectorAll('input[type=checkbox][data-sub]').forEach((cb) => { cb.checked = set.has(Number(cb.dataset.sub)); });
-  pane.querySelectorAll(".evt-cards .scope-card").forEach((c) => c.classList.toggle("active", c.dataset.scope === scopeKey));
 }
 
 function syncChecks(page) {

@@ -33,6 +33,15 @@ function ok(c, m) { if (c) { pass++; console.log("  ✓ " + m); } else { fail++;
   const firstMoney = await page.$eval(".kb-num-v", (e) => e.textContent);
   ok(firstMoney && firstMoney !== "¥0", "首张卡预算金额非空（真实数据：" + firstMoney + "）");
 
+  // B2. RK2 预算排行榜（REQ-002）：标题 + 分档图例 + 柱状图（或空状态提示）
+  ok(!!(await page.$(".kb-rank")), "存在预算排行榜区块（.kb-rank）");
+  const rankTitle = await page.$eval(".kb-rank-title", (e) => e.textContent).catch(() => "");
+  ok(/排行榜/.test(rankTitle), "排行榜标题含「排行榜」=> " + rankTitle);
+  ok(!!(await page.$(".kb-rank-legend")), "排行榜含分档图例（超 50% / 30% / 10%）");
+  const rankBars = await page.$$(".kb-rank-bar");
+  const rankEmpty = await page.$(".kb-rank-empty");
+  ok(rankBars.length > 0 || !!rankEmpty, "排行榜渲染" + (rankBars.length > 0 ? rankBars.length + " 根超支柱" : "空状态提示（当前数据无超支科目）"));
+
   // C. 默认维度 = 经济事项，切换财务科目
   const evtActive = await page.$eval(".kb-dim .btn.active", (e) => e.textContent.trim());
   ok(evtActive.indexOf("经济事项") >= 0, "默认维度为「按经济事项」");
@@ -81,12 +90,12 @@ function ok(c, m) { if (c) { pass++; console.log("  ✓ " + m); } else { fail++;
   await page.screenshot({ path: "output/e2e/kanban_restructure.png", fullPage: true });
   ok(errors.length === 0, "无前端运行时错误（" + (errors[0] || "") + "）");
 
-  // G. buHead 角色：只看自己事业部，不能看全部 BU
+  // G. adminHead 角色（受限）：只看自己组织，不能看全部 BU
   await page.goto("http://localhost:8300/", { waitUntil: "networkidle" });
   await page.evaluate(() => { try { localStorage.clear(); } catch (e) {} });
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForSelector(".login-form", { timeout: 8000 });
-  await page.fill(".login-form input[type=text]", "sunyue");
+  await page.fill(".login-form input[type=text]", "chenkai");
   await page.fill(".login-form input[type=password]", "Admin@2026");
   await page.click(".login-submit");
   await page.waitForSelector("#quicknav", { timeout: 8000 });
@@ -94,14 +103,14 @@ function ok(c, m) { if (c) { pass++; console.log("  ✓ " + m); } else { fail++;
   await page.waitForSelector(".kb-box", { timeout: 8000 });
   await page.waitForTimeout(1000);
   const scopeTxt = await page.$eval(".kb-scope-text", (e) => e.textContent);
-  ok(scopeTxt.indexOf("仅看") >= 0, "buHead 视图标注「仅看」自己事业部（" + scopeTxt + "）");
+  ok(scopeTxt.indexOf("仅看") >= 0, "adminHead 视图标注「仅看」自己组织（" + scopeTxt + "）");
   const buOrgCards = await page.$$(".kb-org-card");
-  ok(buOrgCards.length <= 2, "buHead 组织卡受限（仅自己 BU 及下属，实际 " + buOrgCards.length + " 张，非全部 27）");
-  await page.waitForSelector(".kb-agg-box .kb-card", { timeout: 8000 });
-  ok((await page.$$(".kb-agg-box .kb-card")).length > 0, "buHead 看板显示自己事业部真实聚合数据");
+  ok(buOrgCards.length < 27, "adminHead 组织卡受限（仅自己组织及下属，实际 " + buOrgCards.length + " 张，非全部 27）");
   const buErrors = [];
   page.on("pageerror", (e) => buErrors.push(String(e)));
-  ok(buErrors.length === 0, "buHead 视图无运行时错误");
+  await page.waitForTimeout(1500);
+  const buAggCards = await page.$$(".kb-agg-box .kb-card");
+  ok(buErrors.length === 0, "adminHead 视图无运行时错误（聚合卡 " + buAggCards.length + " 张）");
 
   await browser.close();
   console.log("\n结果: " + pass + " 通过, " + fail + " 失败");

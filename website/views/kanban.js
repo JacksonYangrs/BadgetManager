@@ -49,10 +49,12 @@ BM.renderKanban = function (container) {
   const scopeBar = el("div", "kb-scope");
   const dimBar = el("div", "kb-dim");
   const grid = el("div", "kb-grid");
+  const rankBox = el("div", "kb-rank"); /* RK2 预算排行榜（卡片上方独立区块） */
   const box = el("div", "kb-box");
   box.appendChild(crumb);
   box.appendChild(scopeBar);
   box.appendChild(dimBar);
+  box.appendChild(rankBox); /* 排行榜置于维度卡 grid 之前 */
   box.appendChild(grid);
   page.appendChild(box);
 
@@ -117,8 +119,49 @@ BM.renderKanban = function (container) {
     }
   }
 
+  /* RK2 · 预算排行榜：按超支幅度分档（>50% 红 / >30% 橙 / >10% 黄），降序纵向柱状图。
+   * 数据与卡片同源（BM.kanbanAgg 的 devPct），随组织下钻 + 时间层级联动。
+   * 标题/图例始终渲染；无超支项时给出明确空状态（当前真实数据执行≈预算，暂无超支）。 */
+  function renderRank(groups) {
+    rankBox.innerHTML = "";
+    const over = (groups || []).filter((g) => g.devPct > 0).sort((a, b) => b.devPct - a.devPct);
+
+    const head = el("div", "kb-rank-head");
+    head.innerHTML = `<span class="kb-rank-title">🏆 预算排行榜</span><span class="kb-rank-sub">按超支幅度降序 · 随组织 / 期间联动（仅列超支项）</span>`;
+    rankBox.appendChild(head);
+
+    if (!over.length) {
+      rankBox.appendChild(el("div", "kb-rank-empty", "当前范围 / 期间暂无超支科目（执行未超预算）"));
+    } else {
+      const band = (pct) => (pct >= 50 ? "danger" : pct >= 30 ? "warn" : "near");
+      const chart = el("div", "kb-rank-chart");
+      const top = over.slice(0, 10);
+      const maxPct = Math.max(1, ...top.map((g) => g.devPct));
+      top.forEach((g) => {
+        const b = band(g.devPct);
+        const h = Math.round((g.devPct / maxPct) * 100);
+        const col = el("div", "kb-rank-col");
+        const barwrap = el("div", "kb-rank-barwrap");
+        const bar = el("div", "kb-rank-bar " + b);
+        bar.style.height = Math.max(6, h) + "%";
+        bar.title = g.key + " 超支 " + g.devPct + "%";
+        barwrap.appendChild(bar);
+        col.appendChild(barwrap);
+        col.appendChild(el("div", "kb-rank-pct " + b, "+" + g.devPct + "%"));
+        col.appendChild(el("div", "kb-rank-name", esc(g.key)));
+        chart.appendChild(col);
+      });
+      rankBox.appendChild(chart);
+    }
+
+    const legend = el("div", "kb-rank-legend");
+    legend.innerHTML = `<span class="kb-lg lg-danger">超 50%</span><span class="kb-lg lg-warn">超 30%</span><span class="kb-lg lg-near">超 10%</span>`;
+    rankBox.appendChild(legend);
+  }
+
   function renderGrid() {
     grid.innerHTML = "";
+    rankBox.innerHTML = "";
     Object.keys(dimBtns).forEach((k) => dimBtns[k].classList.toggle("active", k === state.dim));
 
     /* 组织视角：先列组织子节点（可下钻），再列当前维度聚合卡 */
@@ -167,6 +210,7 @@ BM.renderKanban = function (container) {
         if (grid.querySelector(".kb-agg-box") !== aggBox) return;
         aggBox.innerHTML = "";
         const groups = BM.kanbanAgg(items, state.period, state.dim);
+        renderRank(groups); /* RK2 排行榜：与卡片同源，随组织/期间联动 */
         if (!groups.length) { aggBox.appendChild(el("div", "empty", "当前范围无预算数据")); return; }
         groups.forEach((g) => {
           const ratePct = Math.min(100, g.rate);

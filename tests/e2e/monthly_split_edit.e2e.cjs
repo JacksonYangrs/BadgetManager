@@ -17,6 +17,11 @@ function ok(c, m) { if (c) { pass++; console.log("  ✓ " + m); } else { fail++;
   await page.click("#quicknav .qn-btn:has-text(\"预算编制\")");
   await page.waitForSelector(".cmp-apply", { timeout: 8000 });
 
+  // 先给第一个事项填预算值，确保月度拆分页 total > 0（真实数据经济事项 amount 初始为 0）
+  const firstApply = page.locator(".cmp-apply").first();
+  await firstApply.fill("5000000");
+  await page.waitForTimeout(300);
+
   // 进第一个事项的月度分解
   await page.waitForSelector("button:has-text(\"月度拆分\")", { timeout: 8000 });
   await page.click("button:has-text(\"月度拆分\") >> nth=0");
