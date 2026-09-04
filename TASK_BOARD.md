@@ -32,6 +32,7 @@
 ---
 
 | M18 | **db.js God Object 解构（工程重构）** | 松哥拍板"按业务拆成不同文件"。把 1435 行 `server/db.js`（77 函数单点耦合枢纽）拆为 11 文件：9 业务模块（`server/modules/`：organization/auth/subjects/events/budget-compile/budget-execution/rules/ai-policy-extract/notifications）+ AI 三件套（ai-gateway 占位 LLM 网关 / ai-budget-decision 决策分析 / 费控导入 expense-import 从 import_module.js 迁入）；`db.js` 退化为组合根，仅 `Object.assign` 合并 ≥91 个导出，公开 API 不变。`aiSuggestion` 下沉到 ai-budget-decision（内部依赖，不进根）。配套新测试 `tests/integration/db-interface.test.cjs` 锁定接口。**顺带修复前端 bug**：`website/core/state.js` 演示通道 BASE 误含 `importView`（与 389 行注释"不作为菜单项"矛盾），致 `roleViews('staff')` 多出一个菜单项，已移除。 | 单元 124/0、集成 API 7/0、接口回归 12/0、e2e 3/0，全绿（08-26） |
+| M19 | **前端上帝文件拆分重构（方案 A）** | 松哥令「审计过 600 行 / 紧耦合 / 模块未文件级对应」→ 拍板**方案 A**（保持 BM 命名空间、按职责域拆分 + IIFE 隔离、不改 40+ 视图 BM.xxx 调用、预留 ES Module 边界）。**影响评估 + 规格**：`docs/plans/2026-09-04-前端上帝文件拆分重构设计.md`。**拆分**：`data/data.js`(1486)→5 文件（organization/budget/transactions/rules-engine/kanban）；`core/state.js`(803)→3 文件（state 核心 / access 查询权限 / actions 业务动作，access+actions 内 `state.`→`BM.state.`）；`views/plan.js`(1120)→4 文件（plan 主入口 + plan-topdown/bottomup/client 经 `BM.plan.*` 子命名空间共享）；`views/dashboard.js`(653)→整文件 IIFE（不拆）；`views/rules.js`(829) 已 IIFE 不动。原 data.js 删除。**加载清单同步**：`index.html` + `tests/unit/harness.js` + 4 个 `website/tests/smoke_*.js`。**回归全绿**：单测 124/0、smoke 4/4、集成 69/0、E2E 真机 smoke 3/0 + rules_event_map 22/0 + wb-home-diff 21/0 + role-convergence 22/0 + basedata_tree 10/0（v1.5.3） | 前端拆分零回归（09-04） |
 
 ---
 
@@ -62,4 +63,10 @@
 2. **O2**：预算执行数据录入 UI（`PUT /api/executions` 后端已有，前端表单待补）。
 3. ~~测试卫生遗留~~ ✅ **已修复（v1.5.2）**：`p02_fetch_convergence_regression.e2e.cjs` 原连开发库（共享 8300）跑写操作会污染真实数据 + 潜在 SQLITE_BUSY；已改为自启独立后端（端口 8403 + 独立临时 DB_FILE，模式同 role-convergence），35/0 全绿，开发库零污染。
 
-**⚠️ 系统性隐患（建议后续排期）**：各视图是经典 `<script>`（非 module），顶层 `function` 声明会污染全局，`index.html` 后加载的文件覆盖先加载的同名函数。本次 `renderEventsTab` 冲突已用 IIFE 修掉；`el`/`esc`/`companyName` 等同名是逻辑一致的副本（无害）。但同类地雷仍可能在其他视图间出现——建议统一把视图文件改为 IIFE 包裹或 ES Module，从根上消除全局污染。
+**⚠️ 系统性隐患（已于 v1.5.3 闭环）**：各视图是经典 `<script>`（非 module），顶层 `function` 声明会污染全局，`index.html` 后加载的文件覆盖先加载的同名函数。本次 `renderEventsTab` 冲突已用 IIFE 修掉。**2026-09-04 已按方案 A 把 3 个上帝文件（data/state/plan）拆分 + dashboard IIFE 隔离，从根上消除全局污染**（见 M19）。剩余：`app.js` 及部分小视图仍是顶层裸函数，可后续随 ES Module 迁移一并收编。
+
+**🔧 4 个陈旧 E2E（2026-09-04 发现，非拆分引入，属 08-23/24 导航收敛遗留，待修）**：
+1. `compile_dynamic_advice.e2e.cjs` — stale 导航选择器「新预算编制」→ 现为「预算编制」。
+2. `kanban_restructure.e2e.cjs` — stale 导航「预算看板」→ 现为「预算跟踪」。
+3. `rules_grouping.e2e.cjs` — 注入 token 后未设 `BM.state.loggedIn=true`，`openView('rules')` 提前返回，`.rule-group` 永不出现。
+4. `create_next_rule.e2e.cjs` — stale 标题断言「预算规则管理」→ 现为「预算规划」（18 通过 / 1 失败）。

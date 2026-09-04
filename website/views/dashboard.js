@@ -1,11 +1,12 @@
 /* ================================================================
- * dashboard.js — 预算总览看板（v0.2：支持角色数据范围）
+ * views/dashboard.js — 预算总览看板（v0.2：支持角色数据范围）
  * ceo/cooLead/cooAnalyst：全局；adminHead/expense：本公司/本人口径
+ * 迁移自 views/dashboard.js（2026-09-04：整文件包 IIFE 隔离，不拆分）
+ * 说明：15 个顶层函数迁入 IIFE 私有作用域；对外仅 BM.renderDashboard 不变。
  * ================================================================ */
 
+(function () {
 var BM = window.BM || {};
-
-
 
 /* 当前范围描述 */
 function scopeInfo() {
@@ -651,3 +652,4 @@ function renderCenterBody(page, scope) {
 
 window.BM.renderDashboard = renderDashboard;
 window.BM = BM;
+})();

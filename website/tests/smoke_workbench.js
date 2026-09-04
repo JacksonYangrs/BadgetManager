@@ -86,9 +86,15 @@ function assert(name, cond) {
 }
 
 try {
-  load("data/data.js");
+  load("data/organization.js");
+  load("data/budget.js");
+  load("data/transactions.js");
+  load("data/rules-engine.js");
+  load("data/kanban.js");
   load("core/utils.js");
   load("core/state.js");
+  load("core/access.js");
+  load("core/actions.js");
   load("core/api.js");
   load("views/workbench.js");
 

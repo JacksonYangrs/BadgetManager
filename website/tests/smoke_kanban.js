@@ -63,9 +63,15 @@ function load(file) {
 
 let errs = [];
 try {
-  load("data/data.js");
+  load("data/organization.js");
+  load("data/budget.js");
+  load("data/transactions.js");
+  load("data/rules-engine.js");
+  load("data/kanban.js");
   load("core/utils.js");
   load("core/state.js");
+  load("core/access.js");
+  load("core/actions.js");
   load("core/engine.js");
   load("core/calc.js");
   load("views/details.js");   // track 依赖 BM.filterDetails

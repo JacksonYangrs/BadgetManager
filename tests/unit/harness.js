@@ -25,12 +25,18 @@ global.document = {
   body: { appendChild() {} },
 };
 
-/* ---------- 加载顺序：data → utils → calc → state → engine ---------- */
+/* ---------- 加载顺序：data → utils → calc → state → access → actions → engine ---------- */
 const ROOT = path.resolve(__dirname, "../../website");
-require(path.join(ROOT, "data/data.js"));      // BM.CATEGORIES / DEPTS / ROLES / PROJECTS ...
+require(path.join(ROOT, "data/organization.js"));
+require(path.join(ROOT, "data/budget.js"));
+require(path.join(ROOT, "data/transactions.js"));
+require(path.join(ROOT, "data/rules-engine.js"));
+require(path.join(ROOT, "data/kanban.js"));
 require(path.join(ROOT, "core/utils.js"));     // BM.el / esc / money / fmtMoney（共享工具内核）
 require(path.join(ROOT, "core/calc.js"));       // BM.calc.*
-require(path.join(ROOT, "core/state.js"));      // BM.getCat* / roleViews / requestPurchase ...
+require(path.join(ROOT, "core/state.js"));      // 状态核心 + BM.state / loadState / saveState / resetState
+require(path.join(ROOT, "core/access.js"));     // BM.getCat* / roleViews / scoped* ...
+require(path.join(ROOT, "core/actions.js"));    // BM.approveDoc / requestPurchase / ...
 require(path.join(ROOT, "core/engine.js"));     // BM.engineReply
 
 const BM = global.window.BM;
