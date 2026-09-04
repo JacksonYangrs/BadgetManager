@@ -44,13 +44,13 @@ async function check(name, fn) {
     }
   });
 
-  await check("account_subject 层级分布 = L1(18种子+6旧)/L2=64/L3=58/L4=6", () => {
+  await check("account_subject 层级分布 = L1=18/L2=64/L3=58/L4=6", () => {
     const cnt = (lv) => db.prepare("SELECT COUNT(*) AS c FROM account_subject WHERE level = ?").get(lv).c;
     assert.strictEqual(cnt(2), 64, "L2 节点数应为 64");
     assert.strictEqual(cnt(3), 58, "L3 节点数应为 58");
     assert.strictEqual(cnt(4), 6, "L4 节点数应为 6");
-    // L1 = 18 种子大类 + 6 个旧平铺 demo 科目（migrateSubjects 生成的 6602.x）
-    assert.strictEqual(cnt(1), 24, "L1 节点数应为 18(种子) + 6(旧demo) = 24");
+    // L1 = 18 种子大类（旧 6 demo 科目已随清理删除）
+    assert.strictEqual(cnt(1), 18, "L1 节点数应为 18");
   });
 
   await check("4 级示例「人工/人事费/中介服务费/普通中介费用」关系正确", () => {

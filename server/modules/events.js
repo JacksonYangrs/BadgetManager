@@ -2,21 +2,11 @@
 const { decomposeMonthly } = require("../pure-calc");
 const { aiSuggestion } = require("./ai-budget-decision");
 const { getSubject } = require("./subjects");
-const { compileBaseline } = require("./rules");
 const fs = require("fs");
 const path = require("path");
 
 /* 与 subjects.seedSubjectTree 共用同一份 seed（叶子经济事项段） */
 const SUBJECT_SEED_FILE = path.join(__dirname, "..", "seeds", "subject-tree.json");
-
-const SEEDS = [
-  { cat: "总办办公费", acct_code: "6602.11", type: "down5",   last_budget: 1320000, last_year: 1200000, method: "manageStd" },
-  { cat: "食堂费用",   acct_code: "6602.12", type: "canteen", last_budget: 3960000, last_year: 3600000, method: "manageStd" },
-  { cat: "宿舍费用",   acct_code: "6602.13", type: "dorm",    last_budget: 2310000, last_year: 2100000, method: "manageStd" },
-  { cat: "差旅费",     acct_code: "6602.14", type: "revenue", last_budget: 1980000, last_year: 1800000, method: "volume" },
-  { cat: "绿化费",     acct_code: "6602.15", type: "green",   last_budget: 528000,  last_year: 480000,  method: "qtyPrice" },
-  { cat: "按实际预算类", acct_code: "6602.99", type: "actual", last_budget: null,   last_year: null,    method: "manual" },
-];
 
 /* ---------- 初始化 ---------- */
 
@@ -162,29 +152,13 @@ function seedEventLeaves(db) {
   return { ok: true, events: events.length, inserted, unmounted };
 }
 
-/* 种子：首次初始化时把样例经济事项写入（RULE_FACTORS 此时尚未加载，走硬编码因子口径） */
-function seedEvents(db) {
-  const count = db.prepare("SELECT COUNT(*) AS c FROM economic_event").get().c;
-  if (count !== 0) return count;
-  const ins = db.prepare(
-    "INSERT INTO economic_event (cat, acct_code, amount, monthly, last_budget, last_year, method, ai, sort_no) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-  );
-  SEEDS.forEach((s, i) => {
-    const base = compileBaseline(s.method, s.type, s.last_year);
-    ins.run(s.cat, s.acct_code, base, JSON.stringify(decomposeMonthly(base)), s.last_budget, s.last_year, s.method, JSON.stringify(aiSuggestion(s.cat, s.type, s.last_year)), i);
-  });
-  return SEEDS.length;
-}
-
 module.exports = {
-  SEEDS,
   createEvent,
   deleteEvent,
   getEvent,
   listEvents,
   rowToEvent,
   seedEventLeaves,
-  seedEvents,
   updateAmount,
   updateEvent,
   updateMonthly,

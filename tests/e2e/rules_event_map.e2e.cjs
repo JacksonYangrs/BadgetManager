@@ -133,7 +133,7 @@ async function login(page, username, password) {
   ok(res.activeDelDisabled, "Tab2 active 行删除按钮已禁用（守卫）");
   ok(res.evtMap, "Tab3 .evt-map 渲染");
   ok(res.evtCards > 0, "Tab3 左侧规则卡 " + res.evtCards + " 张");
-  ok(res.checks === 206, "Tab3 科目勾选 " + res.checks + "（预期 206）");
+  ok(res.checks === 146, "Tab3 科目勾选 " + res.checks + "（预期 146）");
   ok(res.evtVerSel, "Tab3 版本切换器（.evt-ver-sel）存在");
   ok(res.evtVerOpts >= 1, "Tab3 版本切换器含 " + (res.evtVerOpts || 0) + " 个版本选项");
   ok(res.evtToolbar, "Tab3 工具栏（.evt-toolbar）渲染");

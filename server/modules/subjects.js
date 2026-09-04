@@ -23,33 +23,18 @@ function rowToSubject(row) {
   };
 }
 
-/* 幂等迁移：从 economic_event.acct_code 去重生成 account_subject，并回填 subject_id；
- * 同时给旧库平铺科目补齐 level/path（挂到树根，建立 parent_id/level/path 关系）。 */
-
+/* 幂等清理：删除旧平铺科目（code 纯数字 = M6 费控会计科目）及其挂载的旧经济事项。
+ * 这些过渡数据已被 seedSubjectTree(146 树) + seedEventLeaves(300 叶子) 替代。 */
 function migrateSubjects(db) {
-  const cnt = db.prepare("SELECT COUNT(*) AS c FROM account_subject").get().c;
-  if (cnt === 0) {
-    const rows = db.prepare(
-      "SELECT acct_code, MAX(center) AS center, MAX(method) AS method FROM economic_event WHERE acct_code IS NOT NULL AND acct_code != '' GROUP BY acct_code ORDER BY acct_code"
-    ).all();
-    const ins = db.prepare(
-      "INSERT INTO account_subject (code, name, cat, center, method, control_logic, sort_no) VALUES (?, ?, ?, ?, ?, ?, ?)"
-    );
-    rows.forEach((r, i) => {
-      ins.run(r.acct_code, r.acct_code, r.acct_code, r.center, r.method, "", i);
-    });
-    // 回填 subject_id
-    const subs = db.prepare("SELECT id, code FROM account_subject").all();
-    const map = {};
-    subs.forEach((s) => (map[s.code] = s.id));
-    const evs = db.prepare("SELECT id, acct_code FROM economic_event").all();
-    const upd = db.prepare("UPDATE economic_event SET subject_id = ? WHERE id = ?");
-    evs.forEach((e) => {
-      if (e.acct_code && map[e.acct_code] != null) upd.run(map[e.acct_code], e.id);
-    });
+  const oldSubjects = db.prepare("SELECT id FROM account_subject WHERE code GLOB '[0-9]*'").all();
+  let removedEvents = 0;
+  const delEv = db.prepare("DELETE FROM economic_event WHERE subject_id = ?");
+  const delSub = db.prepare("DELETE FROM account_subject WHERE id = ?");
+  for (const s of oldSubjects) {
+    removedEvents += delEv.run(s.id).changes;
+    delSub.run(s.id);
   }
-  // 幂等 backfill：旧平铺科目无 level/path → 挂树根（level=1, path=name, parent_id 保持 NULL）
-  db.prepare("UPDATE account_subject SET level = 1, path = name WHERE level IS NULL OR path IS NULL").run();
+  return { ok: true, removedSubjects: oldSubjects.length, removedEvents };
 }
 
 /* 幂等 seed：把 4 级分类树写入 account_subject（建 parent_id/level/path 关系）。可重复执行不重复插入。 */

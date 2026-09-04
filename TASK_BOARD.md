@@ -41,8 +41,9 @@
 |---|---|---|---|
 | O1 | 2 家公司 BU 推断纠偏 | ⚪ 待启动 | 2170 泉州三安半导体、2160 厦门三安半导体被 `inferBuCode` 错归 BU-09 光通讯；可在「基础数据 → 组织架构」UI 改 `bu_code`（运行时已推断初值，松哥可纠偏） |
 | O2 | 预算执行数据录入 UI | ⚪ 待启动 | `PUT /api/executions` 已有后端，前端录入表单待补（之前拍板「先只接数据层+种子」，表单列为后续迭代） |
+| D3 | 内网/专网部署 · LLM 出口申请 | ⚪ 待启动 | 松哥 2026-09-02 记录：**内网部署需申请「调用 LLM 的出口」**——内网环境默认不通外网，AI Copilot / 费用诊断 / 规则引擎等 LLM 能力依赖外部大模型 API，须先申请出口放行才能跑通。关联 §0「财务数据披露前很机密」→ D3 专网部署方向，作为部署前置条件排进 D3 实施清单 |
 | R1–R7 | **角色模型重构（14 角色收敛）** | ✅ T1–T6b 全部完成 · 全量回归绿 | 松哥 2026-09-02 拍板「决策二 = A 完整重构 14 角色」。**已完成**：T1 后端角色收敛（9 code + 幂等迁移）、T2 权限闸门、T3 前端字典、T4 状态闸门、T5 切换器/登录、**T6a 桌面端 ~50 处旧角色死分支清理**、**T7 回归 E2E 22/0**（`role-convergence.e2e.cjs`）。**顺手修 F1**：`views/roleSwitch.js` 孤儿文件未接线 → 加入 `index.html` + `app.js` 实现 `BM.switchRole`（轻量切换，写回 centerId/expenseType/scopeCompany）+ roleLabel 点击入口 + `refreshRoleLabel` 改用当前激活角色名；新增回归 `smoke_roleswitch.js`（11/0）。**T6b wb-home 差异化首页**：`workbench.js` 的 `renderHome` 重构为 5 层骨架（hello 9 分支责任叙事 → roleHint → 预算业务提醒 → scope 分组专属面板 → AI 关注），总览卡接真实表 `/api/workbench-overview`、roleTips 走 Copilot 动态接口（`/api/copilot/ask`）+ 降级占位；新增 `smoke_workbench.js`（40/0）+ `wb-home-diff.e2e.cjs`（21/0） |
-| E1–E6 | **经济事项 4 级分类重构** | ✅ 开发完成 · 验收通过 · 1 项 major 遗留 | 松哥 2026-09-02 令：经济事项 1 级 → 4 级（方案 A 拍板）。后端 account_subject 加 level/path 建 4 级树（146 节点 L1=18/L2=64/L3=58/L4=6）+ 叶子经济事项 300；抽取脚本 `scripts/extract_subject_tree.py` → `server/seeds/subject-tree.json`；`GET /api/subjects?tree=1`；前端 `basedata.js` 树形 + 级联表单；测试 seed-integrity 10/0 + basedata_tree.e2e 10/0 真机 + 修 3 陈旧 E2E。全量零回归。**语义修正**：费用类型可挂中间科目节点（全库仅「物料消耗」1 条）。**遗留 major**：科目数不稳定（全新库 152 vs 开发库 206，`migrateSubjects` 不清旧平铺残留，待清理） |
+| E1–E6 | **经济事项 4 级分类重构** | ✅ 开发完成 · 验收通过 · 遗留 major 已清理 | 松哥 2026-09-02 令：经济事项 1 级 → 4 级（方案 A 拍板）。后端 account_subject 加 level/path 建 4 级树（146 节点 L1=18/L2=64/L3=58/L4=6）+ 叶子经济事项 300；抽取脚本 `scripts/extract_subject_tree.py` → `server/seeds/subject-tree.json`；`GET /api/subjects?tree=1`；前端 `basedata.js` 树形 + 级联表单；测试 seed-integrity 10/0 + basedata_tree.e2e 10/0 真机 + 修 3 陈旧 E2E。全量零回归。**语义修正**：费用类型可挂中间科目节点（全库仅「物料消耗」1 条）。**遗留 major（2026-09-04 已清理）**：科目数不稳定 → 松哥拍板「删旧保新」（真实金额表 unit_budget/budget_execution 后面重新导入），删 60 旧平铺费控科目 + 81 旧事项 + 6 demo 样例 seed，科目数稳定为 **146 树 / 300 事项**（v1.5.1） |
 
 ---
 
@@ -55,10 +56,10 @@
 
 ## 四、下一步建议
 
-**角色模型重构（R1–R7）与经济事项 4 级分类重构（E1–E6）均已交付**（2026-09-02）。当前可选后续：
+**角色模型重构（R1–R7）与经济事项 4 级分类重构（E1–E6，含遗留 major 清理）均已交付**（2026-09-02 / 09-04）。当前可选后续：
 
-1. **遗留 major（建议优先）**：清理 `account_subject` 旧平铺残留科目，使科目数稳定（全新库 152 vs 开发库 206）。根因 `migrateSubjects` 只 backfill 不清旧平铺，需确认旧 demo 科目是否删除/合并进树（涉及删历史演示数据，需松哥点头）。
-2. **O1**：2 家公司 BU 推断纠偏。
-3. **O2**：预算执行数据录入 UI。
+1. **O1**：2 家公司 BU 推断纠偏（2170/2160 错归 BU-09 光通讯）。
+2. **O2**：预算执行数据录入 UI（`PUT /api/executions` 后端已有，前端表单待补）。
+3. **测试卫生遗留**：`tests/e2e/p02_fetch_convergence_regression.e2e.cjs:72` 新增经济事项后不清理且连开发库（共享 8300），会污染开发库留 `subject_id=null` 残留；应改为独立 DB_FILE + 用例后清理。
 
 **⚠️ 系统性隐患（建议后续排期）**：各视图是经典 `<script>`（非 module），顶层 `function` 声明会污染全局，`index.html` 后加载的文件覆盖先加载的同名函数。本次 `renderEventsTab` 冲突已用 IIFE 修掉；`el`/`esc`/`companyName` 等同名是逻辑一致的副本（无害）。但同类地雷仍可能在其他视图间出现——建议统一把视图文件改为 IIFE 包裹或 ES Module，从根上消除全局污染。
